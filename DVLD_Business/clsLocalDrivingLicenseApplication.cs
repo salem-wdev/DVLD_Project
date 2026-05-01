@@ -11,7 +11,10 @@ namespace DVLD_Business
 {
     public class clsLocalDrivingLicenseApplication : clsApplication
     {
-        
+        public enum enMode { AddNew = 0, Update = 1 }
+
+        public enMode Mode { get; protected set; } = enMode.AddNew;
+
         public int LocalDrivingLicenseApplicationID { set; get; }
         public int LicenseClassID { set; get; }
         public clsLicenseClass LicenseClassInfo;
@@ -122,6 +125,7 @@ namespace DVLD_Business
             //it will take care of adding all information to the application table.
             if (!base.Save())
                 return false;
+
 
 
             //After we save the main application now we save the sub application.
