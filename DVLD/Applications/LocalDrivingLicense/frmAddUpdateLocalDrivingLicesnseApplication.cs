@@ -228,7 +228,7 @@ namespace DVLD.Applications.Local_Driving_License
         {
             _FillApplicationWithData();
 
-            if (_Mode == enMode.AddNew && clsApplication.DoesPersonHaveActiveApplication(_LocalLicenseApplication.ApplicantPersonID, (int)_LocalLicenseApplication.ApplicationTypeID))
+            if (_Mode == enMode.AddNew && _LocalLicenseApplication.GetActiveApplicationID((clsApplication.enApplicationType)cbLicenseClass.SelectedValue) != -1)
             {
                 MessageBox.Show("The selected person already has an active application of this type.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
