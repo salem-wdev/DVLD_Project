@@ -78,5 +78,11 @@ namespace DVLD
 
         }
 
+        public static bool IsValidCharForID(char ID_Digit)
+        {
+            return char.IsDigit(ID_Digit) || char.IsControl(ID_Digit);
+
+        }
+
     }
 }
