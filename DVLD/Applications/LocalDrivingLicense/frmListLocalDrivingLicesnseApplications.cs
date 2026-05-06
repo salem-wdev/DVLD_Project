@@ -104,5 +104,96 @@ namespace DVLD.Applications.LocalDrivingLicense
             frm.Show();
             _RefreshData();
         }
+
+        private void txtFilterValue_TextChanged(object sender, EventArgs e)
+        {
+            string filterBy = cbFilterBy.SelectedItem.ToString();
+
+            switch (filterBy)
+            {
+                case "L.D.L.AppID":
+                    filterBy = "LocalDrivingLicenseApplicationID";
+                    break;
+                case "National No.":
+                    filterBy = "NationalNo";
+                    break;
+                case "Full Name":
+                    filterBy = "FullName";
+                    break;
+                case "Status":
+                    filterBy = "Status";
+                    break;
+                default:
+                    filterBy = "None";
+                    break;
+            }
+
+
+
+            if (!string.IsNullOrWhiteSpace(txtFilterValue.Text))
+            {
+
+                if (cbFilterBy.SelectedItem.ToString() == "L.D.L.AppID")
+                {
+                    if(!clsValidation.ValidateInteger(txtFilterValue.Text))
+                    {
+                        errorProvider1.SetError(txtFilterValue, "Enter valid integer");
+                        return;
+                    }
+                    else
+                    {
+                        errorProvider1.SetError(txtFilterValue, string.Empty);
+                    }
+
+                    _dtAllLocalApplications.DefaultView.RowFilter = $"{filterBy} = {txtFilterValue.Text}";
+                    lblRecordsCount.Text = dgvLocalDrivingLicenseApplications.Rows.Count.ToString();
+                    return;
+                }
+
+                _dtAllLocalApplications.DefaultView.RowFilter = $"{filterBy} LIKE '%{txtFilterValue.Text}%'";
+
+            }
+            else
+            {
+                _dtAllLocalApplications.DefaultView.RowFilter = string.Empty;
+            }
+
+            lblRecordsCount.Text = dgvLocalDrivingLicenseApplications.Rows.Count.ToString();
+
+        }
+
+        private void txtFilterValue_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (cbFilterBy.SelectedItem.ToString() == "L.D.L.AppID")
+            {
+                e.Handled = !clsValidation.IsValidCharForID(e.KeyChar);
+            }
+        }
+
+        private void cbFilterBy_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbFilterBy.SelectedItem.ToString() == "None")
+            {
+                _dtAllLocalApplications.DefaultView.RowFilter = string.Empty;
+                txtFilterValue.Visible = false;
+            }
+            else
+            {
+                txtFilterValue.Visible = true;
+            }
+
+            txtFilterValue.Text = string.Empty;
+            
+        }
+
+        private void dgvLocalDrivingLicenseApplications_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                dgvLocalDrivingLicenseApplications.ClearSelection();
+                dgvLocalDrivingLicenseApplications.Rows[e.RowIndex].Selected = true;
+                dgvLocalDrivingLicenseApplications.CurrentCell = dgvLocalDrivingLicenseApplications.Rows[e.RowIndex].Cells[0];
+            }
+        }
     }
 }
