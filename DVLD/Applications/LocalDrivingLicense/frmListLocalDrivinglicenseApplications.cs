@@ -185,15 +185,5 @@ namespace DVLD.Applications.LocalDrivingLicense
             txtFilterValue.Text = string.Empty;
             
         }
-
-        private void dgvLocalDrivingLicenseApplications_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                dgvLocalDrivingLicenseApplications.ClearSelection();
-                dgvLocalDrivingLicenseApplications.Rows[e.RowIndex].Selected = true;
-                dgvLocalDrivingLicenseApplications.CurrentCell = dgvLocalDrivingLicenseApplications.Rows[e.RowIndex].Cells[0];
-            }
-        }
     }
 }

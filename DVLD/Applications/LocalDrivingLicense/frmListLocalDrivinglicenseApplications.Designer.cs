@@ -363,7 +363,6 @@
             this.dgvLocalDrivingLicenseApplications.Size = new System.Drawing.Size(1405, 353);
             this.dgvLocalDrivingLicenseApplications.TabIndex = 132;
             this.dgvLocalDrivingLicenseApplications.TabStop = false;
-            this.dgvLocalDrivingLicenseApplications.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvLocalDrivingLicenseApplications_CellMouseDown);
             // 
             // errorProvider1
             // 
