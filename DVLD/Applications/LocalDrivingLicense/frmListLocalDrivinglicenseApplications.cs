@@ -12,11 +12,11 @@ using System.Windows.Forms;
 
 namespace DVLD.Applications.LocalDrivingLicense
 {
-    public partial class frmListLocalDrivingLicesnseApplications : Form
+    public partial class frmListLocalDrivinglicenseApplications : Form
     {
         DataTable _dtAllLocalApplications;
 
-        public frmListLocalDrivingLicesnseApplications()
+        public frmListLocalDrivinglicenseApplications()
         {
             InitializeComponent();
         }
@@ -66,7 +66,7 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void btnAddNewApplication_Click(object sender, EventArgs e)
         {
-            frmAddUpdateLocalDrivingLicesnseApplication frm = new frmAddUpdateLocalDrivingLicesnseApplication();
+            frmAddUpdateLocalDrivingLicenseApplication frm = new frmAddUpdateLocalDrivingLicenseApplication();
             frm.ShowDialog();
             _RefreshData();
         }
@@ -100,7 +100,7 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            frmAddUpdateLocalDrivingLicesnseApplication frm = new frmAddUpdateLocalDrivingLicesnseApplication((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            frmAddUpdateLocalDrivingLicenseApplication frm = new frmAddUpdateLocalDrivingLicenseApplication((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             frm.Show();
             _RefreshData();
         }

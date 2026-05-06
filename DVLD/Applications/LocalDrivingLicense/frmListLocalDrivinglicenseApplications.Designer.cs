@@ -1,6 +1,6 @@
 ﻿namespace DVLD.Applications.LocalDrivingLicense
 {
-    partial class frmListLocalDrivingLicesnseApplications
+    partial class frmListLocalDrivinglicenseApplications
     {
         /// <summary>
         /// Required designer variable.
