@@ -160,20 +160,32 @@ namespace DVLD_Business
 
         private static bool _IsNextTestAppointmentScheduled(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
+            // If the test type is less than StreetTest, then check if the next test appointment is already scheduled.
+            if (TestTypeID == clsTestType.enTestType.StreetTest)
+            {
+                return false;
+            }
+
             // Check if the next test appointment is already scheduled.
             return clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID + 1, LocalDrivingLicenseApplicationID);
         }
 
         private static bool _IsPreviousTestAppointmentLocked(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
+            // If the test type is greater than VisionTest, then check if the previous test appointment is locked.
+            if (TestTypeID == clsTestType.enTestType.VisionTest)
+            { 
+                return true;
+            }
             // Check if the previous test appointment is locked.
             return clsTestAppointmentData.GetIsAppointmentLocked((int)TestTypeID - 1, LocalDrivingLicenseApplicationID);
+
         }
 
         private static bool _DoesHaveActiveTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             // Check if there is an active test appointment for the given test type and application ID.
-            return clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID);
+            return clsTestAppointmentData.DoesHaveAnActiveAppointment((int)TestTypeID, LocalDrivingLicenseApplicationID);
         }
 
         private static bool _IsTestAppointmentInTheRightOrder(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
@@ -186,25 +198,21 @@ namespace DVLD_Business
                 return false;
             }
 
-            // If the test type is greater than VisionTest, then check if the previous test appointment is locked.
-            if (TestTypeID > clsTestType.enTestType.VisionTest)
-            {
+
             // If the previous test appointment is not locked, then it is not in the right order.
-                if (!_IsPreviousTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID))
-                {
-                    return false;
-                }
+            if (!_IsPreviousTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID))
+            {
+                return false;
             }
 
-            // If the test type is less than StreetTest, then check if the next test appointment is already scheduled.
-            if (TestTypeID < clsTestType.enTestType.StreetTest)
+
+
+            // If the next test appointment is already scheduled, then it is not in the right order.
+            if (_IsNextTestAppointmentScheduled(LocalDrivingLicenseApplicationID, TestTypeID))
             {
-                // If the next test appointment is already scheduled, then it is not in the right order.
-                if (_IsNextTestAppointmentScheduled(LocalDrivingLicenseApplicationID, TestTypeID))
-                {
-                    return false;
-                }
+                return false;
             }
+            
             return true;
         }
 
