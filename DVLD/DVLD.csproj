@@ -58,17 +58,17 @@
     <Compile Include="Applications\Application Types\frmListApplicationTypes.Designer.cs">
       <DependentUpon>frmListApplicationTypes.cs</DependentUpon>
     </Compile>
-    <Compile Include="Applications\LocalDrivingLicense\frmAddUpdateLocalDrivingLicesnseApplication.cs">
+    <Compile Include="Applications\LocalDrivingLicense\frmAddUpdateLocalDrivingLicenseApplication.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Applications\LocalDrivingLicense\frmAddUpdateLocalDrivingLicesnseApplication.Designer.cs">
-      <DependentUpon>frmAddUpdateLocalDrivingLicesnseApplication.cs</DependentUpon>
+    <Compile Include="Applications\LocalDrivingLicense\frmAddUpdateLocalDrivingLicenseApplication.Designer.cs">
+      <DependentUpon>frmAddUpdateLocalDrivingLicenseApplication.cs</DependentUpon>
     </Compile>
-    <Compile Include="Applications\LocalDrivingLicense\frmListLocalDrivingLicesnseApplications.cs">
+    <Compile Include="Applications\LocalDrivingLicense\frmListLocalDrivinglicenseApplications.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Applications\LocalDrivingLicense\frmListLocalDrivingLicesnseApplications.Designer.cs">
-      <DependentUpon>frmListLocalDrivingLicesnseApplications.cs</DependentUpon>
+    <Compile Include="Applications\LocalDrivingLicense\frmListLocalDrivinglicenseApplications.Designer.cs">
+      <DependentUpon>frmListLocalDrivinglicenseApplications.cs</DependentUpon>
     </Compile>
     <Compile Include="Global Classes\clsGlobal.cs" />
     <Compile Include="Login\frmLogin.cs">
@@ -177,11 +177,11 @@
     <EmbeddedResource Include="Applications\Application Types\frmListApplicationTypes.resx">
       <DependentUpon>frmListApplicationTypes.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Applications\LocalDrivingLicense\frmAddUpdateLocalDrivingLicesnseApplication.resx">
-      <DependentUpon>frmAddUpdateLocalDrivingLicesnseApplication.cs</DependentUpon>
+    <EmbeddedResource Include="Applications\LocalDrivingLicense\frmAddUpdateLocalDrivingLicenseApplication.resx">
+      <DependentUpon>frmAddUpdateLocalDrivingLicenseApplication.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Applications\LocalDrivingLicense\frmListLocalDrivingLicesnseApplications.resx">
-      <DependentUpon>frmListLocalDrivingLicesnseApplications.cs</DependentUpon>
+    <EmbeddedResource Include="Applications\LocalDrivingLicense\frmListLocalDrivinglicenseApplications.resx">
+      <DependentUpon>frmListLocalDrivinglicenseApplications.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Login\frmLogin.resx">
       <DependentUpon>frmLogin.cs</DependentUpon>

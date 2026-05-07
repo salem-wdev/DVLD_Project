@@ -13,7 +13,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVLD.Applications.Local_Driving_License
 {
-    public partial class frmAddUpdateLocalDrivingLicesnseApplication : Form
+    public partial class frmAddUpdateLocalDrivingLicenseApplication : Form
     {
 
         private bool _IsFormUpdated = false;
@@ -28,13 +28,13 @@ namespace DVLD.Applications.Local_Driving_License
         private int _ApplicationID;
         private clsLocalDrivingLicenseApplication _LocalLicenseApplication;
 
-        public frmAddUpdateLocalDrivingLicesnseApplication()
+        public frmAddUpdateLocalDrivingLicenseApplication()
         {
             InitializeComponent();
             _Mode = enMode.AddNew;
         }
 
-        public frmAddUpdateLocalDrivingLicesnseApplication(int ApplicationID)
+        public frmAddUpdateLocalDrivingLicenseApplication(int ApplicationID)
         {
             InitializeComponent();
             _Mode = enMode.Update;
