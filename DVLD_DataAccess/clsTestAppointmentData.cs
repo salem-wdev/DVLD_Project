@@ -446,8 +446,7 @@ namespace DVLD_DataAccess
             string query = "SELECT TOP 1 1 " +
                 "FROM[DVLD].[dbo].[TestAppointments] " +
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID" +
-                " AND [TestTypeID] = @TestTypeID AND [IsLocked] = 1 " +
-                "ORDER BY AppointmentDate DESC";
+                " AND [TestTypeID] = @TestTypeID AND [IsLocked] = 1 ";
 
             SqlCommand command = new SqlCommand(query, connection);
 
@@ -491,8 +490,7 @@ namespace DVLD_DataAccess
             string query = "SELECT TOP 1 1 " +
                 "FROM[DVLD].[dbo].[TestAppointments] " +
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID " +
-                "AND[TestTypeID] = @TestTypeID " +
-                "ORDER BY AppointmentDate DESC ";
+                "AND[TestTypeID] = @TestTypeID ";
 
             SqlCommand command = new SqlCommand(query, connection);
 
