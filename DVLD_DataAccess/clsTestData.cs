@@ -329,5 +329,54 @@ namespace DVLD_DataAccess
 
         }
 
+        public static bool GetIsPassedTestByTestAppointmentID(int TestAppointmentID)
+        {
+            bool isFound = false;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = "SELECT TOP 1 1 FROM Tests" +
+                " WHERE Tests.TestAppointmentID = @TestAppointmentID " +
+                "AND Tests.TestResult = 1;";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@TestAppointmentID", TestAppointmentID);
+
+            try
+            {
+                connection.Open();
+                object scalar = command.ExecuteScalar();
+
+                if (scalar != null)
+                {
+
+                    // The record was found
+                    isFound = true;
+
+
+                }
+                else
+                {
+                    // The record was not found
+                    isFound = false;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+                isFound = false;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return isFound;
+        }
+
+
     }
 }
