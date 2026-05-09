@@ -284,6 +284,7 @@
             this.showDetailsToolStripMenuItem.Name = "showDetailsToolStripMenuItem";
             this.showDetailsToolStripMenuItem.Size = new System.Drawing.Size(361, 38);
             this.showDetailsToolStripMenuItem.Text = "&Show Application Details";
+            this.showDetailsToolStripMenuItem.Click += new System.EventHandler(this.showDetailsToolStripMenuItem_Click);
             // 
             // cmsApplications
             // 
@@ -304,7 +305,8 @@
             this.toolStripSeparator6,
             this.showPersonLicenseHistoryToolStripMenuItem});
             this.cmsApplications.Name = "contextMenuStrip1";
-            this.cmsApplications.Size = new System.Drawing.Size(362, 344);
+            this.cmsApplications.Size = new System.Drawing.Size(362, 366);
+            this.cmsApplications.Opening += new System.ComponentModel.CancelEventHandler(this.cmsApplications_Opening);
             // 
             // lblTitle
             // 
@@ -368,7 +370,7 @@
             // 
             this.errorProvider1.ContainerControl = this;
             // 
-            // frmListLocalDrivingLicesnseApplications
+            // frmListLocalDrivinglicenseApplications
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -386,7 +388,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.dgvLocalDrivingLicenseApplications);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "frmListLocalDrivingLicesnseApplications";
+            this.Name = "frmListLocalDrivinglicenseApplications";
             this.Text = "frmListLocalDrivingLicesnseApplications";
             this.Load += new System.EventHandler(this.frmListLocalDrivingLicesnseApplications_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

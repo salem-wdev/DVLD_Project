@@ -185,5 +185,18 @@ namespace DVLD.Applications.LocalDrivingLicense
             txtFilterValue.Text = string.Empty;
             
         }
+
+        private void cmsApplications_Opening(object sender, CancelEventArgs e)
+        {
+            // Enable Tests and License menu items based on number of passed tests.
+
+            //throw new NotImplementedException();
+        }
+
+        private void showDetailsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmLocalDrivingLicenseApplicationInfo frm = new frmLocalDrivingLicenseApplicationInfo((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            frm.ShowDialog();
+        }
     }
 }
