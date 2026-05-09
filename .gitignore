@@ -45,4 +45,6 @@ $RECYCLE.BIN/
 *.tlog
 *.tmp.driveupload/
 *.tmp.drivedownload/
-.tmp
+*.tmp
+*DVLD/test.cs
+*DVLD/test.Designer.cs
