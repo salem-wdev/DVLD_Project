@@ -64,7 +64,7 @@
             this.ClientSize = new System.Drawing.Size(911, 450);
             this.Controls.Add(this.ctrlDrivingLicenseApplicationInfo1);
             this.Controls.Add(this.btnClose);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmLocalDrivingLicenseApplicationInfo";
             this.Text = "frmLocalDrivingLicenseApplicationInfo";
             this.Load += new System.EventHandler(this.frmLocalDrivingLicenseApplicationInfo_Load);
