@@ -24,5 +24,10 @@ namespace DVLD.Applications.LocalDrivingLicense
         {
             ctrlDrivingLicenseApplicationInfo1.LoadData(_LocalDrivingLicenseApplicationID);
         }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }
