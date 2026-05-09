@@ -53,6 +53,13 @@ namespace DVLD.Applications.Controls
             lblStatusDate.Text = "[??/??/????]";
             lblCreatedByUser.Text = "[????]";
             llViewPersonInfo.Enabled = false;
+            _ApplicationID = -1;
+            _Application = null;
+        }
+
+        public void Reset()
+        {
+            ResetAll();
         }
 
         public void LoadApplicationBasicInfo(int ApplicationID)
