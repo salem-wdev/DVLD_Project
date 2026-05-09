@@ -109,7 +109,7 @@ namespace DVLD
         private void manageLocalDrivingLicenseApplicationsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             frmListLocalDrivinglicenseApplications frm = new frmListLocalDrivinglicenseApplications();
-            frm.Show();
+            frm.ShowDialog();
         }
     }
 }
