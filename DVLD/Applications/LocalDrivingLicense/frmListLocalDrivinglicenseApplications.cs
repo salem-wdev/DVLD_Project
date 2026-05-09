@@ -12,11 +12,11 @@ using System.Windows.Forms;
 
 namespace DVLD.Applications.LocalDrivingLicense
 {
-    public partial class frmListLocalDrivingLicesnseApplications : Form
+    public partial class frmListLocalDrivinglicenseApplications : Form
     {
         DataTable _dtAllLocalApplications;
 
-        public frmListLocalDrivingLicesnseApplications()
+        public frmListLocalDrivinglicenseApplications()
         {
             InitializeComponent();
         }
@@ -66,7 +66,7 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void btnAddNewApplication_Click(object sender, EventArgs e)
         {
-            frmAddUpdateLocalDrivingLicesnseApplication frm = new frmAddUpdateLocalDrivingLicesnseApplication();
+            frmAddUpdateLocalDrivingLicenseApplication frm = new frmAddUpdateLocalDrivingLicenseApplication();
             frm.ShowDialog();
             _RefreshData();
         }
@@ -100,9 +100,103 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            frmAddUpdateLocalDrivingLicesnseApplication frm = new frmAddUpdateLocalDrivingLicesnseApplication((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            frmAddUpdateLocalDrivingLicenseApplication frm = new frmAddUpdateLocalDrivingLicenseApplication((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             frm.Show();
             _RefreshData();
+        }
+
+        private void txtFilterValue_TextChanged(object sender, EventArgs e)
+        {
+            string filterBy = cbFilterBy.SelectedItem.ToString();
+
+            switch (filterBy)
+            {
+                case "L.D.L.AppID":
+                    filterBy = "LocalDrivingLicenseApplicationID";
+                    break;
+                case "National No.":
+                    filterBy = "NationalNo";
+                    break;
+                case "Full Name":
+                    filterBy = "FullName";
+                    break;
+                case "Status":
+                    filterBy = "Status";
+                    break;
+                default:
+                    filterBy = "None";
+                    break;
+            }
+
+
+
+            if (!string.IsNullOrWhiteSpace(txtFilterValue.Text))
+            {
+
+                if (cbFilterBy.SelectedItem.ToString() == "L.D.L.AppID")
+                {
+                    if(!clsValidation.ValidateInteger(txtFilterValue.Text))
+                    {
+                        errorProvider1.SetError(txtFilterValue, "Enter valid integer");
+                        return;
+                    }
+                    else
+                    {
+                        errorProvider1.SetError(txtFilterValue, string.Empty);
+                    }
+
+                    _dtAllLocalApplications.DefaultView.RowFilter = $"{filterBy} = {txtFilterValue.Text}";
+                    lblRecordsCount.Text = dgvLocalDrivingLicenseApplications.Rows.Count.ToString();
+                    return;
+                }
+
+                _dtAllLocalApplications.DefaultView.RowFilter = $"{filterBy} LIKE '%{txtFilterValue.Text}%'";
+
+            }
+            else
+            {
+                _dtAllLocalApplications.DefaultView.RowFilter = string.Empty;
+            }
+
+            lblRecordsCount.Text = dgvLocalDrivingLicenseApplications.Rows.Count.ToString();
+
+        }
+
+        private void txtFilterValue_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (cbFilterBy.SelectedItem.ToString() == "L.D.L.AppID")
+            {
+                e.Handled = !clsValidation.IsValidCharForID(e.KeyChar);
+            }
+        }
+
+        private void cbFilterBy_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbFilterBy.SelectedItem.ToString() == "None")
+            {
+                _dtAllLocalApplications.DefaultView.RowFilter = string.Empty;
+                txtFilterValue.Visible = false;
+            }
+            else
+            {
+                txtFilterValue.Visible = true;
+            }
+
+            txtFilterValue.Text = string.Empty;
+            
+        }
+
+        private void cmsApplications_Opening(object sender, CancelEventArgs e)
+        {
+            // Enable Tests and License menu items based on number of passed tests.
+
+            //throw new NotImplementedException();
+        }
+
+        private void showDetailsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmLocalDrivingLicenseApplicationInfo frm = new frmLocalDrivingLicenseApplicationInfo((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            frm.ShowDialog();
         }
     }
 }

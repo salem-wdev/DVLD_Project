@@ -24,7 +24,7 @@ namespace DVLD_Business
             NewDrivingLicense = 1, RenewDrivingLicense = 2, ReplaceLostDrivingLicense = 3,
             ReplaceDamagedDrivingLicense = 4, ReleaseDetainedDrivingLicense = 5, NewInternationalLicense = 6, RetakeTest = 7
         };
-        public enMode Mode;
+        public virtual enMode Mode { get; protected set; }
 
         public int ApplicationID { get; set; }
         public int ApplicantPersonID { get; set; }

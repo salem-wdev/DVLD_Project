@@ -13,7 +13,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVLD.Applications.Local_Driving_License
 {
-    public partial class frmAddUpdateLocalDrivingLicesnseApplication : Form
+    public partial class frmAddUpdateLocalDrivingLicenseApplication : Form
     {
 
         private bool _IsFormUpdated = false;
@@ -28,13 +28,13 @@ namespace DVLD.Applications.Local_Driving_License
         private int _ApplicationID;
         private clsLocalDrivingLicenseApplication _LocalLicenseApplication;
 
-        public frmAddUpdateLocalDrivingLicesnseApplication()
+        public frmAddUpdateLocalDrivingLicenseApplication()
         {
             InitializeComponent();
             _Mode = enMode.AddNew;
         }
 
-        public frmAddUpdateLocalDrivingLicesnseApplication(int ApplicationID)
+        public frmAddUpdateLocalDrivingLicenseApplication(int ApplicationID)
         {
             InitializeComponent();
             _Mode = enMode.Update;
@@ -228,7 +228,7 @@ namespace DVLD.Applications.Local_Driving_License
         {
             _FillApplicationWithData();
 
-            if (_Mode == enMode.AddNew && clsApplication.DoesPersonHaveActiveApplication(_LocalLicenseApplication.ApplicantPersonID, (int)_LocalLicenseApplication.ApplicationTypeID))
+            if (_Mode == enMode.AddNew && _LocalLicenseApplication.GetActiveApplicationID((clsApplication.enApplicationType)cbLicenseClass.SelectedValue) != -1)
             {
                 MessageBox.Show("The selected person already has an active application of this type.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -236,7 +236,7 @@ namespace DVLD.Applications.Local_Driving_License
 
             if (_SaveApplication())
             {
-                lblLocalDrivingLicebseApplicationID.Text = _LocalLicenseApplication.ApplicationID.ToString();
+                lblLocalDrivingLicebseApplicationID.Text = _LocalLicenseApplication.LocalDrivingLicenseApplicationID.ToString();
                 lblTitle.Text = "Update Local Driving License Application";
                 this.Text = "Update Local Driving License Application";
                 MessageBox.Show("Application saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);

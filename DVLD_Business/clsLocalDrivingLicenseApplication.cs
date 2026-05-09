@@ -11,7 +11,10 @@ namespace DVLD_Business
 {
     public class clsLocalDrivingLicenseApplication : clsApplication
     {
-        
+        public enum enMode { AddNew = 0, Update = 1 }
+
+        public enMode Mode { get; protected set; } = enMode.AddNew;
+
         public int LocalDrivingLicenseApplicationID { set; get; }
         public int LicenseClassID { set; get; }
         public clsLicenseClass LicenseClassInfo;
@@ -124,6 +127,7 @@ namespace DVLD_Business
                 return false;
 
 
+
             //After we save the main application now we save the sub application.
             switch (Mode)
             {
@@ -168,6 +172,15 @@ namespace DVLD_Business
 
         }
 
+        public byte GetPassedTestCount()
+        {
+            return clsTest.GetPassedTestCount(this.LocalDrivingLicenseApplicationID);
+        }
+
+        public int GetActiveLicenseID()
+        {//this will get the license id that belongs to this application
+            return clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID);
+        }
 
     }
 }
