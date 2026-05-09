@@ -1,4 +1,5 @@
 ﻿using DVLD.Applications.Local_Driving_License;
+using DVLD.Global_Classes;
 using DVLD_Business;
 using System;
 using System.Collections.Generic;
@@ -198,6 +199,11 @@ namespace DVLD.Applications.LocalDrivingLicense
         {
             frmLocalDrivingLicenseApplicationInfo frm = new frmLocalDrivingLicenseApplicationInfo((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             frm.ShowDialog();
+        }
+
+        private void dgvLocalDrivingLicenseApplications_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            clsUtil.ConfigureDataGridViewContextMenu(e, dgvLocalDrivingLicenseApplications);
         }
     }
 }

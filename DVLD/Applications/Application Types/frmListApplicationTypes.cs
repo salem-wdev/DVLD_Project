@@ -1,4 +1,5 @@
-﻿using DVLD_Business;
+﻿using DVLD.Global_Classes;
+using DVLD_Business;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -58,12 +59,7 @@ namespace DVLD.Applications.Application_Types
 
         private void dgvApplicationTypes_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.RowIndex >= 0)
-            {
-                dgvApplicationTypes.ClearSelection();
-                dgvApplicationTypes.Rows[e.RowIndex].Selected = true;
-                dgvApplicationTypes.CurrentCell = dgvApplicationTypes.Rows[e.RowIndex].Cells[0];
-            }
+            clsUtil.ConfigureDataGridViewContextMenu(e, dgvApplicationTypes);
         }
     }
 }
