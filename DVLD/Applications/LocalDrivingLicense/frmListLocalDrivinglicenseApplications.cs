@@ -205,5 +205,27 @@ namespace DVLD.Applications.LocalDrivingLicense
         {
             clsUtil.ConfigureDataGridViewContextMenu(e, dgvLocalDrivingLicenseApplications);
         }
+
+        private void CancelApplicaitonToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (MessageBox.Show("Are you sure do want to cancel this application?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                return;
+
+                clsLocalDrivingLicenseApplication localDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            if (localDrivingLicenseApplication != null)
+            {
+                if (localDrivingLicenseApplication.Cancel())
+                {
+                    MessageBox.Show("Application Canceled Successfully.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Could not cancel applicatoin, other data depends on it.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            
+        }
     }
 }
