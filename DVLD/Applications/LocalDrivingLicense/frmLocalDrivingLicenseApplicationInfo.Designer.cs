@@ -66,7 +66,7 @@
             this.Controls.Add(this.btnClose);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmLocalDrivingLicenseApplicationInfo";
-            this.Text = "frmLocalDrivingLicenseApplicationInfo";
+            this.Text = "Local Driving License Application Info";
             this.Load += new System.EventHandler(this.frmLocalDrivingLicenseApplicationInfo_Load);
             this.ResumeLayout(false);
 
