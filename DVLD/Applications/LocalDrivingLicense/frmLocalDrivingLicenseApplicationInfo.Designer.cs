@@ -50,6 +50,7 @@
             // 
             // ctrlDrivingLicenseApplicationInfo1
             // 
+            this.ctrlDrivingLicenseApplicationInfo1.ImeMode = System.Windows.Forms.ImeMode.On;
             this.ctrlDrivingLicenseApplicationInfo1.Location = new System.Drawing.Point(2, 5);
             this.ctrlDrivingLicenseApplicationInfo1.Name = "ctrlDrivingLicenseApplicationInfo1";
             this.ctrlDrivingLicenseApplicationInfo1.Size = new System.Drawing.Size(909, 376);

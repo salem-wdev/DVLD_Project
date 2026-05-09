@@ -101,7 +101,8 @@ namespace DVLD.Applications.LocalDrivingLicense
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             frmAddUpdateLocalDrivingLicenseApplication frm = new frmAddUpdateLocalDrivingLicenseApplication((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
-            frm.Show();
+            frm.ShowDialog();
+
             _RefreshData();
         }
 
