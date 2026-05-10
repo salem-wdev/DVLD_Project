@@ -1,4 +1,5 @@
-﻿using DVLD_Business;
+﻿using DVLD.Global_Classes;
+using DVLD_Business;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -60,12 +61,7 @@ namespace DVLD.Tests.Test_Types
 
         private void dgvTestTypes_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.RowIndex >= 0)
-            {
-                dgvTestTypes.ClearSelection();
-                dgvTestTypes.Rows[e.RowIndex].Selected = true;
-                dgvTestTypes.CurrentCell = dgvTestTypes.Rows[e.RowIndex].Cells[0];
-            }
+            clsUtil.ConfigureDataGridViewContextMenu(e, dgvTestTypes);
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)

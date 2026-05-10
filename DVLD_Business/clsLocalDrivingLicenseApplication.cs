@@ -159,6 +159,9 @@ namespace DVLD_Business
 
         public override bool Delete()
         {
+            if (!CanBeEdited())
+                return false;
+
             bool IsLocalDrivingApplicationDeleted = false;
             bool IsBaseApplicationDeleted = false;
             //First we delete the Local Driving License Application

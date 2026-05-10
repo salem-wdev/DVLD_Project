@@ -1,4 +1,5 @@
 ﻿using DVLD.Applications.Local_Driving_License;
+using DVLD.Global_Classes;
 using DVLD_Business;
 using System;
 using System.Collections.Generic;
@@ -81,8 +82,16 @@ namespace DVLD.Applications.LocalDrivingLicense
             clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication =
                 clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
 
+            
+
             if (LocalDrivingLicenseApplication != null)
             {
+                if (LocalDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
+                {
+                    MessageBox.Show($"Application can't be deleted because it's {LocalDrivingLicenseApplication.ApplicationStatus.ToString()}", "Delete Application", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 if (LocalDrivingLicenseApplication.Delete())
                 {
                     MessageBox.Show("Application Deleted Successfully.", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -100,8 +109,24 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            clsLocalDrivingLicenseApplication localDrivingLicenseApplication
+                = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            if (localDrivingLicenseApplication == null)
+            {
+                MessageBox.Show("Application not found.", "Edit Application", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (localDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
+            {
+                MessageBox.Show($"You can't edit this application because it's {localDrivingLicenseApplication.ApplicationStatus.ToString()}", "Edit Application", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+                
+            }
+
             frmAddUpdateLocalDrivingLicenseApplication frm = new frmAddUpdateLocalDrivingLicenseApplication((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
-            frm.Show();
+            frm.ShowDialog();
+
             _RefreshData();
         }
 
@@ -197,6 +222,45 @@ namespace DVLD.Applications.LocalDrivingLicense
         {
             frmLocalDrivingLicenseApplicationInfo frm = new frmLocalDrivingLicenseApplicationInfo((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             frm.ShowDialog();
+        }
+
+        private void dgvLocalDrivingLicenseApplications_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            clsUtil.ConfigureDataGridViewContextMenu(e, dgvLocalDrivingLicenseApplications);
+        }
+
+        private void CancelApplicaitonToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (MessageBox.Show("Are you sure do want to cancel this application?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                return;
+
+                clsLocalDrivingLicenseApplication localDrivingLicenseApplication
+                = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            if (localDrivingLicenseApplication != null)
+            {
+                if (localDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
+                {
+                    MessageBox.Show($"Application can't be Cancled because it's {localDrivingLicenseApplication.ApplicationStatus.ToString()}", "Cancel Application", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (localDrivingLicenseApplication.Cancel())
+                {
+                    MessageBox.Show("Application Canceled Successfully.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _RefreshData();
+                }
+                else 
+                {
+                    MessageBox.Show("Could not cancel applicatoin, other data depends on it.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Could not cancel applicatoin, other data depends on it.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            
         }
     }
 }

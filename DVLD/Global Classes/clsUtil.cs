@@ -82,5 +82,15 @@ namespace DVLD.Global_Classes
             return true;
         }
 
+        public static void ConfigureDataGridViewContextMenu(DataGridViewCellMouseEventArgs e, DataGridView dgv)
+        {
+            if (e.RowIndex >= 0)
+            {
+                dgv.ClearSelection();
+                dgv.Rows[e.RowIndex].Selected = true;
+                dgv.CurrentCell = dgv.Rows[e.RowIndex].Cells[0];
+            }
+
+        }
     }
 }

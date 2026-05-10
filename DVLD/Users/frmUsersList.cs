@@ -245,12 +245,7 @@ namespace DVLD.Users
 
         private void dgvUsers_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.RowIndex >= 0)
-            {
-                dgvUsers.ClearSelection();
-                dgvUsers.Rows[e.RowIndex].Selected = true;
-                dgvUsers.CurrentCell = dgvUsers.Rows[e.RowIndex].Cells[0];
-            }
+            clsUtil.ConfigureDataGridViewContextMenu(e, dgvUsers);
 
         }
     }

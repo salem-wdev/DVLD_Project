@@ -123,6 +123,10 @@ namespace DVLD_Business
             //{
             //    return false;
             //}
+
+            if (!CanBeEdited())
+                return false;
+
             this.ApplicantPersonID = PersonInfo.PersonID;
             this.ApplicationTypeID = (enApplicationType)ApplicationTypeInfo.ApplicationTypeID;
             this.CreatedByUserID = CreatedByUserInfo.UserID;
@@ -134,12 +138,18 @@ namespace DVLD_Business
 
         public static bool Delete(int ApplicationID)
         {
+            if (!CanBeEdited(ApplicationID))
+                return false;
+
             return clsApplicationData.DeleteApplication(ApplicationID);
         }
 
         public virtual bool Delete()
         {
-                       return clsApplicationData.DeleteApplication(this.ApplicationID);
+            if (!CanBeEdited())
+                return false;
+
+            return clsApplicationData.DeleteApplication(this.ApplicationID);
         }
 
         public static clsApplication Find(int ApplicationID)
@@ -191,19 +201,25 @@ namespace DVLD_Business
         }
 
         public bool Cancel()
-
         {
+            if (!CanBeEdited())
+                return false;
+
             return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled);
         }
 
         public bool SetComplete()
-
         {
+            if (!CanBeEdited())
+                return false;
+
             return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Completed);
         }
 
         public virtual bool Save()
         {
+            
+
             switch (Mode)
             {
                 case enMode.AddNew:
@@ -254,7 +270,15 @@ namespace DVLD_Business
             return GetActiveApplicationID(this.ApplicantPersonID, ApplicationTypeID);
         }
 
+        public bool CanBeEdited()
+        {
+            return CanBeEdited(this.ApplicationID);
+        }
 
+        public static bool CanBeEdited(int ApplicationID)
+        {
+            return clsApplicationData.CanApplicationBeEdited(ApplicationID);
+        }
 
     }
 }

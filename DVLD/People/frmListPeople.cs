@@ -1,4 +1,5 @@
-﻿using DVLD_Business;
+﻿using DVLD.Global_Classes;
+using DVLD_Business;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -303,12 +304,7 @@ namespace DVLD.People.Forms
 
         private void dgvPeople_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if(e.RowIndex >= 0)
-            {
-                dgvPeople.ClearSelection();
-                dgvPeople.Rows[e.RowIndex].Selected = true;
-                dgvPeople.CurrentCell = dgvPeople.Rows[e.RowIndex].Cells[0];
-            }
+            clsUtil.ConfigureDataGridViewContextMenu(e, dgvPeople);
         }
 
 

@@ -248,6 +248,7 @@
             this.CancelApplicaitonToolStripMenuItem.Name = "CancelApplicaitonToolStripMenuItem";
             this.CancelApplicaitonToolStripMenuItem.Size = new System.Drawing.Size(361, 38);
             this.CancelApplicaitonToolStripMenuItem.Text = "&Cancel Application";
+            this.CancelApplicaitonToolStripMenuItem.Click += new System.EventHandler(this.CancelApplicaitonToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
@@ -365,6 +366,7 @@
             this.dgvLocalDrivingLicenseApplications.Size = new System.Drawing.Size(1405, 353);
             this.dgvLocalDrivingLicenseApplications.TabIndex = 132;
             this.dgvLocalDrivingLicenseApplications.TabStop = false;
+            this.dgvLocalDrivingLicenseApplications.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvLocalDrivingLicenseApplications_CellMouseDown);
             // 
             // errorProvider1
             // 
