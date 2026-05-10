@@ -212,13 +212,24 @@ namespace DVLD.Applications.LocalDrivingLicense
             if (MessageBox.Show("Are you sure do want to cancel this application?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                 return;
 
-                clsLocalDrivingLicenseApplication localDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+                clsLocalDrivingLicenseApplication localDrivingLicenseApplication
+                = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             if (localDrivingLicenseApplication != null)
             {
+                if (localDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
+                {
+                    MessageBox.Show($"Application can't be Cancled because it's {localDrivingLicenseApplication.ApplicationStatus.ToString()}", "Cancel Application", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 if (localDrivingLicenseApplication.Cancel())
                 {
                     MessageBox.Show("Application Canceled Successfully.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     _RefreshData();
+                }
+                else 
+                {
+                    MessageBox.Show("Could not cancel applicatoin, other data depends on it.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else

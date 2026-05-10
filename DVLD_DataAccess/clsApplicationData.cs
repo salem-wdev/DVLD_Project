@@ -465,6 +465,40 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
+        public static bool CanApplicationBeEdited(int LocalDrivingLicenseApplicationID)
+        {
+            bool Result = false;
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+            string query = "SELECT TOP (1) 1 " +
+                "FROM Applications " +
+                "WHERE ApplicationID = 1" +
+                " AND " +
+                "(ApplicationStatus = 1); ";
+
+            SqlCommand command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
+            try
+            {
+                connection.Open();
+                object result = command.ExecuteScalar();
+                if (result != null)
+                {
+                    Result = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return Result;
+
+        }
+
 
     }
 }
