@@ -218,6 +218,7 @@ namespace DVLD.Applications.LocalDrivingLicense
                 if (localDrivingLicenseApplication.Cancel())
                 {
                     MessageBox.Show("Application Canceled Successfully.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _RefreshData();
                 }
             }
             else
