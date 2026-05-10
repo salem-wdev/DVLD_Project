@@ -123,6 +123,10 @@ namespace DVLD_Business
             //{
             //    return false;
             //}
+
+            if (!CanBeEdited())
+                return false;
+
             this.ApplicantPersonID = PersonInfo.PersonID;
             this.ApplicationTypeID = (enApplicationType)ApplicationTypeInfo.ApplicationTypeID;
             this.CreatedByUserID = CreatedByUserInfo.UserID;
@@ -214,8 +218,7 @@ namespace DVLD_Business
 
         public virtual bool Save()
         {
-            if (!CanBeEdited())
-                return false;
+            
 
             switch (Mode)
             {

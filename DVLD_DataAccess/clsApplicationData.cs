@@ -465,18 +465,17 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
-        public static bool CanApplicationBeEdited(int LocalDrivingLicenseApplicationID)
+        public static bool CanApplicationBeEdited(int ApplicationID)
         {
             bool Result = false;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string query = "SELECT TOP (1) 1 " +
                 "FROM Applications " +
-                "WHERE ApplicationID = 1" +
-                " AND " +
-                "(ApplicationStatus = 1); ";
+                "WHERE ApplicationID = @ApplicationID " +
+                "AND ApplicationStatus NOT IN(2, 3); ";
 
             SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
+            command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
             try
             {
                 connection.Open();

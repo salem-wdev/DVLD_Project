@@ -82,8 +82,16 @@ namespace DVLD.Applications.LocalDrivingLicense
             clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication =
                 clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
 
+            
+
             if (LocalDrivingLicenseApplication != null)
             {
+                if (LocalDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
+                {
+                    MessageBox.Show($"Application can't be deleted because it's {LocalDrivingLicenseApplication.ApplicationStatus.ToString()}", "Delete Application", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 if (LocalDrivingLicenseApplication.Delete())
                 {
                     MessageBox.Show("Application Deleted Successfully.", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -101,6 +109,21 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            clsLocalDrivingLicenseApplication localDrivingLicenseApplication
+                = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            if (localDrivingLicenseApplication == null)
+            {
+                MessageBox.Show("Application not found.", "Edit Application", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (localDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
+            {
+                MessageBox.Show($"You can't edit this application because it's {localDrivingLicenseApplication.ApplicationStatus.ToString()}", "Edit Application", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+                
+            }
+
             frmAddUpdateLocalDrivingLicenseApplication frm = new frmAddUpdateLocalDrivingLicenseApplication((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             frm.ShowDialog();
 
