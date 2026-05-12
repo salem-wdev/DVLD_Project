@@ -220,17 +220,29 @@ namespace DVLD_Business
         public static clsTestAppointment GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
 
+            if(TestTypeID == clsTestType.enTestType.None)
+            {
+                return null;
+            }
+
             if (!_IsTestAppointmentInTheRightOrder(LocalDrivingLicenseApplicationID, TestTypeID))
             {
                 return null;
             }
 
+            if (TestTypeID == clsTestType.enTestType.VisionTest)
+            {
+                return new clsTestAppointment();
+            }
+
             // Using a method to check is passed preveous test.
-            // Method()
+            if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID-1))
+            {
+                return null;
+            }
 
 
-
-            throw new Exception();
+            return new clsTestAppointment();
         }
    
     
