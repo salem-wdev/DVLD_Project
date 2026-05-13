@@ -233,6 +233,22 @@ namespace DVLD_Business
             return true;
         }
 
+        public static bool IsTestAppointmentInTheRightOrder(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        {
+            if (TestTypeID == clsTestType.enTestType.None)
+            {
+                return false;
+            }
+
+            if (!_IsTestAppointmentInTheRightOrder(LocalDrivingLicenseApplicationID, TestTypeID))
+            {
+                return false;
+            }
+
+            
+                return true;
+            
+        }
 
         public static clsTestAppointment GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
@@ -252,7 +268,7 @@ namespace DVLD_Business
                 return new clsTestAppointment();
             }
 
-            // Using a method to check is passed preveous test.
+            // check is passed preveous test.
             if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID-1))
             {
                 return null;
