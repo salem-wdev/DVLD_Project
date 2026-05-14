@@ -72,8 +72,8 @@ namespace DVLD_DataAccess
             return isFound;
         }
 
-        public static bool GetTestAppointmentInfoByLocalDrivingLicenseApplicationID(int LocalDrivingLicenseApplicationID, ref int TestAppointmentID,
-            ref int TestTypeID, ref DateTime AppointmentDate,
+        public static bool GetTestAppointmentInfoByLocalDrivingLicenseApplicationID(int LocalDrivingLicenseApplicationID, int TestTypeID,
+            ref int TestAppointmentID, ref DateTime AppointmentDate,
             ref float PaidFees, ref int CreatedByUserID, ref bool IsLocked,
             ref int RetakeTestApplicationID)
         {
@@ -81,12 +81,17 @@ namespace DVLD_DataAccess
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = "SELECT * FROM TestAppointments WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
+            string query = "  SELECT Top 1 * FROM TestAppointments " +
+                "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID " +
+                "AND " +
+                "TestTypeID = @TestTypeID " +
+                "AND IsLocked = 0 " +
+                "ORDER BY AppointmentDate DESC;";
 
             SqlCommand command = new SqlCommand(query, connection);
 
             command.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
-
+            command.Parameters.AddWithValue("@TestTypeID", TestTypeID);
             try
             {
                 connection.Open();
@@ -97,7 +102,6 @@ namespace DVLD_DataAccess
 
                     // The record was found
                     isFound = true;
-                    TestTypeID = (int)reader["TestTypeID"];
                     TestAppointmentID = (int)reader["TestAppointmentID"];
                     AppointmentDate = (DateTime)reader["AppointmentDate"];
                     CreatedByUserID = (int)reader["CreatedByUserID"];
