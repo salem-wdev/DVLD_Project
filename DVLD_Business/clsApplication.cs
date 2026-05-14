@@ -45,10 +45,10 @@ namespace DVLD_Business
         {
             this.ApplicationID = -1;
             this.ApplicantPersonID = -1;
-            this.ApplicationDate = DateTime.MinValue;
+            this.ApplicationDate = DateTime.Now;
             this.ApplicationTypeID = enApplicationType.NewDrivingLicense;
             this.ApplicationStatus = enApplicationStatus.New;
-            this.LastStatusDate = DateTime.MinValue;
+            this.LastStatusDate = DateTime.Now;
             this.PaidFees = 0;
             this.CreatedByUserID = -1;
 
