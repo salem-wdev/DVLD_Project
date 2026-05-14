@@ -277,7 +277,27 @@ namespace DVLD_Business
 
             return new clsTestAppointment();
         }
-   
-    
+
+        public static clsApplication GetNewReTakeTestObj(clsUser user, clsLocalDrivingLicenseApplication LocalApp)
+        {
+            clsApplication application = new clsApplication();
+
+            application.PersonInfo = LocalApp.PersonInfo;
+            application.ApplicationTypeInfo = clsApplicationType.Find((int)clsApplication.enApplicationType.RetakeTest);
+            application.CreatedByUserInfo = user;
+
+            application.ApplicantPersonID = application.PersonInfo.PersonID;
+            application.ApplicationTypeID = (clsApplication.enApplicationType)application.ApplicationTypeInfo.ApplicationTypeID;
+            application.CreatedByUserID = user.UserID;
+
+            application.ApplicationStatus = clsApplication.enApplicationStatus.New;
+            application.PaidFees = application.ApplicationTypeInfo.ApplicationTypeFees;
+            application.LastStatusDate = DateTime.Now;
+            application.ApplicationDate = DateTime.Now;
+
+            return application;
+
+        }
+
     }
 }
