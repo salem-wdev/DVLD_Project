@@ -187,6 +187,11 @@ namespace DVLD_Business
             return clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID + 1, LocalDrivingLicenseApplicationID);
         }
 
+        public static bool IsPreviousTestAppointmentLocked(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        {
+            return _IsPreviousTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID);
+        }
+
         private static bool _IsPreviousTestAppointmentLocked(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             // If the test type is greater than VisionTest, then check if the previous test appointment is locked.
