@@ -468,7 +468,8 @@ namespace DVLD_DataAccess
             string query = "SELECT TOP 1 1 " +
                 "FROM[DVLD].[dbo].[TestAppointments] " +
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID" +
-                " AND [TestTypeID] = @TestTypeID AND[IsLocked] = 0 ;";
+                " AND [TestTypeID] = @TestTypeID AND[IsLocked] = 0 " +
+                "ORDER BY TestAppointmentID DESC";
 
             SqlCommand command = new SqlCommand(query, connection);
 
@@ -506,13 +507,14 @@ namespace DVLD_DataAccess
             int LocalDrivingLicenseApplicationID)
         {
 
-            bool IsFound = false;
+            bool IsLocked = false;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = "SELECT TOP 1 1 " +
+            string query = "SELECT TOP 1 IsLocked " +
                 "FROM[DVLD].[dbo].[TestAppointments] " +
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID" +
-                " AND [TestTypeID] = @TestTypeID AND [IsLocked] = 1 ";
+                " AND [TestTypeID] = @TestTypeID " +
+                "ORDER BY TestAppointmentID DESC";
 
             SqlCommand command = new SqlCommand(query, connection);
 
@@ -523,19 +525,16 @@ namespace DVLD_DataAccess
             {
                 connection.Open();
                 object scalar = command.ExecuteScalar();
-                if (scalar == null)
+                if (scalar != null && scalar != DBNull.Value)
                 {
-                    IsFound = false;
+                    IsLocked = (bool)scalar;
                 }
-                else
-                {
-                    IsFound = true;
-                }
+                
             }
             catch (Exception ex)
             {
                 //Console.WriteLine("Error: " + ex.Message);
-                IsFound = false;
+                IsLocked = false;
             }
 
             finally
@@ -543,7 +542,7 @@ namespace DVLD_DataAccess
                 connection.Close();
             }
 
-            return IsFound;
+            return IsLocked;
         }
 
         public static bool GetIsAppointmentexists(int TestTypeID,
@@ -556,7 +555,8 @@ namespace DVLD_DataAccess
             string query = "SELECT TOP 1 1 " +
                 "FROM[DVLD].[dbo].[TestAppointments] " +
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID " +
-                "AND[TestTypeID] = @TestTypeID ";
+                "AND[TestTypeID] = @TestTypeID " +
+                "ORDER BY TestAppointmentID DESC";
 
             SqlCommand command = new SqlCommand(query, connection);
 
