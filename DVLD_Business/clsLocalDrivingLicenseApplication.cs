@@ -192,6 +192,8 @@ namespace DVLD_Business
 
         public bool DosPassTest(clsTestType.enTestType TestTypeID)
         {
+            
+
             return clsLocalDrivingLicenseApplication.DosPassTest(this.LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
@@ -218,10 +220,11 @@ namespace DVLD_Business
 
         public static bool DosPassTest(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            if (TestTypeID == clsTestType.enTestType.VisionTest)
+            if (!clsTestAppointment.IsTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID))
             {
-                return true;
+                return false;
             }
+
 
             return clsLocalDrivingLicenseApplicationData.DoesPassTestType(LocalDrivingLicenseApplicationID, (int)TestTypeID);
         }
