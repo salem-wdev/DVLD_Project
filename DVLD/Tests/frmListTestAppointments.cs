@@ -110,5 +110,11 @@ namespace DVLD.Tests
                 this.Close();
             }
         }
+
+        private void btnAddNewAppointment_Click(object sender, EventArgs e)
+        {
+            frmScheduleTest frm = new frmScheduleTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
+            frm.ShowDialog();
+        }
     }
 }

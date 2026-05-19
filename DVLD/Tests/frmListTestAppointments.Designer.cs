@@ -80,6 +80,7 @@
             this.btnAddNewAppointment.Size = new System.Drawing.Size(49, 36);
             this.btnAddNewAppointment.TabIndex = 145;
             this.btnAddNewAppointment.UseVisualStyleBackColor = true;
+            this.btnAddNewAppointment.Click += new System.EventHandler(this.btnAddNewAppointment_Click);
             // 
             // label1
             // 
