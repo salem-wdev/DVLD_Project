@@ -199,7 +199,6 @@ namespace DVLD.Tests.Conrols
         {
             if (_CreationMode == enCreationMode.RetakeTestSchedule)
             {
-                _TestAppointment.RetakeTestAppInfo = clsApplication.Find(_TestAppointment.RetakeTestApplicationID);
                 if (_TestAppointment.RetakeTestAppInfo == null)
                 {
                     _TestAppointment.RetakeTestAppInfo = clsTestAppointment.GetNewReTakeTestObj(LocalApp: _LocalDrivingLicenseApplication, user: clsGlobal.CurrentUser);
@@ -237,8 +236,6 @@ namespace DVLD.Tests.Conrols
                 lblUserMessage.Text = "Please select a test type.";
                 return false;
             }
-
-            _IsPassedCurrentTest = clsLocalDrivingLicenseApplication.DosPassTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
            
             if (TestTypeID == clsTestType.enTestType.VisionTest)
             {
