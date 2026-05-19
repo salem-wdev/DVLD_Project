@@ -36,6 +36,7 @@ namespace DVLD_Business
             this.TestTypeID = clsTestType.enTestType.VisionTest;
             this.AppointmentDate = DateTime.Now;
             this.PaidFees = 0;
+            this.IsLocked = false;
             this.CreatedByUserID = -1;
             this.RetakeTestApplicationID = -1;
             Mode = enMode.AddNew;
