@@ -1,4 +1,5 @@
-﻿using DVLD.Properties;
+﻿using DVLD.Global_Classes;
+using DVLD.Properties;
 using DVLD_Business;
 using System;
 using System.Collections.Generic;
@@ -115,6 +116,11 @@ namespace DVLD.Tests
         {
             frmScheduleTest frm = new frmScheduleTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
             frm.ShowDialog();
+        }
+
+        private void dgvLicenseTestAppointments_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            clsUtil.ConfigureDataGridViewContextMenu(e, dgvLicenseTestAppointments);
         }
     }
 }

@@ -176,6 +176,7 @@
             this.dgvLicenseTestAppointments.Size = new System.Drawing.Size(887, 161);
             this.dgvLicenseTestAppointments.TabIndex = 139;
             this.dgvLicenseTestAppointments.TabStop = false;
+            this.dgvLicenseTestAppointments.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvLicenseTestAppointments_CellMouseDown);
             // 
             // ctrlDrivingLicenseApplicationInfo1
             // 
