@@ -85,8 +85,7 @@ namespace DVLD_DataAccess
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID " +
                 "AND " +
                 "TestTypeID = @TestTypeID " +
-                "AND IsLocked = 0 " +
-                "ORDER BY AppointmentDate DESC;";
+                "ORDER BY TestAppointmentID DESC; ";
 
             SqlCommand command = new SqlCommand(query, connection);
 
