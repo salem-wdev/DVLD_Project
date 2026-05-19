@@ -73,7 +73,7 @@ namespace DVLD.Tests.Controls
             InitializeComponent();
 
             dtpTestDate.MinDate = DateTime.Today;
-
+            btnSave.Enabled = false;
         }
 
 
@@ -140,7 +140,6 @@ namespace DVLD.Tests.Controls
 
                 _DisplayRetakeTestData();
 
-                btnSave.Enabled = true;
                 lblUserMessage.Visible = false;
             }
             else
@@ -260,10 +259,12 @@ namespace DVLD.Tests.Controls
             _TestAppointmentID = TestAppointmentID;
 
             _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
-            _TestAppointment = clsTestAppointment.Find(TestAppointmentID);
+            _TestAppointment = clsTestAppointment.Find(_TestAppointmentID);
 
-           
+            if (_TestAppointment != null)
+            {
                 _TestAppointmentID = _TestAppointment.TestAppointmentID;
+            }
 
             return _LocalDrivingLicenseApplication != null && _TestAppointment != null;
 
