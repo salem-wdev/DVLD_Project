@@ -76,6 +76,10 @@ namespace DVLD.Tests.Controls
 
         }
 
+        
+        ///////////////////////////////////////////////////////////
+        // Data
+
         private void _ClearData()
         {
             _LocalDrivingLicenseApplicationID = -1;
@@ -145,6 +149,68 @@ namespace DVLD.Tests.Controls
             }
         }
 
+        private void _FillNewReTakeTestAppObj()
+        {
+            if (_TestAppointment.RetakeTestAppInfo.Mode == clsApplication.enMode.AddNew)
+            {
+                _TestAppointment.RetakeTestAppInfo.PersonInfo = _LocalDrivingLicenseApplication.PersonInfo;
+                _TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo = clsApplicationType.Find((int)clsApplication.enApplicationType.RetakeTest);
+                _TestAppointment.RetakeTestAppInfo.CreatedByUserInfo = clsGlobal.CurrentUser;
+
+                _TestAppointment.RetakeTestAppInfo.ApplicantPersonID = _TestAppointment.RetakeTestAppInfo.PersonInfo.PersonID;
+                _TestAppointment.RetakeTestAppInfo.ApplicationTypeID = (clsApplication.enApplicationType)_TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo.ApplicationTypeID;
+                _TestAppointment.RetakeTestAppInfo.CreatedByUserID = clsGlobal.CurrentUser.UserID;
+
+                _TestAppointment.RetakeTestAppInfo.ApplicationStatus = clsApplication.enApplicationStatus.New;
+                _TestAppointment.RetakeTestAppInfo.PaidFees = _TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo.ApplicationTypeFees;
+                _TestAppointment.RetakeTestAppInfo.LastStatusDate = DateTime.Now;
+                _TestAppointment.RetakeTestAppInfo.ApplicationDate = DateTime.Now;
+
+            }
+        }
+
+        private void _FillTestAppointmentObj()
+        {
+            if(_Mode == enMode.AddNew)
+            {
+                _TestAppointment.CreatedByUserID = clsGlobal.CurrentUser.UserID;
+                _TestAppointment.LocalDrivingLicenseApplicationID = _LocalDrivingLicenseApplicationID;
+                _TestAppointment.TestTypeID = _TestTypeID;
+            }
+            _TestAppointment.AppointmentDate = dtpTestDate.Value;
+        }
+
+        private bool _SaveData()
+        {
+            _FillTestAppointmentObj();
+
+            if (_CreationMode == enCreationMode.RetakeTestSchedule)
+            {
+                if (!_TestAppointment.RetakeTestAppInfo.Save())
+                {
+                    return false;
+                }
+
+                _TestAppointment.RetakeTestApplicationID = _TestAppointment.RetakeTestAppInfo.ApplicationID;
+            }
+
+
+            if(_TestAppointment.Save())
+            {
+                _Mode = enMode.Update;
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Data
+        //////////////////////////////////////////////////////////////
+        // Business
+
         private void _HandleMode()
         {
             // I have to add method to check if faild in test
@@ -175,26 +241,6 @@ namespace DVLD.Tests.Controls
             }
         }
 
-        private void _FillNewReTakeTestAppObj()
-        {
-            if (_TestAppointment.RetakeTestAppInfo.Mode == clsApplication.enMode.AddNew)
-            {
-                _TestAppointment.RetakeTestAppInfo.PersonInfo = _LocalDrivingLicenseApplication.PersonInfo;
-                _TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo = clsApplicationType.Find((int)clsApplication.enApplicationType.RetakeTest);
-                _TestAppointment.RetakeTestAppInfo.CreatedByUserInfo = clsGlobal.CurrentUser;
-
-                _TestAppointment.RetakeTestAppInfo.ApplicantPersonID = _TestAppointment.RetakeTestAppInfo.PersonInfo.PersonID;
-                _TestAppointment.RetakeTestAppInfo.ApplicationTypeID = (clsApplication.enApplicationType)_TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo.ApplicationTypeID;
-                _TestAppointment.RetakeTestAppInfo.CreatedByUserID = clsGlobal.CurrentUser.UserID;
-
-                _TestAppointment.RetakeTestAppInfo.ApplicationStatus = clsApplication.enApplicationStatus.New;
-                _TestAppointment.RetakeTestAppInfo.PaidFees = _TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo.ApplicationTypeFees;
-                _TestAppointment.RetakeTestAppInfo.LastStatusDate = DateTime.Now;
-                _TestAppointment.RetakeTestAppInfo.ApplicationDate = DateTime.Now;
-
-            }
-        }
-
         private void _HandleReTakeTestApp()
         {
             if (_CreationMode == enCreationMode.RetakeTestSchedule)
@@ -207,13 +253,14 @@ namespace DVLD.Tests.Controls
             }
         }
 
-        private void _HandelObjects(int LocalDrivingLicenseApplicationID,clsTestType.enTestType TestType)
+        private void _HandelObjects(int LocalDrivingLicenseApplicationID,clsTestType.enTestType TestType, int TestAppointmentID)
         {
             _LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
             _TestTypeID = TestType;
+            _TestAppointmentID = TestAppointmentID;
 
             _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
-            _TestAppointment = clsTestAppointment.FindByLocalDrivingLicenseApplicationID(LocalDrivingLicenseApplicationID, _TestTypeID);
+            _TestAppointment = clsTestAppointment.Find(TestAppointmentID);
 
             if (_TestAppointment != null && _TestAppointment.IsLocked == false)
             {
@@ -281,10 +328,16 @@ namespace DVLD.Tests.Controls
             return false;
         }
 
-        public bool LoadData(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        // Business
+        //////////////////////////////////////////////////////////////
+       
+        public bool LoadData(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int TestAppointmentID = -1)
         {
-            _HandelObjects(LocalDrivingLicenseApplicationID,TestTypeID);
-            
+
+            // TODO: most overloading this method to handle mode status.
+
+            _HandelObjects(LocalDrivingLicenseApplicationID,TestTypeID, TestAppointmentID);
+
             _HandleMode();
 
             _HandleReTakeTestApp();
@@ -305,6 +358,27 @@ namespace DVLD.Tests.Controls
             {
                 ResetDefaultData();
                 return false;
+            }
+        }
+
+
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to save changes? \nYou can't change this later.", "Confirm Save", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+            {
+                return;
+            }
+
+            if (_SaveData())
+            {
+                MessageBox.Show("Data saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (_CreationMode == enCreationMode.RetakeTestSchedule)
+                    lblRetakeTestAppID.Text = _TestAppointment.RetakeTestAppInfo.ApplicationID.ToString();
+            }
+            else
+            {
+                MessageBox.Show("Failed to save data. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
