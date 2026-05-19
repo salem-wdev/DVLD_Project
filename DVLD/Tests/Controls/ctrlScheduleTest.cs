@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace DVLD.Tests.Conrols
+namespace DVLD.Tests.Controls
 {
     public partial class ctrlScheduleTest : UserControl
     {
