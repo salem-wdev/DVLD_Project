@@ -190,5 +190,44 @@ namespace DVLD_Business
             return clsLocalDrivingLicenseApplicationData.TotalTrialsPerTest(this.LocalDrivingLicenseApplicationID, (int)TestTypeID);
         }
 
+        public bool DosPassTest(clsTestType.enTestType TestTypeID)
+        {
+            
+
+            return clsLocalDrivingLicenseApplication.DosPassTest(this.LocalDrivingLicenseApplicationID, TestTypeID);
+        }
+
+        //public bool DosPassPreviousTest(clsTestType.enTestType CurrentTestType)
+        //{
+        //    return DosPassTest(this.Tes);
+        //}
+
+        public static bool DosPassPreviousTest(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        {
+            if(TestTypeID == clsTestType.enTestType.None)
+            {
+                return false;
+            }
+
+            if (TestTypeID == clsTestType.enTestType.VisionTest)
+            {
+                return true;
+            }
+
+            return clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID - 1);
+
+        }
+
+        public static bool DosPassTest(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        {
+            if (!clsTestAppointment.IsTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID))
+            {
+                return false;
+            }
+
+
+            return clsLocalDrivingLicenseApplicationData.DoesPassTestType(LocalDrivingLicenseApplicationID, (int)TestTypeID);
+        }
+
     }
 }

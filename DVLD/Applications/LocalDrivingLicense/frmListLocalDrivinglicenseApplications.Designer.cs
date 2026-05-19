@@ -155,6 +155,7 @@
             this.showPersonLicenseHistoryToolStripMenuItem.Name = "showPersonLicenseHistoryToolStripMenuItem";
             this.showPersonLicenseHistoryToolStripMenuItem.Size = new System.Drawing.Size(361, 38);
             this.showPersonLicenseHistoryToolStripMenuItem.Text = "Show Person License History";
+            this.showPersonLicenseHistoryToolStripMenuItem.Click += new System.EventHandler(this.showPersonLicenseHistoryToolStripMenuItem_Click);
             // 
             // toolStripSeparator6
             // 
@@ -168,6 +169,7 @@
             this.showLicenseToolStripMenuItem.Name = "showLicenseToolStripMenuItem";
             this.showLicenseToolStripMenuItem.Size = new System.Drawing.Size(361, 38);
             this.showLicenseToolStripMenuItem.Text = "Show &License";
+            this.showLicenseToolStripMenuItem.Click += new System.EventHandler(this.showLicenseToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
@@ -181,6 +183,7 @@
             this.issueDrivingLicenseFirstTimeToolStripMenuItem.Name = "issueDrivingLicenseFirstTimeToolStripMenuItem";
             this.issueDrivingLicenseFirstTimeToolStripMenuItem.Size = new System.Drawing.Size(361, 38);
             this.issueDrivingLicenseFirstTimeToolStripMenuItem.Text = "&Issue Driving License (First Time)";
+            this.issueDrivingLicenseFirstTimeToolStripMenuItem.Click += new System.EventHandler(this.issueDrivingLicenseFirstTimeToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
@@ -194,6 +197,7 @@
             this.scheduleStreetTestToolStripMenuItem.Name = "scheduleStreetTestToolStripMenuItem";
             this.scheduleStreetTestToolStripMenuItem.Size = new System.Drawing.Size(272, 38);
             this.scheduleStreetTestToolStripMenuItem.Text = "Schedule Street Test";
+            this.scheduleStreetTestToolStripMenuItem.Click += new System.EventHandler(this.scheduleStreetTestToolStripMenuItem_Click);
             // 
             // pbPersonImage
             // 
@@ -215,6 +219,7 @@
             this.scheduleWrittenTestToolStripMenuItem.Name = "scheduleWrittenTestToolStripMenuItem";
             this.scheduleWrittenTestToolStripMenuItem.Size = new System.Drawing.Size(272, 38);
             this.scheduleWrittenTestToolStripMenuItem.Text = "Schedule Written Test";
+            this.scheduleWrittenTestToolStripMenuItem.Click += new System.EventHandler(this.scheduleWrittenTestToolStripMenuItem_Click);
             // 
             // ScheduleTestsMenue
             // 
@@ -235,6 +240,7 @@
             this.scheduleVisionTestToolStripMenuItem.Name = "scheduleVisionTestToolStripMenuItem";
             this.scheduleVisionTestToolStripMenuItem.Size = new System.Drawing.Size(272, 38);
             this.scheduleVisionTestToolStripMenuItem.Text = "Schedule Vision Test";
+            this.scheduleVisionTestToolStripMenuItem.Click += new System.EventHandler(this.scheduleVisionTestToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -306,7 +312,7 @@
             this.toolStripSeparator6,
             this.showPersonLicenseHistoryToolStripMenuItem});
             this.cmsApplications.Name = "contextMenuStrip1";
-            this.cmsApplications.Size = new System.Drawing.Size(362, 344);
+            this.cmsApplications.Size = new System.Drawing.Size(362, 366);
             this.cmsApplications.Opening += new System.ComponentModel.CancelEventHandler(this.cmsApplications_Opening);
             // 
             // lblTitle

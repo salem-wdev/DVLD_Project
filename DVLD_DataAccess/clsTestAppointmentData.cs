@@ -72,6 +72,71 @@ namespace DVLD_DataAccess
             return isFound;
         }
 
+        public static bool GetTestAppointmentInfoByLocalDrivingLicenseApplicationID(int LocalDrivingLicenseApplicationID, int TestTypeID,
+            ref int TestAppointmentID, ref DateTime AppointmentDate,
+            ref float PaidFees, ref int CreatedByUserID, ref bool IsLocked,
+            ref int RetakeTestApplicationID)
+        {
+            bool isFound = false;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = "  SELECT Top 1 * FROM TestAppointments " +
+                "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID " +
+                "AND " +
+                "TestTypeID = @TestTypeID " +
+                "ORDER BY TestAppointmentID DESC; ";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
+            command.Parameters.AddWithValue("@TestTypeID", TestTypeID);
+            try
+            {
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+
+                    // The record was found
+                    isFound = true;
+                    TestAppointmentID = (int)reader["TestAppointmentID"];
+                    AppointmentDate = (DateTime)reader["AppointmentDate"];
+                    CreatedByUserID = (int)reader["CreatedByUserID"];
+                    PaidFees = Convert.ToSingle(reader["PaidFees"]);
+                    IsLocked = (bool)reader["IsLocked"];
+
+                    if (reader["RetakeTestApplicationID"] == DBNull.Value)
+                        RetakeTestApplicationID = -1;
+                    else
+                        RetakeTestApplicationID = (int)reader["RetakeTestApplicationID"];
+
+                }
+                else
+                {
+                    // The record was not found
+                    isFound = false;
+                }
+
+                reader.Close();
+
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+                isFound = false;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return isFound;
+        }
+
+
         public static bool GetLastTestAppointment(
              int LocalDrivingLicenseApplicationID, int TestTypeID,
             ref int TestAppointmentID, ref DateTime AppointmentDate,
@@ -402,7 +467,8 @@ namespace DVLD_DataAccess
             string query = "SELECT TOP 1 1 " +
                 "FROM[DVLD].[dbo].[TestAppointments] " +
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID" +
-                " AND [TestTypeID] = @TestTypeID AND[IsLocked] = 0 ;";
+                " AND [TestTypeID] = @TestTypeID AND[IsLocked] = 0 " +
+                "ORDER BY TestAppointmentID DESC";
 
             SqlCommand command = new SqlCommand(query, connection);
 
@@ -440,13 +506,14 @@ namespace DVLD_DataAccess
             int LocalDrivingLicenseApplicationID)
         {
 
-            bool IsFound = false;
+            bool IsLocked = false;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = "SELECT TOP 1 1 " +
+            string query = "SELECT TOP 1 IsLocked " +
                 "FROM[DVLD].[dbo].[TestAppointments] " +
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID" +
-                " AND [TestTypeID] = @TestTypeID AND [IsLocked] = 1 ";
+                " AND [TestTypeID] = @TestTypeID " +
+                "ORDER BY TestAppointmentID DESC";
 
             SqlCommand command = new SqlCommand(query, connection);
 
@@ -457,19 +524,16 @@ namespace DVLD_DataAccess
             {
                 connection.Open();
                 object scalar = command.ExecuteScalar();
-                if (scalar == null)
+                if (scalar != null && scalar != DBNull.Value)
                 {
-                    IsFound = false;
+                    IsLocked = (bool)scalar;
                 }
-                else
-                {
-                    IsFound = true;
-                }
+                
             }
             catch (Exception ex)
             {
                 //Console.WriteLine("Error: " + ex.Message);
-                IsFound = false;
+                IsLocked = false;
             }
 
             finally
@@ -477,7 +541,7 @@ namespace DVLD_DataAccess
                 connection.Close();
             }
 
-            return IsFound;
+            return IsLocked;
         }
 
         public static bool GetIsAppointmentexists(int TestTypeID,
@@ -490,7 +554,8 @@ namespace DVLD_DataAccess
             string query = "SELECT TOP 1 1 " +
                 "FROM[DVLD].[dbo].[TestAppointments] " +
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID " +
-                "AND[TestTypeID] = @TestTypeID ";
+                "AND[TestTypeID] = @TestTypeID " +
+                "ORDER BY TestAppointmentID DESC";
 
             SqlCommand command = new SqlCommand(query, connection);
 

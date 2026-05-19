@@ -47,7 +47,7 @@ namespace DVLD.Applications.LocalDrivingLicense
             }
         }
 
-        private void _ResetDefaultData()
+        public void ResetDefaultData()
         {
             lblLocalDrivingLicenseApplicationID.Text = "[???]";
             lblPassedTests.Text = "0";
@@ -71,7 +71,7 @@ namespace DVLD.Applications.LocalDrivingLicense
             }
             else
             {
-                _ResetDefaultData();
+                ResetDefaultData();
             }
         }
 
