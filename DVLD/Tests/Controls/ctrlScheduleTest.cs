@@ -80,6 +80,7 @@ namespace DVLD.Tests.Controls
         ///////////////////////////////////////////////////////////
         // Data
 
+
         private void _ClearData()
         {
             _LocalDrivingLicenseApplicationID = -1;
@@ -255,7 +256,7 @@ namespace DVLD.Tests.Controls
             _Mode = enMode.Update;
 
             _LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
-            _TestTypeID = TestType;
+            TestTypeID = TestType;
             _TestAppointmentID = TestAppointmentID;
 
             _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
@@ -275,12 +276,12 @@ namespace DVLD.Tests.Controls
             _Mode = enMode.AddNew;
 
             _LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
-            _TestTypeID = TestType;
+            TestTypeID = TestType;
 
             _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
 
-           
-                _TestAppointment = clsTestAppointment.GetNewTestAppointmentObject(LocalDrivingLicenseApplicationID, TestTypeID);
+
+            _TestAppointment = clsTestAppointment.GetNewTestAppointmentObject(LocalDrivingLicenseApplicationID, TestTypeID);
 
             return _LocalDrivingLicenseApplication != null && _TestAppointment != null;
 
@@ -350,7 +351,7 @@ namespace DVLD.Tests.Controls
         public bool LoadData(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int TestAppointmentID = -1)
         {
 
-            // TODO: most overloading this method to handle mode status.
+
             if (TestAppointmentID != -1)
             {
                 if (!_HandelObjects(LocalDrivingLicenseApplicationID, TestTypeID, TestAppointmentID))
@@ -367,6 +368,7 @@ namespace DVLD.Tests.Controls
                     return false;
                 }
             }
+
 
             _HandleMode();
 

@@ -53,14 +53,14 @@
             this.editToolStripMenuItem,
             this.takeTestToolStripMenuItem});
             this.cmsApplications.Name = "contextMenuStrip1";
-            this.cmsApplications.Size = new System.Drawing.Size(197, 102);
+            this.cmsApplications.Size = new System.Drawing.Size(139, 80);
             // 
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.Image = global::DVLD.Properties.Resources.edit_32;
             this.editToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(196, 38);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(138, 38);
             this.editToolStripMenuItem.Text = "&Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
             // 
@@ -69,7 +69,7 @@
             this.takeTestToolStripMenuItem.Image = global::DVLD.Properties.Resources.Test_32;
             this.takeTestToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.takeTestToolStripMenuItem.Name = "takeTestToolStripMenuItem";
-            this.takeTestToolStripMenuItem.Size = new System.Drawing.Size(196, 38);
+            this.takeTestToolStripMenuItem.Size = new System.Drawing.Size(138, 38);
             this.takeTestToolStripMenuItem.Text = "Take Test";
             // 
             // btnAddNewAppointment
@@ -118,6 +118,7 @@
             this.btnClose.TabIndex = 138;
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // pbTestTypeImage
             // 
