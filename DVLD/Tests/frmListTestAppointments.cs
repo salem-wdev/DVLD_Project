@@ -134,5 +134,12 @@ namespace DVLD.Tests
         {
             this.Close();
         }
+
+        private void takeTestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmTakeTest frm = new frmTakeTest(Convert.ToInt32(dgvLicenseTestAppointments.SelectedRows[0].Cells["TestAppointmentID"].Value), _TestTypeID); 
+            frm.ShowDialog();
+            _RefreshData();
+        }
     }
 }
