@@ -116,6 +116,7 @@ namespace DVLD.Tests
         {
             frmScheduleTest frm = new frmScheduleTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
             frm.ShowDialog();
+            _RefreshData();
         }
 
         private void dgvLicenseTestAppointments_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
