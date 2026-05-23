@@ -1,6 +1,7 @@
 ﻿using DVLD_DataAccess;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -41,7 +42,7 @@ namespace DVLD_Business
             get { return clsDetainedLicense.IsLicenseDetained(this.LicenseID); }
         }
 
-        public clsLicense()
+        private clsLicense()
 
         {
             this.LicenseID = -1;
@@ -60,7 +61,7 @@ namespace DVLD_Business
 
         }
 
-        public clsLicense(int LicenseID, int ApplicationID, int DriverID, int LicenseClass,
+        protected clsLicense(int LicenseID, int ApplicationID, int DriverID, int LicenseClass,
             DateTime IssueDate, DateTime ExpirationDate, string Notes,
             float PaidFees, bool IsActive, enIssueReason IssueReason, int CreatedByUserID)
 
@@ -83,6 +84,28 @@ namespace DVLD_Business
 
             Mode = enMode.Update;
         }
+
+        protected clsLicense(clsLicense NewLicense)
+
+        {
+            this.ApplicationID = NewLicense.ApplicationID;
+            this.DriverID = NewLicense.DriverID;
+            this.LicenseClass = NewLicense.LicenseClass;
+            this.IssueDate = NewLicense.IssueDate;
+            this.ExpirationDate = NewLicense.ExpirationDate;
+            this.Notes = NewLicense.Notes;
+            this.PaidFees = NewLicense.PaidFees;
+            this.IsActive = NewLicense.IsActive;
+            this.IssueReason = NewLicense.IssueReason;
+            this.CreatedByUserID = NewLicense.CreatedByUserID;
+
+            this.DriverInfo = NewLicense.DriverInfo;
+            this.LicenseClassIfo = NewLicense.LicenseClassIfo;
+            this.DetainedInfo = NewLicense.DetainedInfo;
+
+            Mode = enMode.AddNew;
+        }
+
 
         private bool _AddNewLicense()
         {
@@ -132,6 +155,9 @@ namespace DVLD_Business
 
         public bool Save()
         {
+
+            throw new NotImplementedException("Most deactivate old licenses for renew and replace scenarios");
+
             switch (Mode)
             {
                 case enMode.AddNew:
@@ -180,7 +206,117 @@ namespace DVLD_Business
 
         }
 
+        public static int GetActiveLicenseIDByDriverID(int DriverID, int LicenseClassID)
+        {
+            return clsLicenseData.GetActiveLicenseIDByDriverID(DriverID, LicenseClassID);
+        }
 
+        private static clsLicense _PrepareObj(clsApplication.enApplicationType IssueReason,
+            int ApplicationID, int DriverID, int LicenseClassID,
+            int LocalDrivingLicenseApplicationID)
+        {
+            clsLicense OldLicense = null;
+            clsLicense NewLicense = null;
+
+
+            if (IssueReason == clsApplication.enApplicationType.RetakeTest ||
+        IssueReason == clsApplication.enApplicationType.ReleaseDetainedDrivingLicense ||
+        IssueReason == clsApplication.enApplicationType.NewInternationalLicense)
+            {
+                return null;
+            }
+
+            if (IssueReason == clsApplication.enApplicationType.RenewDrivingLicense)
+            {
+                OldLicense = clsLicense.Find(GetActiveLicenseIDByDriverID(DriverID, LicenseClassID));
+                if (OldLicense != null)
+                {
+                    if(!OldLicense.IsActive)
+                    {
+                        return null;
+                    }
+
+                    if (OldLicense.ExpirationDate > DateTime.Now)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+
+                        NewLicense = new clsLicense(OldLicense);
+
+                        OldLicense.IsActive = false;
+                    }
+                }
+
+            }
+
+
+            if (IssueReason == clsApplication.enApplicationType.NewDrivingLicense)
+            {
+                if (!clsLocalDrivingLicenseApplication.DoesPassAllTests(LocalDrivingLicenseApplicationID))
+                {
+                    return null;
+                }
+                else
+                {
+                    NewLicense = new clsLicense();
+                }
+            }
+
+            if(IssueReason == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense ||
+                IssueReason == clsApplication.enApplicationType.ReplaceLostDrivingLicense)
+            {
+                OldLicense = clsLicense.Find(GetActiveLicenseIDByDriverID(DriverID, LicenseClassID));
+                if (OldLicense == null || !OldLicense.IsActive)
+                {
+                    return null;
+                }
+                else
+                {
+
+                    NewLicense = new clsLicense(OldLicense);
+
+                    OldLicense.IsActive = false;
+                }
+            }
+
+            return NewLicense;
+
+        }
+
+
+
+        public static clsLicense GetNewLicenseObj(int ApplicationID, int DriverID, int LicenseClassID, int LocalDrivingLicenseApplicationID = -1)
+        {
+
+            clsApplication.enApplicationType IssueReason = clsApplication.GetApplicationIssueReason(ApplicationID);
+
+            clsLicense Newlicense = _PrepareObj(IssueReason, ApplicationID, DriverID, LicenseClassID, LocalDrivingLicenseApplicationID);
+
+            if (Newlicense == null)
+            {
+                return null;
+            }
+            else
+            {
+                Newlicense.ApplicationID = ApplicationID;
+                Newlicense.DriverID = DriverID;
+                Newlicense.LicenseClass = LicenseClassID;
+                Newlicense.IssueReason = (enIssueReason)IssueReason;
+                Newlicense.IssueDate = DateTime.Now;
+
+                if (IssueReason != clsApplication.enApplicationType.ReplaceDamagedDrivingLicense &&
+               IssueReason != clsApplication.enApplicationType.ReplaceLostDrivingLicense)
+                {
+                    Newlicense.ExpirationDate = DateTime.Now.AddYears(clsLicenseClass.Find(LicenseClassID).DefaultValidityLength);
+                }
+                
+                Newlicense.IsActive = true;
+                return Newlicense;
+
+            }
+        }
 
     }
 
