@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -397,6 +398,50 @@ namespace DVLD_DataAccess
             return LicenseID;
         }
 
+        public static bool DeactivateLicenseIDByDriverID(int DriverID, int LicenseClassID)
+        {
+            int effectedRows = 0;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = "UPDATE Licenses " +
+                "SET IsActive = 0 " +
+                "WHERE LicenseID = ( " +
+                "SELECT TOP(1) LicenseID " +
+                "FROM Licenses " +
+                "WHERE DriverID = @DriverID " +
+                "AND LicenseClass = @LicenseClass " +
+                "ORDER BY LicenseID DESC " +
+                "); ";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@DriverID", DriverID);
+            command.Parameters.AddWithValue("@LicenseClass", LicenseClassID);
+
+            try
+            {
+                connection.Open();
+
+                effectedRows = command.ExecuteNonQuery();
+
+                
+            }
+
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+
+            return (effectedRows > 0);
+        }
 
 
         public static bool DeactivateLicense(int LicenseID)

@@ -19,7 +19,7 @@ namespace DVLD_Business
         public clsDriver DriverInfo;
         public int LicenseID { set; get; }
         public int ApplicationID { set; get; }
-        public int DriverID { set; get; }
+        public int DriverID { set; get; } 
         public int LicenseClass { set; get; }
         public clsLicenseClass LicenseClassIfo;
         public DateTime IssueDate { set; get; }
@@ -27,7 +27,7 @@ namespace DVLD_Business
         public string Notes { set; get; }
         public float PaidFees { set; get; }
         public bool IsActive { set; get; }
-        public enIssueReason IssueReason { set; get; }
+        public enIssueReason IssueReason { private set; get; }
         public string IssueReasonText
         {
             get
@@ -153,30 +153,44 @@ namespace DVLD_Business
 
         }
 
+        
+
         public bool Save()
         {
 
-            throw new NotImplementedException("Most deactivate old licenses for renew and replace scenarios");
+            //throw new NotImplementedException("Most deactivate old licenses for renew and replace scenarios");
+
 
             switch (Mode)
             {
                 case enMode.AddNew:
+                    if (IssueReason != enIssueReason.FirstTime)
+                    {
+                        if (!clsLicenseData.DeactivateLicenseIDByDriverID(this.DriverID, this.LicenseClass))
+                        {
+
+                            return false;
+
+                        }
+                    }
+
                     if (_AddNewLicense())
                     {
 
                         Mode = enMode.Update;
                         return true;
+
                     }
                     else
                     {
                         return false;
                     }
-
+                   
                 case enMode.Update:
 
-                    return _UpdateLicense();
+                            return _UpdateLicense();
 
-            }
+                        }
 
             return false;
         }
@@ -291,6 +305,9 @@ namespace DVLD_Business
         {
 
             clsApplication.enApplicationType IssueReason = clsApplication.GetApplicationIssueReason(ApplicationID);
+
+            throw new NotImplementedException("Most prevent international license to throw here");
+            throw new NotImplementedException("Most declare issue reason");
 
             clsLicense Newlicense = _PrepareObj(IssueReason, ApplicationID, DriverID, LicenseClassID, LocalDrivingLicenseApplicationID);
 
