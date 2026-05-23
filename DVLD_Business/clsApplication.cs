@@ -280,7 +280,7 @@ namespace DVLD_Business
             return clsApplicationData.CanApplicationBeEdited(ApplicationID);
         }
 
-        public static enApplicationType GetApplicationIssueReason(int ApplicationID)
+        public static enApplicationType GetApplicationTypeID(int ApplicationID)
         {
             return (enApplicationType)clsApplicationData.GetApplicationTypeID(ApplicationID);
         }
