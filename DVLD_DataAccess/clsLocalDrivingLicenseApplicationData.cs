@@ -385,6 +385,49 @@ namespace DVLD_DataAccess
 
         }
 
+        public static bool DoesPassAllTests(int LocalDrivingLicenseApplicationID)
+        {
+            bool Result = false;
 
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = " SELECT TestResult " +
+                "FROM Tests " +
+                "WHERE (TestAppointmentID = " +
+                "(SELECT TOP (1) TestAppointmentID " +
+                "FROM TestAppointments " +
+                "WHERE (LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID AND TestTypeID = 3) " +
+                "ORDER BY TestAppointmentID DESC))";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
+
+            try
+            {
+                connection.Open();
+
+                object result = command.ExecuteScalar();
+
+                if (result != null && bool.TryParse(result.ToString(), out bool returnedResult))
+                {
+                    Result = returnedResult;
+                }
+            }
+
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+            return Result;
+
+        }
     }
 }
