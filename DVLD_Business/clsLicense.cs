@@ -225,7 +225,7 @@ namespace DVLD_Business
             return clsLicenseData.GetActiveLicenseIDByDriverID(DriverID, LicenseClassID);
         }
 
-        private static clsLicense _PrepareObj(clsApplication.enApplicationType IssueReason,
+        private static clsLicense _PrepareObj(clsApplication.enApplicationType ApplicationType,
             int ApplicationID, int DriverID, int LicenseClassID,
             int LocalDrivingLicenseApplicationID)
         {
@@ -233,14 +233,15 @@ namespace DVLD_Business
             clsLicense NewLicense = null;
 
 
-            if (IssueReason == clsApplication.enApplicationType.RetakeTest ||
-        IssueReason == clsApplication.enApplicationType.ReleaseDetainedDrivingLicense ||
-        IssueReason == clsApplication.enApplicationType.NewInternationalLicense)
+            if (ApplicationType == clsApplication.enApplicationType.RetakeTest ||
+        ApplicationType == clsApplication.enApplicationType.ReleaseDetainedDrivingLicense ||
+        ApplicationType == clsApplication.enApplicationType.NewInternationalLicense || 
+        ApplicationType == clsApplication.enApplicationType.NewInternationalLicense)
             {
                 return null;
             }
 
-            if (IssueReason == clsApplication.enApplicationType.RenewDrivingLicense)
+            if (ApplicationType == clsApplication.enApplicationType.RenewDrivingLicense)
             {
                 OldLicense = clsLicense.Find(GetActiveLicenseIDByDriverID(DriverID, LicenseClassID));
                 if (OldLicense != null)
@@ -258,15 +259,17 @@ namespace DVLD_Business
                     {
 
                         NewLicense = new clsLicense(OldLicense);
+                        NewLicense.IssueReason = enIssueReason.Renew;
 
                         OldLicense.IsActive = false;
+
                     }
                 }
 
             }
 
 
-            if (IssueReason == clsApplication.enApplicationType.NewDrivingLicense)
+            if (ApplicationType == clsApplication.enApplicationType.NewDrivingLicense)
             {
                 if (!clsLocalDrivingLicenseApplication.DoesPassAllTests(LocalDrivingLicenseApplicationID))
                 {
@@ -275,11 +278,13 @@ namespace DVLD_Business
                 else
                 {
                     NewLicense = new clsLicense();
+                    NewLicense.IssueReason = enIssueReason.FirstTime;
                 }
             }
 
-            if(IssueReason == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense ||
-                IssueReason == clsApplication.enApplicationType.ReplaceLostDrivingLicense)
+
+            if (ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense ||
+                ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense)
             {
                 OldLicense = clsLicense.Find(GetActiveLicenseIDByDriverID(DriverID, LicenseClassID));
                 if (OldLicense == null || !OldLicense.IsActive)
@@ -290,6 +295,10 @@ namespace DVLD_Business
                 {
 
                     NewLicense = new clsLicense(OldLicense);
+
+                    NewLicense.IssueReason = (ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense)
+                             ? enIssueReason.DamagedReplacement
+                             : enIssueReason.LostReplacement;
 
                     OldLicense.IsActive = false;
                 }
@@ -304,12 +313,12 @@ namespace DVLD_Business
         public static clsLicense GetNewLicenseObj(int ApplicationID, int DriverID, int LicenseClassID, int LocalDrivingLicenseApplicationID = -1)
         {
 
-            clsApplication.enApplicationType IssueReason = clsApplication.GetApplicationIssueReason(ApplicationID);
+            clsApplication.enApplicationType ApplicationType = clsApplication.GetApplicationTypeID(ApplicationID);
 
-            throw new NotImplementedException("Most prevent international license to throw here");
-            throw new NotImplementedException("Most declare issue reason");
+            //throw new NotImplementedException("Most prevent international license to throw here");
+            //throw new NotImplementedException("Most declare issue reason");
 
-            clsLicense Newlicense = _PrepareObj(IssueReason, ApplicationID, DriverID, LicenseClassID, LocalDrivingLicenseApplicationID);
+            clsLicense Newlicense = _PrepareObj(ApplicationType, ApplicationID, DriverID, LicenseClassID, LocalDrivingLicenseApplicationID);
 
             if (Newlicense == null)
             {
@@ -320,11 +329,10 @@ namespace DVLD_Business
                 Newlicense.ApplicationID = ApplicationID;
                 Newlicense.DriverID = DriverID;
                 Newlicense.LicenseClass = LicenseClassID;
-                Newlicense.IssueReason = (enIssueReason)IssueReason;
                 Newlicense.IssueDate = DateTime.Now;
 
-                if (IssueReason != clsApplication.enApplicationType.ReplaceDamagedDrivingLicense &&
-               IssueReason != clsApplication.enApplicationType.ReplaceLostDrivingLicense)
+                if (ApplicationType != clsApplication.enApplicationType.ReplaceDamagedDrivingLicense &&
+               ApplicationType != clsApplication.enApplicationType.ReplaceLostDrivingLicense)
                 {
                     Newlicense.ExpirationDate = DateTime.Now.AddYears(clsLicenseClass.Find(LicenseClassID).DefaultValidityLength);
                 }
