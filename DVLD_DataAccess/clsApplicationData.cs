@@ -498,6 +498,44 @@ namespace DVLD_DataAccess
 
         }
 
+        public static int GetApplicationTypeID(int ApplicationID)
+        {
+            int ApplicationTypeID = -1;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = "SELECT TOP (1) ApplicationTypeID " +
+                "FROM " +
+                "Applications WHERE ApplicationID = @ApplicationID";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
+
+            try
+            {
+                connection.Open();
+                object result = command.ExecuteScalar();
+
+
+                if (result != null && int.TryParse(result.ToString(), out int AppTypeID))
+                {
+                    ApplicationTypeID = AppTypeID;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+                return ApplicationTypeID;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return ApplicationTypeID;
+        }
+
 
     }
 }
