@@ -22,8 +22,11 @@ namespace DVLD_Business
         public int DriverID { set; get; } 
         public int LicenseClass { set; get; }
         public clsLicenseClass LicenseClassIfo;
-        public DateTime IssueDate { set; get; }
-        public DateTime ExpirationDate { set; get; }
+        private DateTime _IssueDate; 
+        private DateTime _ExpirationDate;
+
+        public DateTime IssueDate { get => _IssueDate;}
+        public DateTime ExpirationDate { get => _ExpirationDate;}
         public string Notes { set; get; }
         public float PaidFees { set; get; }
         public bool IsActive { set; get; }
@@ -49,8 +52,8 @@ namespace DVLD_Business
             this.ApplicationID = -1;
             this.DriverID = -1;
             this.LicenseClass = -1;
-            this.IssueDate = DateTime.Now;
-            this.ExpirationDate = DateTime.Now;
+            this._IssueDate = DateTime.Now;
+            this._ExpirationDate = DateTime.Now;
             this.Notes = "";
             this.PaidFees = 0;
             this.IsActive = true;
@@ -70,8 +73,8 @@ namespace DVLD_Business
             this.ApplicationID = ApplicationID;
             this.DriverID = DriverID;
             this.LicenseClass = LicenseClass;
-            this.IssueDate = IssueDate;
-            this.ExpirationDate = ExpirationDate;
+            this._IssueDate = IssueDate;
+            this._ExpirationDate = ExpirationDate;
             this.Notes = Notes;
             this.PaidFees = PaidFees;
             this.IsActive = IsActive;
@@ -91,8 +94,8 @@ namespace DVLD_Business
             this.ApplicationID = NewLicense.ApplicationID;
             this.DriverID = NewLicense.DriverID;
             this.LicenseClass = NewLicense.LicenseClass;
-            this.IssueDate = NewLicense.IssueDate;
-            this.ExpirationDate = NewLicense.ExpirationDate;
+            this._IssueDate = NewLicense.IssueDate;
+            this._ExpirationDate = NewLicense.ExpirationDate;
             this.Notes = NewLicense.Notes;
             this.PaidFees = NewLicense.PaidFees;
             this.IsActive = NewLicense.IsActive;
@@ -112,7 +115,7 @@ namespace DVLD_Business
             //call DataAccess Layer 
 
             this.LicenseID = clsLicenseData.AddNewLicense(this.ApplicationID, this.DriverID, this.LicenseClass,
-               this.IssueDate, this.ExpirationDate, this.Notes, this.PaidFees,
+               ref this._IssueDate, ref this._ExpirationDate, this.Notes, this.PaidFees,
                this.IsActive, (byte)this.IssueReason, this.CreatedByUserID);
 
 
@@ -124,8 +127,8 @@ namespace DVLD_Business
             //call DataAccess Layer 
 
             return clsLicenseData.UpdateLicense(this.ApplicationID, this.LicenseID, this.DriverID, this.LicenseClass,
-               this.IssueDate, this.ExpirationDate, this.Notes, this.PaidFees,
-               this.IsActive, (byte)this.IssueReason, this.CreatedByUserID);
+               this.Notes, this.PaidFees, this.IsActive, (byte)this.IssueReason,
+               this.CreatedByUserID);
         }
 
         public static clsLicense Find(int LicenseID)
@@ -329,13 +332,8 @@ namespace DVLD_Business
                 Newlicense.ApplicationID = ApplicationID;
                 Newlicense.DriverID = DriverID;
                 Newlicense.LicenseClass = LicenseClassID;
-                Newlicense.IssueDate = DateTime.Now;
 
-                if (ApplicationType != clsApplication.enApplicationType.ReplaceDamagedDrivingLicense &&
-               ApplicationType != clsApplication.enApplicationType.ReplaceLostDrivingLicense)
-                {
-                    Newlicense.ExpirationDate = DateTime.Now.AddYears(clsLicenseClass.Find(LicenseClassID).DefaultValidityLength);
-                }
+                
                 
                 Newlicense.IsActive = true;
                 return Newlicense;
