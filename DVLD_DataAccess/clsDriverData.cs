@@ -161,16 +161,15 @@ namespace DVLD_DataAccess
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = @"Insert Into Drivers (PersonID,CreatedByUserID,CreatedDate)
-                            Values (@PersonID,@CreatedByUserID,@CreatedDate);
-                          
-                            SELECT SCOPE_IDENTITY();";
+            string query = @"INSERT INTO Drivers (PersonID, CreatedByUserID, CreatedDate)
+                 VALUES (@PersonID, @CreatedByUserID, GETDATE());
+                            
+                 SELECT SCOPE_IDENTITY();";
 
 
             SqlCommand command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@PersonID", PersonID);
             command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
-            command.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
             try
             {
                 connection.Open();
