@@ -1,5 +1,6 @@
 ﻿using DVLD.Applications.Local_Driving_License;
 using DVLD.Global_Classes;
+using DVLD.Licenses.Local_Licenses;
 using DVLD.Tests;
 using DVLD_Business;
 using System;
@@ -358,7 +359,8 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void issueDrivingLicenseFirstTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException("Issue Driving License First Time");
+            frmIssueDriverLicenseFirstTime frm = new frmIssueDriverLicenseFirstTime((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            frm.ShowDialog();
         }
 
         private void showLicenseToolStripMenuItem_Click(object sender, EventArgs e)
