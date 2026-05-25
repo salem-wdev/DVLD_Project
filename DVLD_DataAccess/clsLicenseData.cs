@@ -217,6 +217,11 @@ namespace DVLD_DataAccess
                                            ,@IssueReason
                                            ,@CreatedByUserID);
                                 
+                                    UPDATE [dbo].[Applications]
+                                       SET 
+                                          [ApplicationStatus] =3
+                                          
+                                     WHERE ApplicationID = @ApplicationID
                                 
                                 SELECT SCOPE_IDENTITY() AS NewLicenseID, GETDATE() AS DB_IssueDate, @CalculatedExpirationDate AS DB_ExpirationDate;";
 
