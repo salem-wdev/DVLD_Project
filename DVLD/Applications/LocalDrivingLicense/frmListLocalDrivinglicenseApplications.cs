@@ -373,7 +373,9 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void showPersonLicenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException("Show Person License History");
+            clsPerson person = clsPerson.Find(dgvLocalDrivingLicenseApplications.CurrentRow.Cells[2].Value.ToString());
+            frmShowPersonLicenseHistory frm = new frmShowPersonLicenseHistory(person.PersonID);
+            frm.ShowDialog();
         }
     }
 }
