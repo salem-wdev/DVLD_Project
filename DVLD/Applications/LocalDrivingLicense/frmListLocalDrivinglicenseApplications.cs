@@ -361,6 +361,7 @@ namespace DVLD.Applications.LocalDrivingLicense
         {
             frmIssueDriverLicenseFirstTime frm = new frmIssueDriverLicenseFirstTime((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             frm.ShowDialog();
+            _RefreshData();
         }
 
         private void showLicenseToolStripMenuItem_Click(object sender, EventArgs e)
