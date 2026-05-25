@@ -365,7 +365,9 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void showLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException("Show License");
+            clsLocalDrivingLicenseApplication LocalDriving = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            frmShowLicenseInfo frm = new frmShowLicenseInfo(LocalDriving.GetActiveLicenseID());
+            frm.ShowDialog();
         }
 
         private void showPersonLicenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
