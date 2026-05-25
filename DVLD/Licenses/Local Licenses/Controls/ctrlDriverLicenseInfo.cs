@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DVLD.Classes;
 
-namespace DVLD.Licenses.Controls
+namespace DVLD.Licenses.Local_Licenses.Controls
 {
     public partial class ctrlDriverLicenseInfo : UserControl
     {

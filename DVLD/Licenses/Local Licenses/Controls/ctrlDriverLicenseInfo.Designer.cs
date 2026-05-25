@@ -1,4 +1,4 @@
-﻿namespace DVLD.Licenses.Controls
+﻿namespace DVLD.Licenses.Local_Licenses.Controls
 {
     partial class ctrlDriverLicenseInfo
     {
