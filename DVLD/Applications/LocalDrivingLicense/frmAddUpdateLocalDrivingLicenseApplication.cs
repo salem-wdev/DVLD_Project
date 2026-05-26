@@ -116,8 +116,8 @@ namespace DVLD.Applications.Local_Driving_License
                 _LocalLicenseApplication.CreatedByUserID = clsGlobal.CurrentUser.UserID;
                 _LocalLicenseApplication.CreatedByUserInfo = clsGlobal.CurrentUser;
             }
-           
-            _LocalLicenseApplication.ApplicationTypeID = (clsApplication.enApplicationType)cbLicenseClass.SelectedValue; // Assuming Application
+
+            _LocalLicenseApplication.ApplicationTypeID = clsApplication.enApplicationType.NewDrivingLicense;
             _LocalLicenseApplication.ApplicationTypeInfo = clsApplicationType.Find((int)_LocalLicenseApplication.ApplicationTypeID);
             _LocalLicenseApplication.LastStatusDate = DateTime.Now;
 
