@@ -83,6 +83,7 @@
             this.dgvLocalLicensesHistory.Size = new System.Drawing.Size(996, 168);
             this.dgvLocalLicensesHistory.TabIndex = 132;
             this.dgvLocalLicensesHistory.TabStop = false;
+            this.dgvLocalLicensesHistory.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvLocalLicensesHistory_CellMouseDown);
             // 
             // cmsLocalLicenseHistory
             // 
@@ -233,20 +234,21 @@
             this.dgvInternationalLicensesHistory.Size = new System.Drawing.Size(996, 168);
             this.dgvInternationalLicensesHistory.TabIndex = 136;
             this.dgvInternationalLicensesHistory.TabStop = false;
+            this.dgvInternationalLicensesHistory.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvInternationalLicensesHistory_CellMouseDown);
             // 
             // cmsInterenationalLicenseHistory
             // 
             this.cmsInterenationalLicenseHistory.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.InternationalLicenseHistorytoolStripMenuItem});
             this.cmsInterenationalLicenseHistory.Name = "cmsLocalLicenseHistory";
-            this.cmsInterenationalLicenseHistory.Size = new System.Drawing.Size(197, 64);
+            this.cmsInterenationalLicenseHistory.Size = new System.Drawing.Size(186, 42);
             // 
             // InternationalLicenseHistorytoolStripMenuItem
             // 
             this.InternationalLicenseHistorytoolStripMenuItem.Image = global::DVLD.Properties.Resources.License_View_32;
             this.InternationalLicenseHistorytoolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.InternationalLicenseHistorytoolStripMenuItem.Name = "InternationalLicenseHistorytoolStripMenuItem";
-            this.InternationalLicenseHistorytoolStripMenuItem.Size = new System.Drawing.Size(196, 38);
+            this.InternationalLicenseHistorytoolStripMenuItem.Size = new System.Drawing.Size(185, 38);
             this.InternationalLicenseHistorytoolStripMenuItem.Text = "Show License Info";
             this.InternationalLicenseHistorytoolStripMenuItem.Click += new System.EventHandler(this.InternationalLicenseHistorytoolStripMenuItem_Click);
             // 

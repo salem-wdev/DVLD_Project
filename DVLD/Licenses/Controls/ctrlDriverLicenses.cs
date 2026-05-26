@@ -1,4 +1,5 @@
-﻿using DVLD.Licenses.International_Licenses;
+﻿using DVLD.Global_Classes;
+using DVLD.Licenses.International_Licenses;
 using DVLD.Licenses.Local_Licenses;
 using DVLD_Business;
 using System;
@@ -146,6 +147,16 @@ namespace DVLD.Licenses.Controls
         {
             frmShowInternationalLicenseInfo frm = new frmShowInternationalLicenseInfo((int)dgvInternationalLicensesHistory.CurrentRow.Cells[0].Value); 
             frm.ShowDialog();
+        }
+
+        private void dgvLocalLicensesHistory_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            clsUtil.ConfigureDataGridViewContextMenu(e, dgvLocalLicensesHistory);
+        }
+
+        private void dgvInternationalLicensesHistory_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            clsUtil.ConfigureDataGridViewContextMenu(e, dgvInternationalLicensesHistory);
         }
     }
 }
