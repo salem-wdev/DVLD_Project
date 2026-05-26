@@ -116,6 +116,7 @@ namespace DVLD.Tests
         {
             frmScheduleTest frm = new frmScheduleTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
             frm.ShowDialog();
+            _RefreshData();
         }
 
         private void dgvLicenseTestAppointments_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
@@ -133,6 +134,13 @@ namespace DVLD.Tests
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void takeTestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmTakeTest frm = new frmTakeTest(Convert.ToInt32(dgvLicenseTestAppointments.SelectedRows[0].Cells["TestAppointmentID"].Value), _TestTypeID); 
+            frm.ShowDialog();
+            _RefreshData();
         }
     }
 }

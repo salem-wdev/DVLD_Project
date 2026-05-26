@@ -1,4 +1,5 @@
-﻿using DVLD_Business;
+﻿using DVLD.Licenses.Local_Licenses;
+using DVLD_Business;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -77,7 +78,8 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void llShowLicenceInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            
+            frmShowLicenseInfo frm = new frmShowLicenseInfo(_LicenseID);
+            frm.ShowDialog();
         }
     }
 }

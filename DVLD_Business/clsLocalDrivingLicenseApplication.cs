@@ -120,6 +120,11 @@ namespace DVLD_Business
 
         public override bool Save()
         {
+            if (Mode == enMode.AddNew && clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID) != -1)
+            {
+                return false;
+            }
+
 
             //Because of inheritance first we call the save method in the base class,
             //it will take care of adding all information to the application table.
@@ -228,6 +233,12 @@ namespace DVLD_Business
 
             return clsLocalDrivingLicenseApplicationData.DoesPassTestType(LocalDrivingLicenseApplicationID, (int)TestTypeID);
         }
+
+        public static bool DoesPassAllTests(int LocalDrivingLicenseApplicationID)
+        {
+            return clsLocalDrivingLicenseApplicationData.DoesPassAllTests(LocalDrivingLicenseApplicationID);
+        }
+
 
     }
 }

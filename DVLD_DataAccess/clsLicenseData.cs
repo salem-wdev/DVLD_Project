@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -165,44 +166,70 @@ namespace DVLD_DataAccess
         }
 
         public static int AddNewLicense(int ApplicationID, int DriverID, int LicenseClass,
-             DateTime IssueDate, DateTime ExpirationDate, string Notes,
+            ref DateTime IssueDate,ref DateTime ExpirationDate, string Notes,
              float PaidFees, bool IsActive, byte IssueReason, int CreatedByUserID)
         {
             int LicenseID = -1;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = @"
-                              INSERT INTO Licenses
-                               (ApplicationID,
-                                DriverID,
-                                LicenseClass,
-                                IssueDate,
-                                ExpirationDate,
-                                Notes,
-                                PaidFees,
-                                IsActive,IssueReason,
-                                CreatedByUserID)
-                         VALUES
-                               (
-                               @ApplicationID,
-                               @DriverID,
-                               @LicenseClass,
-                               @IssueDate,
-                               @ExpirationDate,
-                               @Notes,
-                               @PaidFees,
-                               @IsActive,@IssueReason, 
-                               @CreatedByUserID);
-                            SELECT SCOPE_IDENTITY();";
+            string query = @"DECLARE @CalculatedExpirationDate DATETIME;
+                                
+                                
+                                IF @IssueReason = 3 OR @IssueReason = 4 
+                                BEGIN
+                                
+                                    SELECT TOP 1 @CalculatedExpirationDate = ExpirationDate 
+                                    FROM [dbo].[Licenses] 
+                                    WHERE DriverID = @DriverID AND LicenseClass = @LicenseClass
+                                    ORDER BY LicenseID DESC; 
+                                END
+                                ELSE 
+                                BEGIN
+                                
+                                    SET @CalculatedExpirationDate = DATEADD(year, 
+                                        (SELECT DefaultValidityLength FROM [dbo].[LicenseClasses] WHERE LicenseClassID = @LicenseClass), 
+                                        GETDATE()
+                                    );
+                                END
+                                
+                                
+                                INSERT INTO [dbo].[Licenses]
+                                           ([ApplicationID]
+                                           ,[DriverID]
+                                           ,[LicenseClass]
+                                           ,[IssueDate]
+                                           ,[ExpirationDate]
+                                           ,[Notes]
+                                           ,[PaidFees]
+                                           ,[IsActive]
+                                           ,[IssueReason]
+                                           ,[CreatedByUserID])
+                                     VALUES
+                                           (@ApplicationID
+                                           ,@DriverID
+                                           ,@LicenseClass
+                                           ,GETDATE()                
+                                           ,@CalculatedExpirationDate 
+                                           ,@Notes
+                                           ,@PaidFees
+                                           ,@IsActive
+                                           ,@IssueReason
+                                           ,@CreatedByUserID);
+                                
+                                    UPDATE [dbo].[Applications]
+                                       SET 
+                                          [ApplicationStatus] =3
+                                          
+                                     WHERE ApplicationID = @ApplicationID
+                                
+                                SELECT SCOPE_IDENTITY() AS NewLicenseID, GETDATE() AS DB_IssueDate, @CalculatedExpirationDate AS DB_ExpirationDate;";
 
             SqlCommand command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
             command.Parameters.AddWithValue("@DriverID", DriverID);
             command.Parameters.AddWithValue("@LicenseClass", LicenseClass);
-            command.Parameters.AddWithValue("@IssueDate", IssueDate);
 
-            command.Parameters.AddWithValue("@ExpirationDate", ExpirationDate);
 
             if (Notes == "")
                 command.Parameters.AddWithValue("@Notes", DBNull.Value);
@@ -221,11 +248,15 @@ namespace DVLD_DataAccess
             {
                 connection.Open();
 
-                object result = command.ExecuteScalar();
+                SqlDataReader reader = command.ExecuteReader();
 
-                if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                if (reader.Read())
                 {
-                    LicenseID = insertedID;
+                    LicenseID = Convert.ToInt32(reader["NewLicenseID"]);
+
+
+                    IssueDate = Convert.ToDateTime(reader["DB_IssueDate"]);
+                    ExpirationDate = Convert.ToDateTime(reader["DB_ExpirationDate"]);
                 }
             }
 
@@ -246,8 +277,8 @@ namespace DVLD_DataAccess
         }
 
         public static bool UpdateLicense(int LicenseID, int ApplicationID, int DriverID, int LicenseClass,
-             DateTime IssueDate, DateTime ExpirationDate, string Notes,
-             float PaidFees, bool IsActive, byte IssueReason, int CreatedByUserID)
+             string Notes, float PaidFees, bool IsActive, byte IssueReason,
+             int CreatedByUserID)
         {
 
             int rowsAffected = 0;
@@ -256,8 +287,6 @@ namespace DVLD_DataAccess
             string query = @"UPDATE Licenses
                            SET ApplicationID=@ApplicationID, DriverID = @DriverID,
                               LicenseClass = @LicenseClass,
-                              IssueDate = @IssueDate,
-                              ExpirationDate = @ExpirationDate,
                               Notes = @Notes,
                               PaidFees = @PaidFees,
                               IsActive = @IsActive,IssueReason=@IssueReason,
@@ -270,9 +299,7 @@ namespace DVLD_DataAccess
             command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
             command.Parameters.AddWithValue("@DriverID", DriverID);
             command.Parameters.AddWithValue("@LicenseClass", LicenseClass);
-            command.Parameters.AddWithValue("@IssueDate", IssueDate);
-            command.Parameters.AddWithValue("@ExpirationDate", ExpirationDate);
-
+            
             if (Notes == "")
                 command.Parameters.AddWithValue("@Notes", DBNull.Value);
             else
@@ -349,6 +376,99 @@ namespace DVLD_DataAccess
 
             return LicenseID;
         }
+
+        public static int GetActiveLicenseIDByDriverID(int DriverID, int LicenseClassID)
+        {
+            int LicenseID = -1;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"SELECT        Licenses.LicenseID
+                            FROM Licenses INNER JOIN
+                                                     Drivers ON Licenses.DriverID = Drivers.DriverID
+                            WHERE  
+                             
+                             Licenses.LicenseClass = @LicenseClass 
+                              AND Drivers.DriverID = @DriverID
+                              And IsActive=1;";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@DriverID", DriverID);
+            command.Parameters.AddWithValue("@LicenseClass", LicenseClassID);
+
+            try
+            {
+                connection.Open();
+
+                object result = command.ExecuteScalar();
+
+                if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                {
+                    LicenseID = insertedID;
+                }
+            }
+
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+
+            return LicenseID;
+        }
+
+        public static bool DeactivateLicenseIDByDriverID(int DriverID, int LicenseClassID)
+        {
+            int effectedRows = 0;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = "UPDATE Licenses " +
+                "SET IsActive = 0 " +
+                "WHERE LicenseID = ( " +
+                "SELECT TOP(1) LicenseID " +
+                "FROM Licenses " +
+                "WHERE DriverID = @DriverID " +
+                "AND LicenseClass = @LicenseClass " +
+                "ORDER BY LicenseID DESC " +
+                "); ";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@DriverID", DriverID);
+            command.Parameters.AddWithValue("@LicenseClass", LicenseClassID);
+
+            try
+            {
+                connection.Open();
+
+                effectedRows = command.ExecuteNonQuery();
+
+                
+            }
+
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+
+            return (effectedRows > 0);
+        }
+
 
         public static bool DeactivateLicense(int LicenseID)
         {

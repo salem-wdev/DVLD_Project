@@ -30,6 +30,10 @@ namespace DVLD.Tests.Controls
         private bool _IsPassedCurrentTest = false;
         private bool IsPassedPreviosTest = false;
 
+        private float retakeFees = 0.0f;
+        private float fees = 0.0f;
+        private float totalFees = 0.0f;
+
         public clsTestType.enTestType TestTypeID
         {
             get
@@ -80,6 +84,18 @@ namespace DVLD.Tests.Controls
         ///////////////////////////////////////////////////////////
         // Data
 
+        private void _CalculateFees()
+        {
+            if (_CreationMode == enCreationMode.RetakeTestSchedule)
+            {
+                retakeFees = (float)_TestAppointment.RetakeTestAppInfo.PaidFees;
+                lblRetakeAppFees.Text = $"${retakeFees}";
+            }
+            fees = (float)_LocalDrivingLicenseApplication.PaidFees + _LocalDrivingLicenseApplication.LicenseClassInfo.ClassFees;
+            totalFees = fees + retakeFees;
+
+            _TestAppointment.PaidFees = totalFees;
+        }
 
         private void _ClearData()
         {
@@ -110,15 +126,12 @@ namespace DVLD.Tests.Controls
 
         private void _DisplayRetakeTestData()
         {
-            decimal fees = _LocalDrivingLicenseApplication.PaidFees;
 
             if (_CreationMode == enCreationMode.RetakeTestSchedule)
             {
                 lblRetakeTestAppID.Text = _TestAppointment.RetakeTestAppInfo.ApplicationID.ToString();
-                decimal retakeFees = _TestAppointment.RetakeTestAppInfo.PaidFees;
                 lblRetakeAppFees.Text = $"${retakeFees}";
-                decimal totalFees = fees + retakeFees;
-                lblTotalFees.Text = $"${totalFees}";
+                lblTotalFees.Text = $"${_TestAppointment.PaidFees}";
             }
             else
             {
@@ -136,7 +149,7 @@ namespace DVLD.Tests.Controls
                 lblDrivingClass.Text = _LocalDrivingLicenseApplication.LicenseClassInfo.ClassName;
                 lblFullName.Text = _LocalDrivingLicenseApplication.PersonFullName;
                 lblTrial.Text = _LocalDrivingLicenseApplication.TotalTrialsPerTest(TestTypeID).ToString();
-                decimal fees = _LocalDrivingLicenseApplication.PaidFees;
+                decimal fees = _LocalDrivingLicenseApplication.PaidFees + (decimal)_LocalDrivingLicenseApplication.LicenseClassInfo.ClassFees;
                 lblFees.Text = $"${fees}";
 
                 _DisplayRetakeTestData();
@@ -385,6 +398,7 @@ namespace DVLD.Tests.Controls
             if (_LocalDrivingLicenseApplication != null && _TestAppointment != null)
             {
                 _DisplayData();
+                _CalculateFees();
                 return true;
             }
             else

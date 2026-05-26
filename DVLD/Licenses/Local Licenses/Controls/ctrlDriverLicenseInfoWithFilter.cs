@@ -1,0 +1,80 @@
+﻿using DVLD_Business;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace DVLD.Licenses.Local_Licenses.Controls
+{
+    public partial class ctrlDriverLicenseInfoWithFilter : UserControl
+    {
+        // Define a custom event handler delegate with parameters
+        public event Action<int> OnLicenseSelected;
+        // Create a protected method to raise the event with a parameter
+        protected virtual void LicenseSelected(int DriverID)
+        {
+            Action<int> handler = OnLicenseSelected;
+            if (handler != null)
+            {
+                handler(DriverID); // Raise the event with the parameter
+            }
+        }
+
+        private int _LicenseID = -1; // Variable to store the selected DriverID
+
+        public int SelectedLicenseID
+        {
+            get { return _LicenseID; }
+            set
+            {
+                if (_LicenseID != value)
+                {
+                    _LicenseID = value;
+                    LicenseSelected(_LicenseID); // Raise the event when the property changes
+                }
+            }
+        }
+
+        public ctrlDriverLicenseInfoWithFilter()
+        {
+            InitializeComponent();
+        }
+
+        private void _Find()
+        {
+            _LicenseID = int.Parse(txtLicenseID.Text);
+            if (clsLicense.Find(_LicenseID) != null)
+            {
+                ctrlDriverLicenseInfo1.LoadData(_LicenseID);
+                LicenseSelected(_LicenseID); // Raise the event when a driver is found
+            }
+            else
+            {
+                _LicenseID = -1;
+                MessageBox.Show("License not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ctrlDriverLicenseInfo1.ClearData();
+            }
+        }
+
+        private void btnFind_Click(object sender, EventArgs e)
+        {
+            if(string.IsNullOrWhiteSpace(txtLicenseID.Text))
+            {
+                MessageBox.Show("Please enter a License ID.", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _Find();
+        }
+
+        private void txtLicenseID_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = !clsValidation.IsValidCharForID(e.KeyChar);
+        }
+    }
+}

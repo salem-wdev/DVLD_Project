@@ -1,5 +1,6 @@
 ﻿using DVLD.Applications.Local_Driving_License;
 using DVLD.Global_Classes;
+using DVLD.Licenses.Local_Licenses;
 using DVLD.Tests;
 using DVLD_Business;
 using System;
@@ -358,17 +359,23 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void issueDrivingLicenseFirstTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException("Issue Driving License First Time");
+            frmIssueDriverLicenseFirstTime frm = new frmIssueDriverLicenseFirstTime((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            frm.ShowDialog();
+            _RefreshData();
         }
 
         private void showLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException("Show License");
+            clsLocalDrivingLicenseApplication LocalDriving = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            frmShowLicenseInfo frm = new frmShowLicenseInfo(LocalDriving.GetActiveLicenseID());
+            frm.ShowDialog();
         }
 
         private void showPersonLicenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException("Show Person License History");
+            clsPerson person = clsPerson.Find(dgvLocalDrivingLicenseApplications.CurrentRow.Cells[2].Value.ToString());
+            frmShowPersonLicenseHistory frm = new frmShowPersonLicenseHistory(person.PersonID);
+            frm.ShowDialog();
         }
     }
 }
