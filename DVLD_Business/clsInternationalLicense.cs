@@ -135,6 +135,11 @@ namespace DVLD_Business
         public bool Save()
         {
 
+            if (Mode == enMode.AddNew && clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(this.DriverID) != -1)
+            {
+                return false;
+            }
+
             //Because of inheritance first we call the save method in the base class,
             //it will take care of adding all information to the application table.
             base.Mode = (clsApplication.enMode)Mode;
