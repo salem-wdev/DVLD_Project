@@ -94,6 +94,7 @@ namespace DVLD.Tests.Controls
             fees = (float)_LocalDrivingLicenseApplication.PaidFees + _LocalDrivingLicenseApplication.LicenseClassInfo.ClassFees;
             totalFees = fees + retakeFees;
 
+            lblTotalFees.Text = totalFees.ToString();
             _TestAppointment.PaidFees = totalFees;
         }
 
