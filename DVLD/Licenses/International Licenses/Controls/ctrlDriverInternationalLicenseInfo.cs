@@ -95,7 +95,7 @@ namespace DVLD.Licenses.International_Licenses.Controls
         public bool LoadData(int LicenseID)
         {
             _InternationalLicenseID = LicenseID;
-            _InternationalLicense = clsInternationalLicense.Find(_InternationalLicenseID);
+            _InternationalLicense = clsInternationalLicense.FindByInternationalLicenseID(_InternationalLicenseID);
             if (_InternationalLicense == null)
             {
                 MessageBox.Show("Could not find License ID = " + _InternationalLicenseID.ToString(),

@@ -39,7 +39,8 @@ namespace DVLD.Applications.Controls
             lblDate.Text = _Application.ApplicationDate.ToString("dd/MM/yyyy");
             lblStatusDate.Text = _Application.LastStatusDate.ToString("dd/MM/yyyy");
             lblCreatedByUser.Text = _Application.CreatedByUserInfo.UserName;
-            llViewPersonInfo.Enabled = true;
+
+            llViewPersonInfo.Enabled = (_Application.ApplicantPersonID != -1);
         }
 
         private void ResetAll()

@@ -11,18 +11,18 @@ namespace DVLD_Business
     {
 
         public enum enMode { AddNew = 0, Update = 1 };
-        public enMode Mode = enMode.AddNew;
+        public enMode Mode { get; protected set; } = enMode.AddNew;
 
-        public clsDriver DriverInfo;
-        public int InternationalLicenseID { set; get; }  
-        public int DriverID { set; get; }
-        public int IssuedUsingLocalLicenseID { set; get; }   
-        public DateTime IssueDate { set; get; }
-        public DateTime ExpirationDate { set; get; }    
+        public clsDriver DriverInfo { get; protected set; }
+        public int InternationalLicenseID {  get; private set; }  
+        public int DriverID { get; protected set; }
+        public int IssuedUsingLocalLicenseID { get; protected set; }
+        public DateTime IssueDate { get; private set; }
+        public DateTime ExpirationDate { get; private set; }
         public bool IsActive { set; get; }
        
 
-        public clsInternationalLicense()
+        private clsInternationalLicense()
 
         {
             //here we set the applicaiton type to New International License.
@@ -41,32 +41,18 @@ namespace DVLD_Business
 
         }
 
-        public clsInternationalLicense(int ApplicationID, int ApplicantPersonID,
-            DateTime ApplicationDate, 
-             enApplicationStatus ApplicationStatus, DateTime LastStatusDate,
-             decimal PaidFees, int CreatedByUserID, 
-             int InternationalLicenseID,  int DriverID, int IssuedUsingLocalLicenseID,
-            DateTime IssueDate, DateTime ExpirationDate,bool IsActive)
-
+        protected clsInternationalLicense(int InternationalLicenseID,  int DriverID,
+            int IssuedUsingLocalLicenseID,
+            DateTime IssueDate, DateTime ExpirationDate,bool IsActive, clsApplication Application)
+            : base(Application)
         {
-            //this is for the base clase
-            base.ApplicationID = ApplicationID;
-            base.ApplicantPersonID = ApplicantPersonID;
-            base.ApplicationDate = ApplicationDate;
-            base.ApplicationTypeID = clsApplication.enApplicationType.NewInternationalLicense;
-            base.ApplicationStatus = ApplicationStatus;
-            base.LastStatusDate = LastStatusDate;
-            base.PaidFees = PaidFees;
-            base.CreatedByUserID = CreatedByUserID;
-
+           
             this.InternationalLicenseID = InternationalLicenseID;
-            this.ApplicationID=ApplicationID;
             this.DriverID = DriverID;
             this.IssuedUsingLocalLicenseID = IssuedUsingLocalLicenseID;
             this.IssueDate = IssueDate;
             this.ExpirationDate = ExpirationDate;
             this.IsActive = IsActive;
-            this.CreatedByUserID = CreatedByUserID;
 
             this.DriverInfo = clsDriver.FindByDriverID(this.DriverID);
 
@@ -96,7 +82,7 @@ namespace DVLD_Business
                this.IsActive, this.CreatedByUserID);
         }
 
-        public static clsInternationalLicense Find(int InternationalLicenseID)
+        public static clsInternationalLicense FindByInternationalLicenseID(int InternationalLicenseID)
         {
             int ApplicationID = -1;
             int DriverID = -1; int IssuedUsingLocalLicenseID = -1;
@@ -111,13 +97,9 @@ namespace DVLD_Business
                 clsApplication Application = clsApplication.Find(ApplicationID);
 
 
-                return new clsInternationalLicense(Application.ApplicationID,
-                    Application.ApplicantPersonID,
-                                     Application.ApplicationDate, 
-                                    (enApplicationStatus)Application.ApplicationStatus, Application.LastStatusDate,
-                                     Application.PaidFees, Application.CreatedByUserID,
-                                     InternationalLicenseID, DriverID, IssuedUsingLocalLicenseID,
-                                         IssueDate, ExpirationDate, IsActive);
+                return new clsInternationalLicense(InternationalLicenseID, DriverID,
+                    IssuedUsingLocalLicenseID, IssueDate, ExpirationDate,
+                    IsActive, Application);
 
             }
              
@@ -180,5 +162,25 @@ namespace DVLD_Business
         {
             return clsInternationalLicenseData.GetDriverInternationalLicenses(DriverID);
         }
+
+        public static clsInternationalLicense GetNewInternationalLicense(int DriverID)
+        {
+            clsInternationalLicense InternationalLicense = new clsInternationalLicense();
+            int LocalLicenseID = -1;
+
+            LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
+
+            if(LocalLicenseID == -1)
+            {
+                return null;
+            }
+
+            InternationalLicense.DriverID = DriverID;
+            InternationalLicense.IssuedUsingLocalLicenseID = LocalLicenseID;
+            InternationalLicense.IsActive = true;
+
+            return InternationalLicense;
+        }
+
     }
 }
