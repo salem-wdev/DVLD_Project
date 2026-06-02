@@ -162,5 +162,20 @@ namespace DVLD_Business
         {
             return clsInternationalLicenseData.GetDriverInternationalLicenses(DriverID);
         }
+
+        public static clsInternationalLicense GetNewInternationalLicense(int DriverID)
+        {
+            int LocalLicenseID = -1;
+
+            LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
+
+            if(LocalLicenseID == -1)
+            {
+                return null;
+            }
+
+            return new clsInternationalLicense(-1, DriverID, LocalLicenseID, DateTime.Now, DateTime.Now.AddYears(1), true, clsApplication.Find(LocalLicenseID));
+        }
+
     }
 }
