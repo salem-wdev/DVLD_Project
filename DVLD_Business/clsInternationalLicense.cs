@@ -11,18 +11,18 @@ namespace DVLD_Business
     {
 
         public enum enMode { AddNew = 0, Update = 1 };
-        public enMode Mode = enMode.AddNew;
+        public enMode Mode { get; protected set; } = enMode.AddNew;
 
-        public clsDriver DriverInfo;
-        public int InternationalLicenseID { set; get; }  
-        public int DriverID { set; get; }
-        public int IssuedUsingLocalLicenseID { set; get; }   
-        public DateTime IssueDate { set; get; }
-        public DateTime ExpirationDate { set; get; }    
+        public clsDriver DriverInfo { get; protected set; }
+        public int InternationalLicenseID {  get; private set; }  
+        public int DriverID { get; protected set; }
+        public int IssuedUsingLocalLicenseID { get; protected set; }
+        public DateTime IssueDate { get; private set; }
+        public DateTime ExpirationDate { get; private set; }
         public bool IsActive { set; get; }
        
 
-        public clsInternationalLicense()
+        private clsInternationalLicense()
 
         {
             //here we set the applicaiton type to New International License.
@@ -41,7 +41,7 @@ namespace DVLD_Business
 
         }
 
-        public clsInternationalLicense(int InternationalLicenseID,  int DriverID,
+        protected clsInternationalLicense(int InternationalLicenseID,  int DriverID,
             int IssuedUsingLocalLicenseID,
             DateTime IssueDate, DateTime ExpirationDate,bool IsActive, clsApplication Application)
             : base(Application)
