@@ -165,6 +165,7 @@ namespace DVLD_Business
 
         public static clsInternationalLicense GetNewInternationalLicense(int DriverID)
         {
+            clsInternationalLicense InternationalLicense = new clsInternationalLicense();
             int LocalLicenseID = -1;
 
             LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
@@ -174,7 +175,11 @@ namespace DVLD_Business
                 return null;
             }
 
-            return new clsInternationalLicense(-1, DriverID, LocalLicenseID, DateTime.Now, DateTime.Now.AddYears(1), true, clsApplication.Find(LocalLicenseID));
+            InternationalLicense.DriverID = DriverID;
+            InternationalLicense.IssuedUsingLocalLicenseID = LocalLicenseID;
+            InternationalLicense.IsActive = true;
+
+            return InternationalLicense;
         }
 
     }
