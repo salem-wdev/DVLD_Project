@@ -13,7 +13,22 @@ namespace DVLD_Business
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode { get; protected set; } = enMode.AddNew;
 
-        public clsDriver DriverInfo { get; protected set; }
+        // Holds the cached driver information; backing field for the lazy-loaded DriverInfo property.
+        private clsDriver _DriverInfo = null;
+
+        public clsDriver DriverInfo
+        {
+            get
+            {
+                // Database query is deferred until this property is explicitly requested by the UI or other layers.
+                if (_DriverInfo == null && this.DriverID != -1)
+                {
+                    _DriverInfo = clsDriver.FindByDriverID(this.DriverID);
+                }
+                return _DriverInfo;
+            }
+        }
+
         public int InternationalLicenseID {  get; private set; }  
         public int DriverID { get; protected set; }
         public int IssuedUsingLocalLicenseID { get; protected set; }
@@ -53,8 +68,6 @@ namespace DVLD_Business
             this.IssueDate = IssueDate;
             this.ExpirationDate = ExpirationDate;
             this.IsActive = IsActive;
-
-            this.DriverInfo = clsDriver.FindByDriverID(this.DriverID);
 
             Mode = enMode.Update;
         }
