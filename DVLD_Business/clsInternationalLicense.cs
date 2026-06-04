@@ -13,13 +13,28 @@ namespace DVLD_Business
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode { get; protected set; } = enMode.AddNew;
 
-        public clsDriver DriverInfo { get; protected set; }
+        // Holds the cached driver information; backing field for the lazy-loaded DriverInfo property.
+        private clsDriver _DriverInfo = null;
+
+        public clsDriver DriverInfo
+        {
+            get
+            {
+                // Database query is deferred until this property is explicitly requested by the UI or other layers.
+                if (_DriverInfo == null && this.DriverID != -1)
+                {
+                    _DriverInfo = clsDriver.FindByDriverID(this.DriverID);
+                }
+                return _DriverInfo;
+            }
+        }
+
         public int InternationalLicenseID {  get; private set; }  
         public int DriverID { get; protected set; }
         public int IssuedUsingLocalLicenseID { get; protected set; }
         public DateTime IssueDate { get; private set; }
         public DateTime ExpirationDate { get; private set; }
-        public bool IsActive { set; get; }
+        public bool IsActive { get; internal set; }
        
 
         private clsInternationalLicense()
@@ -54,13 +69,19 @@ namespace DVLD_Business
             this.ExpirationDate = ExpirationDate;
             this.IsActive = IsActive;
 
-            this.DriverInfo = clsDriver.FindByDriverID(this.DriverID);
-
             Mode = enMode.Update;
         }
 
         private bool _AddNewInternationalLicense()
         {
+
+            if (!IsDriverEligibleForInternationalLicense(DriverID, out int LocalLicenseID))
+            {
+                return false;
+            }
+
+            this.IssuedUsingLocalLicenseID = LocalLicenseID;
+
             //call DataAccess Layer 
 
             this.InternationalLicenseID = 
@@ -114,13 +135,8 @@ namespace DVLD_Business
 
         }
 
-        public bool Save()
+        public override bool Save()
         {
-
-            if (Mode == enMode.AddNew && clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(this.DriverID) != -1)
-            {
-                return false;
-            }
 
             //Because of inheritance first we call the save method in the base class,
             //it will take care of adding all information to the application table.
@@ -163,14 +179,46 @@ namespace DVLD_Business
             return clsInternationalLicenseData.GetDriverInternationalLicenses(DriverID);
         }
 
+        private static bool _IsDriverEligibleForInternationalLicense(int DriverID,out int LocalLicenseID)
+        {
+            LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
+            if (LocalLicenseID == -1)
+            {
+                return false;
+            }
+
+            if (clsDetainedLicense.IsLicenseDetained(LocalLicenseID))
+            {
+                return false;
+            }
+
+            int InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(DriverID);
+            if (InternationalLicenseID != -1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool IsDriverEligibleForInternationalLicense(int DriverID)
+        {
+            int LocalLicenseID;
+            return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
+        }
+
+        public static bool IsDriverEligibleForInternationalLicense(int DriverID, out int LocalLicenseID)
+        {
+            return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
+        }
+
         public static clsInternationalLicense GetNewInternationalLicense(int DriverID)
         {
             clsInternationalLicense InternationalLicense = new clsInternationalLicense();
-            int LocalLicenseID = -1;
+            
+            int LocalLicenseID;
 
-            LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
-
-            if(LocalLicenseID == -1)
+            if (!IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID))
             {
                 return null;
             }
