@@ -19,7 +19,7 @@ namespace DVLD_Business
         public int IssuedUsingLocalLicenseID { get; protected set; }
         public DateTime IssueDate { get; private set; }
         public DateTime ExpirationDate { get; private set; }
-        public bool IsActive { set; get; }
+        public bool IsActive { get; internal set; }
        
 
         private clsInternationalLicense()
