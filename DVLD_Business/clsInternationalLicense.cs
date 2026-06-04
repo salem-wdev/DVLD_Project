@@ -61,6 +61,14 @@ namespace DVLD_Business
 
         private bool _AddNewInternationalLicense()
         {
+
+            if (!IsDriverEligibleForInternationalLicense(DriverID, out int LocalLicenseID))
+            {
+                return false;
+            }
+
+            this.IssuedUsingLocalLicenseID = LocalLicenseID;
+
             //call DataAccess Layer 
 
             this.InternationalLicenseID = 
@@ -117,20 +125,6 @@ namespace DVLD_Business
         public override bool Save()
         {
 
-            if (Mode == enMode.AddNew)
-            {
-                if (clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(this.DriverID) != -1)
-                {
-                    return false;
-                }
-
-                if (clsDetainedLicense.IsLicenseDetained(this.IssuedUsingLocalLicenseID))
-                {
-                    return false;
-                }
-            }
-
-
             //Because of inheritance first we call the save method in the base class,
             //it will take care of adding all information to the application table.
             base.Mode = (clsApplication.enMode)Mode;
@@ -172,28 +166,46 @@ namespace DVLD_Business
             return clsInternationalLicenseData.GetDriverInternationalLicenses(DriverID);
         }
 
+        private static bool _IsDriverEligibleForInternationalLicense(int DriverID,out int LocalLicenseID)
+        {
+            LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
+            if (LocalLicenseID == -1)
+            {
+                return false;
+            }
+
+            if (clsDetainedLicense.IsLicenseDetained(LocalLicenseID))
+            {
+                return false;
+            }
+
+            int InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(DriverID);
+            if (InternationalLicenseID != -1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool IsDriverEligibleForInternationalLicense(int DriverID)
+        {
+            int LocalLicenseID;
+            return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
+        }
+
+        public static bool IsDriverEligibleForInternationalLicense(int DriverID, out int LocalLicenseID)
+        {
+            return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
+        }
+
         public static clsInternationalLicense GetNewInternationalLicense(int DriverID)
         {
             clsInternationalLicense InternationalLicense = new clsInternationalLicense();
             
-            int LocalLicenseID = -1;
-            int InternationalLicenseID = -1;
+            int LocalLicenseID;
 
-            LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
-
-            if(LocalLicenseID == -1)
-            {
-                return null;
-            }
-
-            if(clsDetainedLicense.IsLicenseDetained(LocalLicenseID))
-            {
-                return null;
-            }
-
-            InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(DriverID);
-
-            if (InternationalLicenseID != -1)
+            if (!IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID))
             {
                 return null;
             }
