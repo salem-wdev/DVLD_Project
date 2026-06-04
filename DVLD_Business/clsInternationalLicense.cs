@@ -114,7 +114,7 @@ namespace DVLD_Business
 
         }
 
-        public bool Save()
+        public override bool Save()
         {
 
             if (Mode == enMode.AddNew && clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(this.DriverID) != -1)
