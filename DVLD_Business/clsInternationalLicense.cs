@@ -117,10 +117,19 @@ namespace DVLD_Business
         public override bool Save()
         {
 
-            if (Mode == enMode.AddNew && clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(this.DriverID) != -1)
+            if (Mode == enMode.AddNew)
             {
-                return false;
+                if (clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(this.DriverID) != -1)
+                {
+                    return false;
+                }
+
+                if (clsDetainedLicense.IsLicenseDetained(this.IssuedUsingLocalLicenseID))
+                {
+                    return false;
+                }
             }
+
 
             //Because of inheritance first we call the save method in the base class,
             //it will take care of adding all information to the application table.
@@ -173,6 +182,11 @@ namespace DVLD_Business
             LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
 
             if(LocalLicenseID == -1)
+            {
+                return null;
+            }
+
+            if(clsDetainedLicense.IsLicenseDetained(LocalLicenseID))
             {
                 return null;
             }
