@@ -299,9 +299,9 @@ namespace DVLD_Business
             return new clsTestAppointment();
         }
 
-        public static clsApplication GetNewReTakeTestObj(int CreatedByUserID, clsLocalDrivingLicenseApplication LocalApp)
+        public static clsApplication GetNewReTakeTestObj(int CreatedByUserID, int ApplicantPersonID)
         {
-            return clsApplication.GetNewApplicationobject(CreatedByUserID, LocalApp.ApplicantPersonID, clsApplication.enApplicationType.RetakeTest);
+            return clsApplication.GetNewApplicationobject(CreatedByUserID, ApplicantPersonID, clsApplication.enApplicationType.RetakeTest);
         }
 
     }
