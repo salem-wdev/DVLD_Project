@@ -35,9 +35,45 @@ namespace DVLD_Business
         public decimal PaidFees { get; set; }
         public int CreatedByUserID { get; set; }
 
-        public clsUser CreatedByUserInfo { get; set; }
-        public clsApplicationType ApplicationTypeInfo { get; set; }
-        public clsPerson PersonInfo { get; set; }
+        private clsUser _CreatedByUserInfo = null;
+
+        private clsApplicationType _ApplicationTypeInfo = null;
+
+        private clsPerson _PersonInfo = null;
+
+        public clsUser CreatedByUserInfo
+        {
+            get
+            {
+                if (_CreatedByUserInfo == null && CreatedByUserID != -1)
+                {
+                    _CreatedByUserInfo = clsUser.Find(CreatedByUserID);
+                }
+                return _CreatedByUserInfo;
+            }
+        }
+        public clsApplicationType ApplicationTypeInfo
+        {
+            get
+            {
+                if (_ApplicationTypeInfo == null && (int)ApplicationTypeID>0 )
+                {
+                    _ApplicationTypeInfo = clsApplicationType.Find((int)ApplicationTypeID);
+                }
+                return _ApplicationTypeInfo;
+            }
+        }
+        public clsPerson PersonInfo
+        {
+            get
+            {
+                if (_PersonInfo == null && ApplicantPersonID != -1)
+                {
+                    _PersonInfo = clsPerson.Find(ApplicantPersonID);
+                }
+                return _PersonInfo;
+            }
+        }
 
 
 
@@ -52,10 +88,7 @@ namespace DVLD_Business
             this.PaidFees = 0;
             this.CreatedByUserID = -1;
 
-            this.PersonInfo = new clsPerson();
-            this.ApplicationTypeInfo = new clsApplicationType();
-            this.CreatedByUserInfo = new clsUser();
-
+            
             Mode = enMode.AddNew;
         }
 
@@ -75,10 +108,7 @@ namespace DVLD_Business
             this.PaidFees = PaidFees;
             this.CreatedByUserID = CreatedByUserID;
 
-            this.ApplicationTypeInfo = clsApplicationType.Find((int)ApplicationTypeID);
-            this.PersonInfo = clsPerson.Find(ApplicantPersonID);
-            this.CreatedByUserInfo = clsUser.Find(CreatedByUserID);
-
+           
             Mode = enMode.Update;
         }
 
@@ -93,10 +123,7 @@ namespace DVLD_Business
             this.PaidFees = BaseApplication.PaidFees;
             this.CreatedByUserID = BaseApplication.CreatedByUserID;
 
-            this.ApplicationTypeInfo = BaseApplication.ApplicationTypeInfo;
-            this.PersonInfo = BaseApplication.PersonInfo;
-            this.CreatedByUserInfo = BaseApplication.CreatedByUserInfo;
-
+            
             Mode = enMode.Update;
         }
 
