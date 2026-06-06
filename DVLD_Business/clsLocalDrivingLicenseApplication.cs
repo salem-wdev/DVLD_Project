@@ -15,8 +15,8 @@ namespace DVLD_Business
 
         public enMode Mode { get; protected set; } = enMode.AddNew;
 
-        public int LocalDrivingLicenseApplicationID { set; get; }
-        public int LicenseClassID { set; get; }
+        public int LocalDrivingLicenseApplicationID { private set; get; }
+        public int LicenseClassID { private set; get; }
 
         private clsLicenseClass _LicenseClassInfo = null;
 
@@ -40,11 +40,22 @@ namespace DVLD_Business
 
         }
 
-        public clsLocalDrivingLicenseApplication()
+        private clsLocalDrivingLicenseApplication()
 
         {
             this.LocalDrivingLicenseApplicationID = -1;
             this.LicenseClassID = -1;
+
+
+            Mode = enMode.AddNew;
+
+        }
+
+        private clsLocalDrivingLicenseApplication(int LicenseClassID)
+
+        {
+            this.LocalDrivingLicenseApplicationID = -1;
+            this.LicenseClassID = LicenseClassID;
 
 
             Mode = enMode.AddNew;
@@ -251,6 +262,10 @@ namespace DVLD_Business
             return clsLocalDrivingLicenseApplicationData.DoesPassAllTests(LocalDrivingLicenseApplicationID);
         }
 
+        public static clsLocalDrivingLicenseApplication GetNewLocalDrivingLicenseApp(int LicenseClassID)
+        {
+            return new clsLocalDrivingLicenseApplication(LicenseClassID);
+        }
 
     }
 }
