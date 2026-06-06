@@ -26,12 +26,12 @@ namespace DVLD_Business
         };
         public virtual enMode Mode { get; protected set; }
 
-        public int ApplicationID { get; set; }
-        public int ApplicantPersonID { get; set; }
-        public DateTime ApplicationDate { get; set; }
-        public enApplicationType ApplicationTypeID { get; set; }
-        public enApplicationStatus ApplicationStatus { get; set; }
-        public DateTime LastStatusDate { get; set; }
+        public int ApplicationID { get; private set; }
+        public int ApplicantPersonID { get; protected set; }
+        public DateTime ApplicationDate { get; private set; }
+        public enApplicationType ApplicationTypeID { get; protected set; }
+        public enApplicationStatus ApplicationStatus { get; private set; }
+        public DateTime LastStatusDate { get; private set; }
         public decimal PaidFees { get; set; }
         public int CreatedByUserID { get; set; }
 
