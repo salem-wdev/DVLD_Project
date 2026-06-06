@@ -76,8 +76,23 @@ namespace DVLD_Business
         }
 
 
+        private clsApplication(int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        {
+            this.ApplicationID = -1;
+            this.ApplicantPersonID = ApplicantPersonID;
+            this.ApplicationDate = DateTime.Now;
+            this.ApplicationTypeID = ApplicationTypeID;
+            this.ApplicationStatus = enApplicationStatus.New;
+            this.LastStatusDate = DateTime.Now;
+            this.PaidFees = 0;
+            this.CreatedByUserID = -1;
 
-        public clsApplication()
+
+            Mode = enMode.AddNew;
+        }
+
+
+        protected clsApplication()
         {
             this.ApplicationID = -1;
             this.ApplicantPersonID = -1;
@@ -310,6 +325,12 @@ namespace DVLD_Business
         public static enApplicationType GetApplicationTypeID(int ApplicationID)
         {
             return (enApplicationType)clsApplicationData.GetApplicationTypeID(ApplicationID);
+        }
+
+        internal static clsApplication GetNewApplicationobject(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        {
+            clsApplication application = new clsApplication(ApplicantPersonID, ApplicationTypeID);
+            return application;
         }
 
     }
