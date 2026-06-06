@@ -33,7 +33,7 @@ namespace DVLD_Business
         public enApplicationStatus ApplicationStatus { get; private set; }
         public DateTime LastStatusDate { get; private set; }
         public decimal PaidFees { get; set; }
-        public int CreatedByUserID { get; set; }
+        public int CreatedByUserID { get; private set; }
 
         private clsUser _CreatedByUserInfo = null;
 
@@ -76,7 +76,7 @@ namespace DVLD_Business
         }
 
 
-        private clsApplication(int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        private clsApplication(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
             this.ApplicationID = -1;
             this.ApplicantPersonID = ApplicantPersonID;
@@ -85,7 +85,7 @@ namespace DVLD_Business
             this.ApplicationStatus = enApplicationStatus.New;
             this.LastStatusDate = DateTime.Now;
             this.PaidFees = 0;
-            this.CreatedByUserID = -1;
+            this.CreatedByUserID = CreatedByUserID;
 
 
             Mode = enMode.AddNew;
@@ -148,10 +148,7 @@ namespace DVLD_Business
             //{
             //    return false;
             //}
-            this.ApplicantPersonID = PersonInfo.PersonID;
-            this.ApplicationTypeID = (enApplicationType)ApplicationTypeInfo.ApplicationTypeID;
-            this.CreatedByUserID = CreatedByUserInfo.UserID;
-
+            
             this.ApplicationID = clsApplicationData.AddNewApplication(this.ApplicantPersonID,
                 this.ApplicationDate, (int)this.ApplicationTypeID, (byte)this.ApplicationStatus,
                 this.LastStatusDate, this.PaidFees, this.CreatedByUserID);
@@ -329,7 +326,7 @@ namespace DVLD_Business
 
         internal static clsApplication GetNewApplicationobject(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
-            clsApplication application = new clsApplication(ApplicantPersonID, ApplicationTypeID);
+            clsApplication application = new clsApplication(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
             return application;
         }
 
