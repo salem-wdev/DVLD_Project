@@ -39,7 +39,7 @@ namespace DVLD.Applications.Local_Driving_License
             InitializeComponent();
             _Mode = enMode.Update;
             _ApplicationID = ApplicationID;
-              }
+        }
 
         /// <summary>
         /// Logic Methods
@@ -51,7 +51,6 @@ namespace DVLD.Applications.Local_Driving_License
             {
                 _ApplicationID = -1;
                 _LocalLicenseApplication = null;
-                _LocalLicenseApplication = new clsLocalDrivingLicenseApplication();
                 lblLocalDrivingLicebseApplicationID.Text = "[???]";
                 lblApplicationDate.Text = DateTime.Now.ToShortDateString();
                 cbLicenseClass.SelectedIndex = 0;
@@ -103,24 +102,7 @@ namespace DVLD.Applications.Local_Driving_License
 
         private void _FillApplicationWithData()
         {
-
-            _LocalLicenseApplication.ApplicantPersonID = ctrlPersonCardWithFilter1.ctrlPersonCard1.PersonID;
-            _LocalLicenseApplication.PersonInfo = clsPerson.Find(_LocalLicenseApplication.ApplicantPersonID);
-            _LocalLicenseApplication.LicenseClassID = (int)cbLicenseClass.SelectedValue;
-            _LocalLicenseApplication.LicenseClassInfo = clsLicenseClass.Find((int)cbLicenseClass.SelectedValue);
-
-            if (_Mode == enMode.AddNew)
-            {
-                _LocalLicenseApplication.ApplicationStatus = clsApplication.enApplicationStatus.New;
-                _LocalLicenseApplication.ApplicationDate = DateTime.Now;
-                _LocalLicenseApplication.CreatedByUserID = clsGlobal.CurrentUser.UserID;
-                _LocalLicenseApplication.CreatedByUserInfo = clsGlobal.CurrentUser;
-            }
-
-            _LocalLicenseApplication.ApplicationTypeID = clsApplication.enApplicationType.NewDrivingLicense;
-            _LocalLicenseApplication.ApplicationTypeInfo = clsApplicationType.Find((int)_LocalLicenseApplication.ApplicationTypeID);
-            _LocalLicenseApplication.LastStatusDate = DateTime.Now;
-
+            
             if (_LocalLicenseApplication.ApplicationTypeInfo != null)
             {
                 _LocalLicenseApplication.PaidFees = _LocalLicenseApplication.ApplicationTypeInfo.ApplicationTypeFees + 15;
@@ -186,7 +168,6 @@ namespace DVLD.Applications.Local_Driving_License
                 }
             }
 
-
             _ResetDefaultValues(true);
         }
 
@@ -247,7 +228,15 @@ namespace DVLD.Applications.Local_Driving_License
             }
 
         }
+
+        private void cbLicenseClass_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(_Mode == enMode.AddNew)
+            {
+                _LocalLicenseApplication = clsLocalDrivingLicenseApplication.GetNewLocalDrivingLicenseApp((int)cbLicenseClass.SelectedValue, clsGlobal.CurrentUser.UserID, ctrlPersonCardWithFilter1.ctrlPersonCard1.PersonID, clsApplication.enApplicationType.NewDrivingLicense);
+            }
+        }
         ///////////////////////////////////////////////////////////////////
-        
+
     }
 }

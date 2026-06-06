@@ -15,9 +15,22 @@ namespace DVLD_Business
 
         public enMode Mode { get; protected set; } = enMode.AddNew;
 
-        public int LocalDrivingLicenseApplicationID { set; get; }
-        public int LicenseClassID { set; get; }
-        public clsLicenseClass LicenseClassInfo;
+        public int LocalDrivingLicenseApplicationID { private set; get; }
+        public int LicenseClassID { private set; get; }
+
+        private clsLicenseClass _LicenseClassInfo = null;
+
+        public clsLicenseClass LicenseClassInfo
+        {
+            get
+            {
+                if( _LicenseClassInfo == null && LicenseClassID != -1)
+                {
+                    _LicenseClassInfo = clsLicenseClass.Find(LicenseClassID);
+                }
+                return _LicenseClassInfo;
+            }
+        }
         public string PersonFullName
         {
             get
@@ -27,11 +40,25 @@ namespace DVLD_Business
 
         }
 
-        public clsLocalDrivingLicenseApplication()
+        private clsLocalDrivingLicenseApplication()
 
         {
             this.LocalDrivingLicenseApplicationID = -1;
             this.LicenseClassID = -1;
+
+
+            Mode = enMode.AddNew;
+
+        }
+
+        private clsLocalDrivingLicenseApplication(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+
+        {
+            this.LocalDrivingLicenseApplicationID = -1;
+            this.LicenseClassID = LicenseClassID;
+            this.CreatedByUserID = CreatedByUserID;
+            this.ApplicantPersonID = ApplicantPersonID;
+            this.ApplicationTypeID = ApplicationTypeID;
 
 
             Mode = enMode.AddNew;
@@ -44,7 +71,6 @@ namespace DVLD_Business
         {
             this.LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID; ;
             this.LicenseClassID = LicenseClassID;
-            this.LicenseClassInfo = clsLicenseClass.Find(LicenseClassID);
             
             Mode = enMode.Update;
         }
@@ -239,6 +265,10 @@ namespace DVLD_Business
             return clsLocalDrivingLicenseApplicationData.DoesPassAllTests(LocalDrivingLicenseApplicationID);
         }
 
+        public static clsLocalDrivingLicenseApplication GetNewLocalDrivingLicenseApp(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        {
+            return new clsLocalDrivingLicenseApplication(LicenseClassID, CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
+        }
 
     }
 }

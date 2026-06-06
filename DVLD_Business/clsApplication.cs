@@ -26,22 +26,73 @@ namespace DVLD_Business
         };
         public virtual enMode Mode { get; protected set; }
 
-        public int ApplicationID { get; set; }
-        public int ApplicantPersonID { get; set; }
-        public DateTime ApplicationDate { get; set; }
-        public enApplicationType ApplicationTypeID { get; set; }
-        public enApplicationStatus ApplicationStatus { get; set; }
-        public DateTime LastStatusDate { get; set; }
+        public int ApplicationID { get; private set; }
+        public int ApplicantPersonID { get; protected set; }
+        public DateTime ApplicationDate { get; private set; }
+        public enApplicationType ApplicationTypeID { get; protected set; }
+        public enApplicationStatus ApplicationStatus { get; private set; }
+        public DateTime LastStatusDate { get; private set; }
         public decimal PaidFees { get; set; }
-        public int CreatedByUserID { get; set; }
+        public int CreatedByUserID { get; private set; }
 
-        public clsUser CreatedByUserInfo { get; set; }
-        public clsApplicationType ApplicationTypeInfo { get; set; }
-        public clsPerson PersonInfo { get; set; }
+        private clsUser _CreatedByUserInfo = null;
+
+        private clsApplicationType _ApplicationTypeInfo = null;
+
+        private clsPerson _PersonInfo = null;
+
+        public clsUser CreatedByUserInfo
+        {
+            get
+            {
+                if (_CreatedByUserInfo == null && CreatedByUserID != -1)
+                {
+                    _CreatedByUserInfo = clsUser.Find(CreatedByUserID);
+                }
+                return _CreatedByUserInfo;
+            }
+        }
+        public clsApplicationType ApplicationTypeInfo
+        {
+            get
+            {
+                if (_ApplicationTypeInfo == null && (int)ApplicationTypeID>0 )
+                {
+                    _ApplicationTypeInfo = clsApplicationType.Find((int)ApplicationTypeID);
+                }
+                return _ApplicationTypeInfo;
+            }
+        }
+        public clsPerson PersonInfo
+        {
+            get
+            {
+                if (_PersonInfo == null && ApplicantPersonID != -1)
+                {
+                    _PersonInfo = clsPerson.Find(ApplicantPersonID);
+                }
+                return _PersonInfo;
+            }
+        }
 
 
+        private clsApplication(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        {
+            this.ApplicationID = -1;
+            this.ApplicantPersonID = ApplicantPersonID;
+            this.ApplicationDate = DateTime.Now;
+            this.ApplicationTypeID = ApplicationTypeID;
+            this.ApplicationStatus = enApplicationStatus.New;
+            this.LastStatusDate = DateTime.Now;
+            this.PaidFees = 0;
+            this.CreatedByUserID = CreatedByUserID;
 
-        public clsApplication()
+
+            Mode = enMode.AddNew;
+        }
+
+
+        protected clsApplication()
         {
             this.ApplicationID = -1;
             this.ApplicantPersonID = -1;
@@ -52,10 +103,7 @@ namespace DVLD_Business
             this.PaidFees = 0;
             this.CreatedByUserID = -1;
 
-            this.PersonInfo = new clsPerson();
-            this.ApplicationTypeInfo = new clsApplicationType();
-            this.CreatedByUserInfo = new clsUser();
-
+            
             Mode = enMode.AddNew;
         }
 
@@ -75,10 +123,7 @@ namespace DVLD_Business
             this.PaidFees = PaidFees;
             this.CreatedByUserID = CreatedByUserID;
 
-            this.ApplicationTypeInfo = clsApplicationType.Find((int)ApplicationTypeID);
-            this.PersonInfo = clsPerson.Find(ApplicantPersonID);
-            this.CreatedByUserInfo = clsUser.Find(CreatedByUserID);
-
+           
             Mode = enMode.Update;
         }
 
@@ -93,10 +138,7 @@ namespace DVLD_Business
             this.PaidFees = BaseApplication.PaidFees;
             this.CreatedByUserID = BaseApplication.CreatedByUserID;
 
-            this.ApplicationTypeInfo = BaseApplication.ApplicationTypeInfo;
-            this.PersonInfo = BaseApplication.PersonInfo;
-            this.CreatedByUserInfo = BaseApplication.CreatedByUserInfo;
-
+            
             Mode = enMode.Update;
         }
 
@@ -106,10 +148,7 @@ namespace DVLD_Business
             //{
             //    return false;
             //}
-            this.ApplicantPersonID = PersonInfo.PersonID;
-            this.ApplicationTypeID = (enApplicationType)ApplicationTypeInfo.ApplicationTypeID;
-            this.CreatedByUserID = CreatedByUserInfo.UserID;
-
+            
             this.ApplicationID = clsApplicationData.AddNewApplication(this.ApplicantPersonID,
                 this.ApplicationDate, (int)this.ApplicationTypeID, (byte)this.ApplicationStatus,
                 this.LastStatusDate, this.PaidFees, this.CreatedByUserID);
@@ -283,6 +322,12 @@ namespace DVLD_Business
         public static enApplicationType GetApplicationTypeID(int ApplicationID)
         {
             return (enApplicationType)clsApplicationData.GetApplicationTypeID(ApplicationID);
+        }
+
+        internal static clsApplication GetNewApplicationobject(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        {
+            clsApplication application = new clsApplication(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
+            return application;
         }
 
     }
