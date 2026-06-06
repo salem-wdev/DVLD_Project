@@ -51,11 +51,14 @@ namespace DVLD_Business
 
         }
 
-        private clsLocalDrivingLicenseApplication(int LicenseClassID)
+        private clsLocalDrivingLicenseApplication(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
 
         {
             this.LocalDrivingLicenseApplicationID = -1;
             this.LicenseClassID = LicenseClassID;
+            this.CreatedByUserID = CreatedByUserID;
+            this.ApplicantPersonID = ApplicantPersonID;
+            this.ApplicationTypeID = ApplicationTypeID;
 
 
             Mode = enMode.AddNew;
@@ -262,9 +265,9 @@ namespace DVLD_Business
             return clsLocalDrivingLicenseApplicationData.DoesPassAllTests(LocalDrivingLicenseApplicationID);
         }
 
-        public static clsLocalDrivingLicenseApplication GetNewLocalDrivingLicenseApp(int LicenseClassID)
+        public static clsLocalDrivingLicenseApplication GetNewLocalDrivingLicenseApp(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
-            return new clsLocalDrivingLicenseApplication(LicenseClassID);
+            return new clsLocalDrivingLicenseApplication(LicenseClassID, CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
         }
 
     }
