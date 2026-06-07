@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DVLD_DataAccess
 {
@@ -71,8 +72,8 @@ namespace DVLD_DataAccess
         }
 
         public static int AddNewApplication(int ApplicantPersonID,
-            DateTime ApplicationDate, int ApplicationTypeID,
-            byte ApplicationStatus, DateTime LastStatusDate,
+            ref DateTime ApplicationDate, int ApplicationTypeID,
+            ref byte ApplicationStatus, ref DateTime LastStatusDate,
             decimal PaidFees, int CreatedByUserID)
         {
 
@@ -80,32 +81,28 @@ namespace DVLD_DataAccess
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string Query = "INSERT INTO [dbo].[Applications]" +
-                " ([ApplicantPersonID], [ApplicationDate], " +
-                "[ApplicationTypeID], [ApplicationStatus], " +
-                "[LastStatusDate], [PaidFees], [CreatedByUserID])" +
-                " VALUES " +
-                "( @ApplicantPersonID, @ApplicationDate, " +
-                "@ApplicationTypeID, @ApplicationStatus," +
-                " @LastStatusDate , @PaidFees, @CreatedByUserID ); " +
-                "SELECT SCOPE_IDENTITY();";
+            string Query = "INSERT INTO [dbo].[Applications] " +
+                "([ApplicantPersonID], [ApplicationDate], [ApplicationTypeID], [ApplicationStatus], [LastStatusDate], [PaidFees], [CreatedByUserID]) " +
+                "OUTPUT INSERTED.ApplicationID, INSERTED.ApplicationDate, INSERTED.LastStatusDate, INSERTED.ApplicationStatus " +
+                "VALUES " +
+                "(@ApplicantPersonID, GETDATE(), @ApplicationTypeID, 1, GETDATE(), @PaidFees, @CreatedByUserID);";
 
             SqlCommand command = new SqlCommand(Query, connection);
             command.Parameters.AddWithValue("@ApplicantPersonID", ApplicantPersonID);
-            command.Parameters.AddWithValue("@ApplicationDate", ApplicationDate);
             command.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
-            command.Parameters.AddWithValue("@ApplicationStatus", ApplicationStatus);
-            command.Parameters.AddWithValue("@LastStatusDate", LastStatusDate);
             command.Parameters.AddWithValue("@PaidFees", PaidFees);
             command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
 
             try
             {
                 connection.Open();
-                object newApplicationID = command.ExecuteScalar();
-                if (int.TryParse(newApplicationID.ToString(), out int NewID))
+                SqlDataReader reader = command.ExecuteReader();
+                if (reader.Read())
                 {
-                    ApplicationID = NewID;
+                    ApplicationID = Convert.ToInt32(reader["ApplicationID"]);
+                    ApplicationDate = (DateTime)reader["ApplicationDate"];
+                    LastStatusDate = (DateTime)reader["LastStatusDate"];
+                    ApplicationStatus = Convert.ToByte(reader["ApplicationStatus"]);
                 }
                 else
                 {
@@ -123,9 +120,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateApplication(int ApplicationID,int ApplicantPersonID,
-            DateTime ApplicationDate, int ApplicationTypeID,
-            byte ApplicationStatus, DateTime LastStatusDate,
+        public static bool UpdateApplication(int ApplicationID,
             decimal PaidFees, int CreatedByUserID)
         {
             int NumberOfEffectedRows = 0;
@@ -133,22 +128,12 @@ namespace DVLD_DataAccess
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
             string Query = "UPDATE [dbo].[Applications] " +
-                "SET [ApplicantPersonID] = @ApplicantPersonID " +
-      ",[ApplicationDate] = @ApplicationDate " +
-      ",[ApplicationTypeID] = @ApplicationTypeID " +
-      ",[ApplicationStatus] = @ApplicationStatus " +
-      ",[LastStatusDate] = @LastStatusDate " +
-     " ,[PaidFees] = @PaidFees " +
-      ",[CreatedByUserID] = @CreatedByUserID " +
- "WHERE [ApplicationID] = @ApplicationID";
+                "SET[PaidFees] = @PaidFees, " +
+                "[CreatedByUserID] = @CreatedByUserID " +
+                "WHERE[ApplicationID] = @ApplicationID";
 
             SqlCommand command = new SqlCommand(Query, connection);
 
-            command.Parameters.AddWithValue("@ApplicantPersonID", ApplicantPersonID);
-            command.Parameters.AddWithValue("@ApplicationDate", ApplicationDate);
-            command.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
-            command.Parameters.AddWithValue("@ApplicationStatus", ApplicationStatus);
-            command.Parameters.AddWithValue("@LastStatusDate", LastStatusDate);
             command.Parameters.AddWithValue("@PaidFees", PaidFees);
             command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
             command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
