@@ -167,18 +167,8 @@ namespace DVLD.Tests.Controls
         {
             if (_TestAppointment.RetakeTestAppInfo.Mode == clsApplication.enMode.AddNew)
             {
-                _TestAppointment.RetakeTestAppInfo.PersonInfo = _LocalDrivingLicenseApplication.PersonInfo;
-                _TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo = clsApplicationType.Find((int)clsApplication.enApplicationType.RetakeTest);
-                _TestAppointment.RetakeTestAppInfo.CreatedByUserInfo = clsGlobal.CurrentUser;
 
-                _TestAppointment.RetakeTestAppInfo.ApplicantPersonID = _TestAppointment.RetakeTestAppInfo.PersonInfo.PersonID;
-                _TestAppointment.RetakeTestAppInfo.ApplicationTypeID = (clsApplication.enApplicationType)_TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo.ApplicationTypeID;
-                _TestAppointment.RetakeTestAppInfo.CreatedByUserID = clsGlobal.CurrentUser.UserID;
-
-                _TestAppointment.RetakeTestAppInfo.ApplicationStatus = clsApplication.enApplicationStatus.New;
                 _TestAppointment.RetakeTestAppInfo.PaidFees = _TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo.ApplicationTypeFees;
-                _TestAppointment.RetakeTestAppInfo.LastStatusDate = DateTime.Now;
-                _TestAppointment.RetakeTestAppInfo.ApplicationDate = DateTime.Now;
 
             }
         }
@@ -259,7 +249,7 @@ namespace DVLD.Tests.Controls
             {
                 if (_TestAppointment.RetakeTestAppInfo == null)
                 {
-                    _TestAppointment.RetakeTestAppInfo = clsTestAppointment.GetNewReTakeTestObj(LocalApp: _LocalDrivingLicenseApplication, user: clsGlobal.CurrentUser);
+                    _TestAppointment.RetakeTestAppInfo = clsTestAppointment.GetNewReTakeTestObj(clsGlobal.CurrentUser.UserID, _LocalDrivingLicenseApplication.ApplicantPersonID);
                     _FillNewReTakeTestAppObj();
                 }
             }
@@ -301,7 +291,6 @@ namespace DVLD.Tests.Controls
 
 
         }
-
 
         private bool _HandelBusinessRolls()
         {
@@ -408,8 +397,6 @@ namespace DVLD.Tests.Controls
                 return false;
             }
         }
-
-
 
         private void btnSave_Click(object sender, EventArgs e)
         {

@@ -28,12 +28,12 @@ namespace DVLD_Business
 
         public int ApplicationID { get; private set; }
         public int ApplicantPersonID { get; protected set; }
-        public DateTime ApplicationDate { get; private set; }
+        private DateTime _ApplicationDate;
         public enApplicationType ApplicationTypeID { get; protected set; }
-        public enApplicationStatus ApplicationStatus { get; private set; }
-        public DateTime LastStatusDate { get; private set; }
+        private enApplicationStatus _ApplicationStatus;
+        private DateTime _LastStatusDate;
         public decimal PaidFees { get; set; }
-        public int CreatedByUserID { get; private set; }
+        public int CreatedByUserID { get; protected set; }
 
         private clsUser _CreatedByUserInfo = null;
 
@@ -74,16 +74,37 @@ namespace DVLD_Business
                 return _PersonInfo;
             }
         }
+        public DateTime ApplicationDate
+        {
+            get
+            {
+                return _ApplicationDate;
+            }
+        }
+        public enApplicationStatus ApplicationStatus
+        {
+            get
+            {
+                return _ApplicationStatus;
+            }
+        }
+        public DateTime LastStatusDate
+        {
+            get
+            {
+                return _LastStatusDate;
+            }
+        }
 
 
         private clsApplication(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
             this.ApplicationID = -1;
             this.ApplicantPersonID = ApplicantPersonID;
-            this.ApplicationDate = DateTime.Now;
+            this._ApplicationDate = DateTime.Now;
             this.ApplicationTypeID = ApplicationTypeID;
-            this.ApplicationStatus = enApplicationStatus.New;
-            this.LastStatusDate = DateTime.Now;
+            this._ApplicationStatus = enApplicationStatus.New;
+            this._LastStatusDate = DateTime.Now;
             this.PaidFees = 0;
             this.CreatedByUserID = CreatedByUserID;
 
@@ -96,10 +117,10 @@ namespace DVLD_Business
         {
             this.ApplicationID = -1;
             this.ApplicantPersonID = -1;
-            this.ApplicationDate = DateTime.Now;
+            this._ApplicationDate = DateTime.Now;
             this.ApplicationTypeID = enApplicationType.NewDrivingLicense;
-            this.ApplicationStatus = enApplicationStatus.New;
-            this.LastStatusDate = DateTime.Now;
+            this._ApplicationStatus = enApplicationStatus.New;
+            this._LastStatusDate = DateTime.Now;
             this.PaidFees = 0;
             this.CreatedByUserID = -1;
 
@@ -116,10 +137,10 @@ namespace DVLD_Business
         {
             this.ApplicationID = ApplicationID;
             this.ApplicantPersonID = ApplicantPersonID;
-            this.ApplicationDate = ApplicationDate;
+            this._ApplicationDate = ApplicationDate;
             this.ApplicationTypeID = ApplicationTypeID;
-            this.ApplicationStatus = ApplicationStatus;
-            this.LastStatusDate = LastStatusDate;
+            this._ApplicationStatus = ApplicationStatus;
+            this._LastStatusDate = LastStatusDate;
             this.PaidFees = PaidFees;
             this.CreatedByUserID = CreatedByUserID;
 
@@ -131,10 +152,10 @@ namespace DVLD_Business
         {
             this.ApplicationID = BaseApplication.ApplicationID;
             this.ApplicantPersonID = BaseApplication.ApplicantPersonID;
-            this.ApplicationDate = BaseApplication.ApplicationDate;
+            this._ApplicationDate = BaseApplication.ApplicationDate;
             this.ApplicationTypeID = BaseApplication.ApplicationTypeID;
-            this.ApplicationStatus = BaseApplication.ApplicationStatus;
-            this.LastStatusDate = BaseApplication.LastStatusDate;
+            this._ApplicationStatus = BaseApplication.ApplicationStatus;
+            this._LastStatusDate = BaseApplication.LastStatusDate;
             this.PaidFees = BaseApplication.PaidFees;
             this.CreatedByUserID = BaseApplication.CreatedByUserID;
 
@@ -148,10 +169,14 @@ namespace DVLD_Business
             //{
             //    return false;
             //}
-            
+
+            byte applicationStatus = 0;
+
             this.ApplicationID = clsApplicationData.AddNewApplication(this.ApplicantPersonID,
-                this.ApplicationDate, (int)this.ApplicationTypeID, (byte)this.ApplicationStatus,
-                this.LastStatusDate, this.PaidFees, this.CreatedByUserID);
+                ref this._ApplicationDate, (int)this.ApplicationTypeID, ref applicationStatus,
+                ref this._LastStatusDate, this.PaidFees, this.CreatedByUserID);
+
+            this._ApplicationStatus = (enApplicationStatus)applicationStatus;
 
             return (ApplicationID != -1);
         }
@@ -166,13 +191,9 @@ namespace DVLD_Business
             if (!CanBeEdited())
                 return false;
 
-            this.ApplicantPersonID = PersonInfo.PersonID;
-            this.ApplicationTypeID = (enApplicationType)ApplicationTypeInfo.ApplicationTypeID;
-            this.CreatedByUserID = CreatedByUserInfo.UserID;
 
-            return clsApplicationData.UpdateApplication(this.ApplicationID, this.ApplicantPersonID,
-                this.ApplicationDate, (int)this.ApplicationTypeID, (byte)this.ApplicationStatus,
-                this.LastStatusDate, this.PaidFees, this.CreatedByUserID);
+            return clsApplicationData.UpdateApplication(this.ApplicationID,
+                this.PaidFees, this.CreatedByUserID);
         }
 
         public static bool Delete(int ApplicationID)
