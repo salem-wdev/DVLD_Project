@@ -17,6 +17,7 @@ namespace DVLD.Applications.Local_Driving_License
     {
 
         private bool _IsFormUpdated = false;
+        private bool _isDataLoaded = false;
         private enum enMode
         {
             AddNew = 1,
@@ -232,9 +233,15 @@ namespace DVLD.Applications.Local_Driving_License
 
         private void cbLicenseClass_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if(!_isDataLoaded)
+            {
+                return;
+            }
+
             if(_Mode == enMode.AddNew)
             {
-                _LocalLicenseApplication = clsLocalDrivingLicenseApplication.GetNewLocalDrivingLicenseApp((int)cbLicenseClass.SelectedValue, clsGlobal.CurrentUser.UserID, ctrlPersonCardWithFilter1.ctrlPersonCard1.PersonID, clsApplication.enApplicationType.NewDrivingLicense);
+                _LocalLicenseApplication = clsLocalDrivingLicenseApplication.GetNewLocalDrivingLicenseApp((int)cbLicenseClass.SelectedValue,
+                    clsGlobal.CurrentUser.UserID, ctrlPersonCardWithFilter1.ctrlPersonCard1.PersonID, clsApplication.enApplicationType.NewDrivingLicense);
             }
         }
         ///////////////////////////////////////////////////////////////////
