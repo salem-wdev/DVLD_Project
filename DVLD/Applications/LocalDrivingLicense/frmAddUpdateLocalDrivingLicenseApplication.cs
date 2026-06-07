@@ -170,7 +170,6 @@ namespace DVLD.Applications.Local_Driving_License
             }
             _ResetDefaultValues(true);
 
-            _LocalLicenseApplication = clsLocalDrivingLicenseApplication.GetNewLocalDrivingLicenseApp((int)cbLicenseClass.SelectedValue, clsGlobal.CurrentUser.UserID, ctrlPersonCardWithFilter1.ctrlPersonCard1.PersonID, clsApplication.enApplicationType.NewDrivingLicense);
         }
 
         private void CtrlPersonCardWithFilter1_OnPersonSelected(int obj)
@@ -193,6 +192,8 @@ namespace DVLD.Applications.Local_Driving_License
                 btnApplicationInfoNext.Enabled = false;
             }
 
+            _LocalLicenseApplication = clsLocalDrivingLicenseApplication.GetNewLocalDrivingLicenseApp((int)cbLicenseClass.SelectedValue, clsGlobal.CurrentUser.UserID, ctrlPersonCardWithFilter1.ctrlPersonCard1.PersonID, clsApplication.enApplicationType.NewDrivingLicense);
+            _isDataLoaded = true;
             _IsFormUpdated = true;
 
         }
