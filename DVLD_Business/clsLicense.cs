@@ -17,10 +17,11 @@ namespace DVLD_Business
         public enum enIssueReason { FirstTime = 1, Renew = 2, DamagedReplacement = 3, LostReplacement = 4 };
 
         public clsDriver DriverInfo;
-        public int LicenseID { set; get; }
-        public int ApplicationID { set; get; }
-        public int DriverID { set; get; } 
-        public int LicenseClass { set; get; }
+        public int LicenseID { private set; get; }
+        public int ApplicationID { private set; get; }
+        public int DriverID { private set; get; } 
+        public int LicenseClass { protected set; get; }
+
         public clsLicenseClass LicenseClassIfo;
         private DateTime _IssueDate; 
         private DateTime _ExpirationDate;
@@ -29,7 +30,7 @@ namespace DVLD_Business
         public DateTime ExpirationDate { get => _ExpirationDate;}
         public string Notes { set; get; }
         public float PaidFees { set; get; }
-        public bool IsActive { set; get; }
+        public bool IsActive { protected set; get; }
         public enIssueReason IssueReason { private set; get; }
         public string IssueReasonText
         {
@@ -38,8 +39,8 @@ namespace DVLD_Business
                 return GetIssueReasonText(this.IssueReason);
             }
         }
-        public clsDetainedLicense DetainedInfo { set; get; }
-        public int CreatedByUserID { set; get; }
+        public clsDetainedLicense DetainedInfo {  get; }
+        public int CreatedByUserID { private set; get; }
         public bool IsDetained
         {
             get { return clsDetainedLicense.IsLicenseDetained(this.LicenseID); }
