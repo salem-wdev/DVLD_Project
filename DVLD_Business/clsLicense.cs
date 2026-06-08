@@ -27,7 +27,7 @@ namespace DVLD_Business
         public DateTime IssueDate { get => _IssueDate;}
         public DateTime ExpirationDate { get => _ExpirationDate;}
         public string Notes { set; get; }
-        public float PaidFees { set; get; }
+        public float PaidFees { private set; get; }
         public bool IsActive { protected set; get; }
         public enIssueReason IssueReason { private set; get; }
         public string IssueReasonText
@@ -341,8 +341,19 @@ namespace DVLD_Business
 
         }
 
-
-
+        /// <summary>
+        /// Prepares and initializes a new license object based on the application type (New, Renew, or Replacement).
+        /// </summary>
+        /// <param name="ApplicationID">The ID of the application associated with this license.</param>
+        /// <param name="DriverID">The ID of the driver receiving the license.</param>
+        /// <param name="LicenseClassID">The ID of the target license class.</param>
+        /// <param name="CreatedByUser">The ID of the user who is creating this license.</param>
+        /// <param name="LocalDrivingLicenseApplicationID">
+        /// Optional (Defaults to -1). Required only for first-time license issuance to verify that all required tests are passed. 
+        /// Can be omitted or left as -1 for renewals and replacements.
+        /// </param>
+        /// <returns>A populated <see cref="clsLicense"/> object if validation passes; otherwise, returns <c>null</c>.</returns>
+        
         public static clsLicense GetNewLicenseObj(int ApplicationID, int DriverID, int LicenseClassID, int CreatedByUser, int LocalDrivingLicenseApplicationID = -1)
         {
 
@@ -363,6 +374,7 @@ namespace DVLD_Business
                 Newlicense.DriverID = DriverID;
                 Newlicense.LicenseClassID = LicenseClassID;
                 Newlicense.CreatedByUserID = CreatedByUser;
+                Newlicense.PaidFees = clsLicenseClass.Find(LicenseClassID).ClassFees;
 
 
                 Newlicense.IsActive = true;
