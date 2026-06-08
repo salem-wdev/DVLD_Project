@@ -30,25 +30,22 @@ namespace DVLD.Licenses.Local_Licenses
                 _Driver.PersonID = _LocalDrivingLicenseApplication.ApplicantPersonID;
                 _Driver.CreatedByUserID = clsGlobal.CurrentUser.UserID;
                 _DriverID = _Driver.DriverID;
+                return _Driver.Save();
             }
 
-            return _Driver.Save();
+            _DriverID = _Driver.DriverID;
+            return _DriverID > -1;
         }
 
         private void _FillLicenseObj()
         {
             _License = clsLicense.GetNewLicenseObj(_LocalDrivingLicenseApplication.ApplicationID,
-                _DriverID, _LocalDrivingLicenseApplication.LicenseClassID, _LocalDriverLicenseAppID);
+                _DriverID, _LocalDrivingLicenseApplication.LicenseClassID, clsGlobal.CurrentUser.UserID, _LocalDriverLicenseAppID);
             if (_License != null)
             {
 
-                _License.ApplicationID = _LocalDrivingLicenseApplication.ApplicationID;
-                _License.DriverID = _Driver.DriverID;
-                _License.LicenseClass = _LocalDrivingLicenseApplication.LicenseClassID;
+                
                 _License.Notes = txtNotes.Text;
-                _License.PaidFees = clsLicenseClass.Find(_LocalDrivingLicenseApplication.LicenseClassID).ClassFees;
-                _License.IsActive = true;
-                _License.CreatedByUserID = clsGlobal.CurrentUser.UserID;
             }
             else
             {
