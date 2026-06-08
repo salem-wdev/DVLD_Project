@@ -55,7 +55,7 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             lblLicenseID.Text = _License.LicenseID.ToString();
             lblIsActive.Text = _License.IsActive ? "Yes" : "No";
             lblIsDetained.Text = _License.IsDetained ? "Yes" : "No";
-            lblClass.Text = _License.LicenseClassIfo.ClassName;
+            lblClass.Text = _License.LicenseClassInfo.ClassName;
             lblFullName.Text = _License.DriverInfo.PersonInfo.FullName;
             lblNationalNo.Text = _License.DriverInfo.PersonInfo.NationalNo;
             lblGendor.Text = _License.DriverInfo.PersonInfo.Gender == 0 ? "Male" : "Female";
