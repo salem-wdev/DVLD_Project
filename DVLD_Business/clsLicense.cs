@@ -191,7 +191,6 @@ namespace DVLD_Business
         public bool Save()
         {
 
-            //throw new NotImplementedException("Most deactivate old licenses for renew and replace scenarios");
 
 
             switch (Mode)
@@ -199,6 +198,7 @@ namespace DVLD_Business
                 case enMode.AddNew:
                     if (IssueReason != enIssueReason.FirstTime)
                     {
+                        // To deactivate the old license upon renewal
                         if (!clsLicenseData.DeactivateLicenseIDByDriverID(this.DriverID, this.LicenseClassID))
                         {
 
@@ -343,7 +343,7 @@ namespace DVLD_Business
 
 
 
-        public static clsLicense GetNewLicenseObj(int ApplicationID, int DriverID, int LicenseClassID, int LocalDrivingLicenseApplicationID = -1)
+        public static clsLicense GetNewLicenseObj(int ApplicationID, int DriverID, int LicenseClassID, int CreatedByUser, int LocalDrivingLicenseApplicationID = -1)
         {
 
             clsApplication.enApplicationType ApplicationType = clsApplication.GetApplicationTypeID(ApplicationID);
@@ -362,9 +362,9 @@ namespace DVLD_Business
                 Newlicense.ApplicationID = ApplicationID;
                 Newlicense.DriverID = DriverID;
                 Newlicense.LicenseClassID = LicenseClassID;
+                Newlicense.CreatedByUserID = CreatedByUser;
 
-                
-                
+
                 Newlicense.IsActive = true;
                 return Newlicense;
 
