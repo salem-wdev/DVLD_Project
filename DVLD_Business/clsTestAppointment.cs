@@ -159,6 +159,11 @@ namespace DVLD_Business
 
         public bool Save()
         {
+            if(IsTestAppointmentLocked(this.LocalDrivingLicenseApplicationID, this.TestTypeID))
+            {
+                return false;
+            }
+
             if(!RetakeTestAppInfo.Save())
             {
                 return false;
