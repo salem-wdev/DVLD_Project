@@ -35,7 +35,16 @@ namespace DVLD_Business
         {
             get
             {
-                return PersonInfo.FullName;
+                // if lazy loading was failed will return empty string
+
+                if (PersonInfo != null)
+                {
+                    return PersonInfo.FullName;
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
 
         }

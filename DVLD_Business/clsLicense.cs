@@ -16,20 +16,19 @@ namespace DVLD_Business
 
         public enum enIssueReason { FirstTime = 1, Renew = 2, DamagedReplacement = 3, LostReplacement = 4 };
 
-        public clsDriver DriverInfo;
-        public int LicenseID { set; get; }
-        public int ApplicationID { set; get; }
-        public int DriverID { set; get; } 
-        public int LicenseClass { set; get; }
-        public clsLicenseClass LicenseClassIfo;
+        public int LicenseID { private set; get; }
+        public int ApplicationID { private set; get; }
+        public int DriverID { private set; get; } 
+        public int LicenseClassID { protected set; get; }
+
         private DateTime _IssueDate; 
         private DateTime _ExpirationDate;
 
         public DateTime IssueDate { get => _IssueDate;}
         public DateTime ExpirationDate { get => _ExpirationDate;}
         public string Notes { set; get; }
-        public float PaidFees { set; get; }
-        public bool IsActive { set; get; }
+        public float PaidFees { private set; get; }
+        public bool IsActive { protected set; get; }
         public enIssueReason IssueReason { private set; get; }
         public string IssueReasonText
         {
@@ -38,11 +37,50 @@ namespace DVLD_Business
                 return GetIssueReasonText(this.IssueReason);
             }
         }
-        public clsDetainedLicense DetainedInfo { set; get; }
-        public int CreatedByUserID { set; get; }
+
+        public int CreatedByUserID { private set; get; }
         public bool IsDetained
         {
             get { return clsDetainedLicense.IsLicenseDetained(this.LicenseID); }
+        }
+
+        private clsDriver _DriverInfo = null;
+        public clsDriver DriverInfo
+        {
+            get
+            {
+                if(_DriverInfo == null && DriverID != -1)
+                {
+                    _DriverInfo = clsDriver.FindByDriverID(this.DriverID);
+                }
+                return _DriverInfo;
+            }
+        }
+
+        private clsDetainedLicense _DetainedInfo = null;
+        public clsDetainedLicense DetainedInfo
+        {
+            get
+            {
+                if(_DetainedInfo == null && this.LicenseID != -1)
+                {
+                    _DetainedInfo = clsDetainedLicense.FindByLicenseID(this.LicenseID);
+                }
+                return _DetainedInfo;
+            }
+        }
+
+        private clsLicenseClass _LicenseClassInfo = null;
+        public clsLicenseClass LicenseClassInfo
+        {
+            get
+            {
+                if (_LicenseClassInfo == null && LicenseClassID != -1)
+                {
+                    _LicenseClassInfo = clsLicenseClass.Find(LicenseClassID);
+                }
+                return _LicenseClassInfo;
+            }
         }
 
         private clsLicense()
@@ -51,7 +89,7 @@ namespace DVLD_Business
             this.LicenseID = -1;
             this.ApplicationID = -1;
             this.DriverID = -1;
-            this.LicenseClass = -1;
+            this.LicenseClassID = -1;
             this._IssueDate = DateTime.Now;
             this._ExpirationDate = DateTime.Now;
             this.Notes = "";
@@ -72,7 +110,7 @@ namespace DVLD_Business
             this.LicenseID = LicenseID;
             this.ApplicationID = ApplicationID;
             this.DriverID = DriverID;
-            this.LicenseClass = LicenseClass;
+            this.LicenseClassID = LicenseClass;
             this._IssueDate = IssueDate;
             this._ExpirationDate = ExpirationDate;
             this.Notes = Notes;
@@ -80,10 +118,6 @@ namespace DVLD_Business
             this.IsActive = IsActive;
             this.IssueReason = IssueReason;
             this.CreatedByUserID = CreatedByUserID;
-
-            this.DriverInfo = clsDriver.FindByDriverID(this.DriverID);
-            this.LicenseClassIfo = clsLicenseClass.Find(this.LicenseClass);
-            this.DetainedInfo = clsDetainedLicense.FindByLicenseID(this.LicenseID);
 
             Mode = enMode.Update;
         }
@@ -93,7 +127,7 @@ namespace DVLD_Business
         {
             this.ApplicationID = NewLicense.ApplicationID;
             this.DriverID = NewLicense.DriverID;
-            this.LicenseClass = NewLicense.LicenseClass;
+            this.LicenseClassID = NewLicense.LicenseClassID;
             this._IssueDate = NewLicense.IssueDate;
             this._ExpirationDate = NewLicense.ExpirationDate;
             this.Notes = NewLicense.Notes;
@@ -101,10 +135,6 @@ namespace DVLD_Business
             this.IsActive = NewLicense.IsActive;
             this.IssueReason = NewLicense.IssueReason;
             this.CreatedByUserID = NewLicense.CreatedByUserID;
-
-            this.DriverInfo = NewLicense.DriverInfo;
-            this.LicenseClassIfo = NewLicense.LicenseClassIfo;
-            this.DetainedInfo = NewLicense.DetainedInfo;
 
             Mode = enMode.AddNew;
         }
@@ -114,7 +144,7 @@ namespace DVLD_Business
         {
             //call DataAccess Layer 
 
-            this.LicenseID = clsLicenseData.AddNewLicense(this.ApplicationID, this.DriverID, this.LicenseClass,
+            this.LicenseID = clsLicenseData.AddNewLicense(this.ApplicationID, this.DriverID, this.LicenseClassID,
                ref this._IssueDate, ref this._ExpirationDate, this.Notes, this.PaidFees,
                this.IsActive, (byte)this.IssueReason, this.CreatedByUserID);
 
@@ -126,7 +156,7 @@ namespace DVLD_Business
         {
             //call DataAccess Layer 
 
-            return clsLicenseData.UpdateLicense(this.ApplicationID, this.LicenseID, this.DriverID, this.LicenseClass,
+            return clsLicenseData.UpdateLicense(this.ApplicationID, this.LicenseID, this.DriverID, this.LicenseClassID,
                this.Notes, this.PaidFees, this.IsActive, (byte)this.IssueReason,
                this.CreatedByUserID);
         }
@@ -161,7 +191,6 @@ namespace DVLD_Business
         public bool Save()
         {
 
-            //throw new NotImplementedException("Most deactivate old licenses for renew and replace scenarios");
 
 
             switch (Mode)
@@ -169,7 +198,8 @@ namespace DVLD_Business
                 case enMode.AddNew:
                     if (IssueReason != enIssueReason.FirstTime)
                     {
-                        if (!clsLicenseData.DeactivateLicenseIDByDriverID(this.DriverID, this.LicenseClass))
+                        // To deactivate the old license upon renewal
+                        if (!clsLicenseData.DeactivateLicenseIDByDriverID(this.DriverID, this.LicenseClassID))
                         {
 
                             return false;
@@ -311,9 +341,20 @@ namespace DVLD_Business
 
         }
 
-
-
-        public static clsLicense GetNewLicenseObj(int ApplicationID, int DriverID, int LicenseClassID, int LocalDrivingLicenseApplicationID = -1)
+        /// <summary>
+        /// Prepares and initializes a new license object based on the application type (New, Renew, or Replacement).
+        /// </summary>
+        /// <param name="ApplicationID">The ID of the application associated with this license.</param>
+        /// <param name="DriverID">The ID of the driver receiving the license.</param>
+        /// <param name="LicenseClassID">The ID of the target license class.</param>
+        /// <param name="CreatedByUser">The ID of the user who is creating this license.</param>
+        /// <param name="LocalDrivingLicenseApplicationID">
+        /// Optional (Defaults to -1). Required only for first-time license issuance to verify that all required tests are passed. 
+        /// Can be omitted or left as -1 for renewals and replacements.
+        /// </param>
+        /// <returns>A populated <see cref="clsLicense"/> object if validation passes; otherwise, returns <c>null</c>.</returns>
+        
+        public static clsLicense GetNewLicenseObj(int ApplicationID, int DriverID, int LicenseClassID, int CreatedByUser, int LocalDrivingLicenseApplicationID = -1)
         {
 
             clsApplication.enApplicationType ApplicationType = clsApplication.GetApplicationTypeID(ApplicationID);
@@ -331,10 +372,11 @@ namespace DVLD_Business
             {
                 Newlicense.ApplicationID = ApplicationID;
                 Newlicense.DriverID = DriverID;
-                Newlicense.LicenseClass = LicenseClassID;
+                Newlicense.LicenseClassID = LicenseClassID;
+                Newlicense.CreatedByUserID = CreatedByUser;
+                Newlicense.PaidFees = clsLicenseClass.Find(LicenseClassID).ClassFees;
 
-                
-                
+
                 Newlicense.IsActive = true;
                 return Newlicense;
 

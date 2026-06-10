@@ -13,14 +13,26 @@ namespace DVLD_Business
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
 
-        public int TestID { set; get; }
-        public int TestAppointmentID { set; get; }
-        public clsTestAppointment TestAppointmentInfo { set; get; }
-        public bool TestResult { set; get; }
-        public string Notes { set; get; }
-        public int CreatedByUserID { set; get; }
+        public int TestID { private set; get; }
+        public int TestAppointmentID { private set; get; }
+        public bool TestResult { private set; get; }
+        public string Notes { private set; get; }
+        public int CreatedByUserID { private set; get; }
 
-        public clsTest()
+        private clsTestAppointment _TestAppointmentInfo = null;
+        public clsTestAppointment TestAppointmentInfo
+        {
+            get
+            {
+                if (_TestAppointmentInfo != null && TestAppointmentID != -1)
+                {
+                    _TestAppointmentInfo = clsTestAppointment.Find(TestAppointmentID);
+                }
+                return _TestAppointmentInfo;
+            }
+        }
+
+        private clsTest()
 
         {
             this.TestID = -1;
@@ -33,13 +45,25 @@ namespace DVLD_Business
 
         }
 
-        public clsTest(int TestID, int TestAppointmentID,
+        private clsTest( int TestAppointmentID,
             bool TestResult, string Notes, int CreatedByUserID)
 
         {
             this.TestID = TestID;
             this.TestAppointmentID = TestAppointmentID;
-            this.TestAppointmentInfo = clsTestAppointment.Find(TestAppointmentID);
+            this.TestResult = TestResult;
+            this.Notes = Notes;
+            this.CreatedByUserID = CreatedByUserID;
+
+            Mode = enMode.AddNew;
+        }
+
+        private clsTest(int TestID, int TestAppointmentID,
+            bool TestResult, string Notes, int CreatedByUserID)
+
+        {
+            this.TestID = TestID;
+            this.TestAppointmentID = TestAppointmentID;
             this.TestResult = TestResult;
             this.Notes = Notes;
             this.CreatedByUserID = CreatedByUserID;
@@ -148,6 +172,31 @@ namespace DVLD_Business
         public static bool IsTestPassed(int TestAppointmentID)
         {
             return clsTestData.GetIsPassedTestByTestAppointmentID(TestAppointmentID);
+        }
+
+        public static clsTest GetNewTestObj(int TestAppointmentID, bool TestResult, string Notes, int CreatedByUserID)
+        {
+            // prevent creating a test object if the TestAppointmentID or CreatedByUserID is invalid,
+            // or if the related TestAppointment is invalid or locked.
+            if (CreatedByUserID <= 0 || TestAppointmentID <= 0)
+            {
+                return null;
+            }
+
+            clsTestAppointment TestAppointmentInfo = clsTestAppointment.Find(TestAppointmentID);
+
+            if (TestAppointmentInfo == null || TestAppointmentInfo.TestTypeID == clsTestType.enTestType.None)
+            {
+                return null;
+            }
+
+            if (TestAppointmentInfo.IsLocked)
+            {
+                return null;
+            }
+
+
+            return new clsTest(TestAppointmentID, TestResult, Notes, CreatedByUserID);
         }
 
     }

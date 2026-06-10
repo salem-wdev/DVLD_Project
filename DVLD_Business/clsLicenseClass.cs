@@ -13,11 +13,11 @@ namespace DVLD_Business
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
 
-        public int LicenseClassID { set; get; }
+        public int LicenseClassID { private set; get; }
         public string ClassName { set; get; }
         public string ClassDescription { set; get; }
-        public byte MinimumAllowedAge { set; get; }
-        public byte DefaultValidityLength { set; get; }
+        public byte MinimumAllowedAge { private set; get; }
+        public byte DefaultValidityLength { private set; get; }
         public float ClassFees { set; get; }
 
         public clsLicenseClass()
