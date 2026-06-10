@@ -159,6 +159,13 @@ namespace DVLD_Business
 
         public bool Save()
         {
+            if(!RetakeTestAppInfo.Save())
+            {
+                return false;
+            }
+
+            RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
+
             switch (Mode)
             {
                 case enMode.AddNew:
