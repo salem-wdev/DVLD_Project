@@ -16,7 +16,7 @@ namespace DVLD_Business
         public int TestAppointmentID { private set; get; }
         public clsTestType.enTestType TestTypeID { private set; get; }
         public int LocalDrivingLicenseApplicationID { private set; get; }
-        public DateTime AppointmentDate { private set; get; }
+        public DateTime AppointmentDate { set; get; }
         public float PaidFees { private set; get; }
         public int CreatedByUserID { private set; get; }
         public bool IsLocked { protected set; get; }
