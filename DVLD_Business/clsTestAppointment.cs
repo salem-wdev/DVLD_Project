@@ -13,14 +13,14 @@ namespace DVLD_Business
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
 
-        public int TestAppointmentID { set; get; }
-        public clsTestType.enTestType TestTypeID { set; get; }
-        public int LocalDrivingLicenseApplicationID { set; get; }
-        public DateTime AppointmentDate { set; get; }
-        public float PaidFees { set; get; }
-        public int CreatedByUserID { set; get; }
-        public bool IsLocked { set; get; }
-        public int RetakeTestApplicationID { set; get; }
+        public int TestAppointmentID { private set; get; }
+        public clsTestType.enTestType TestTypeID { private set; get; }
+        public int LocalDrivingLicenseApplicationID { private set; get; }
+        public DateTime AppointmentDate { private set; get; }
+        public float PaidFees { private set; get; }
+        public int CreatedByUserID { private set; get; }
+        public bool IsLocked { protected set; get; }
+        public int RetakeTestApplicationID { private set; get; }
 
         private clsApplication _RetakeTestAppInfo = null;
         public clsApplication RetakeTestAppInfo
