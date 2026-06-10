@@ -544,6 +544,44 @@ namespace DVLD_DataAccess
             return IsLocked;
         }
 
+        public static bool GetIsAppointmentLockedByID(int TestAppointmentID)
+        {
+
+            bool IsLocked = false;
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = "SELECT TOP 1 IsLocked " +
+                "FROM[DVLD].[dbo].[TestAppointments] " +
+                "WHERE TestAppointmentID = @TestAppointmentID";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@TestAppointmentID", TestAppointmentID);
+
+            try
+            {
+                connection.Open();
+                object scalar = command.ExecuteScalar();
+                if (scalar != null && scalar != DBNull.Value)
+                {
+                    IsLocked = (bool)scalar;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+                IsLocked = false;
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+            return IsLocked;
+        }
+
         public static bool LockExpiredAppointments(int TestTypeID,
             int LocalDrivingLicenseApplicationID)
         {
