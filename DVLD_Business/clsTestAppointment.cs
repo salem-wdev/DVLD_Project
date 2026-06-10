@@ -329,7 +329,7 @@ namespace DVLD_Business
                 if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
                 {
                     testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
-                    testAppointment._RetakeTestAppInfo = GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
+                    testAppointment._RetakeTestAppInfo = _GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
                     return testAppointment;
                 }
 
@@ -345,14 +345,14 @@ namespace DVLD_Business
             if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
             {
                 testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
-                testAppointment._RetakeTestAppInfo = GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
+                testAppointment._RetakeTestAppInfo = _GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
                 return testAppointment;
             }
 
             return new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
         }
 
-        public static clsApplication GetNewReTakeTestObj(int CreatedByUserID, int ApplicantPersonID)
+        private static clsApplication _GetNewReTakeTestObj(int CreatedByUserID, int ApplicantPersonID)
         {
             return clsApplication.GetNewApplicationobject(CreatedByUserID, ApplicantPersonID, clsApplication.enApplicationType.RetakeTest);
         }
