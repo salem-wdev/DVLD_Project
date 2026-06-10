@@ -164,12 +164,15 @@ namespace DVLD_Business
                 return false;
             }
 
-            if(!RetakeTestAppInfo.Save())
+            if (RetakeTestAppInfo != null)
             {
-                return false;
-            }
+                if (!RetakeTestAppInfo.Save())
+                {
+                    return false;
+                }
 
-            RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
+                RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
+            }
 
             switch (Mode)
             {
