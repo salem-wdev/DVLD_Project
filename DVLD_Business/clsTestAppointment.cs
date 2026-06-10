@@ -17,7 +17,7 @@ namespace DVLD_Business
         public clsTestType.enTestType TestTypeID { private set; get; }
         public int LocalDrivingLicenseApplicationID { private set; get; }
         public DateTime AppointmentDate { set; get; }
-        public float PaidFees { private set; get; }
+        public float PaidFees { private set; get; } = 0.0f;
         public int CreatedByUserID { private set; get; }
         public bool IsLocked { protected set; get; }
         public int RetakeTestApplicationID { private set; get; }
@@ -202,6 +202,19 @@ namespace DVLD_Business
             return clsTestAppointmentData.GetTestID(TestAppointmentID);
         }
 
+        private static float _CalculateFees(clsApplication RetakeTestAppInfo, clsTestType.enTestType TestTypeID)
+        {
+            float paidFees = 0.0f;
+            if (RetakeTestAppInfo != null)
+            {
+                RetakeTestAppInfo.PaidFees = clsApplicationType.Find((int)clsApplication.enApplicationType.RetakeTest).ApplicationTypeFees;
+                paidFees += (float)RetakeTestAppInfo.PaidFees;
+            }
+
+            paidFees += (float)clsTestType.Find(TestTypeID).TestTypeFees;
+
+            return paidFees;
+        }
 
         private static bool _IsNextTestAppointmentScheduled(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
@@ -313,6 +326,19 @@ namespace DVLD_Business
             
         }
 
+        private static clsTestAppointment _GetReadyObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        {
+            clsTestAppointment testAppointment;
+
+            testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+            if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
+            {
+                testAppointment._RetakeTestAppInfo = _GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
+            }
+            testAppointment.PaidFees = _CalculateFees(testAppointment._RetakeTestAppInfo, TestTypeID);
+            return testAppointment;
+        }
+
         public static clsTestAppointment GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
             clsTestAppointment testAppointment;
@@ -329,14 +355,7 @@ namespace DVLD_Business
 
             if (TestTypeID == clsTestType.enTestType.VisionTest)
             {
-                if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
-                {
-                    testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
-                    testAppointment._RetakeTestAppInfo = _GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
-                    return testAppointment;
-                }
-
-                return new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+                return _GetReadyObject(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
             }
 
             // check is passed preveous test.
@@ -345,14 +364,9 @@ namespace DVLD_Business
                 return null;
             }
 
-            if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
-            {
-                testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
-                testAppointment._RetakeTestAppInfo = _GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
-                return testAppointment;
-            }
 
-            return new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+
+            return _GetReadyObject(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
         }
 
         private static clsApplication _GetNewReTakeTestObj(int CreatedByUserID, int ApplicantPersonID)
