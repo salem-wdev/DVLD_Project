@@ -159,10 +159,6 @@ namespace DVLD_Business
 
         public bool Save()
         {
-            if(IsTestAppointmentLocked(this.LocalDrivingLicenseApplicationID, this.TestTypeID))
-            {
-                return false;
-            }
 
             if (RetakeTestAppInfo != null)
             {
@@ -190,6 +186,10 @@ namespace DVLD_Business
 
                 case enMode.Update:
 
+                    if (clsTestAppointmentData.GetIsAppointmentLockedByID(this.TestAppointmentID))
+                    {
+                        return false;
+                    }
                     return _UpdateTestAppointment();
 
             }
