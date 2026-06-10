@@ -21,7 +21,19 @@ namespace DVLD_Business
         public int CreatedByUserID { set; get; }
         public bool IsLocked { set; get; }
         public int RetakeTestApplicationID { set; get; }
-        public clsApplication RetakeTestAppInfo { set; get; }
+
+        private clsApplication _RetakeTestAppInfo = null;
+        public clsApplication RetakeTestAppInfo
+        {
+            get
+            { 
+                if (_RetakeTestAppInfo == null && RetakeTestApplicationID != -1)
+                {
+                    _RetakeTestAppInfo = clsApplication.Find(RetakeTestApplicationID);
+                }
+                return _RetakeTestAppInfo;
+            }
+        }
 
         public int TestID
         {
@@ -29,15 +41,16 @@ namespace DVLD_Business
 
         }
 
-        protected clsTestAppointment()
+        protected clsTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
 
         {
             this.TestAppointmentID = -1;
-            this.TestTypeID = clsTestType.enTestType.VisionTest;
-            this.AppointmentDate = DateTime.Now;
+            this.TestTypeID = TestTypeID;
+            this.LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
+            this.AppointmentDate = AppointmentDate;
             this.PaidFees = 0;
             this.IsLocked = false;
-            this.CreatedByUserID = -1;
+            this.CreatedByUserID = CreatedByUserID;
             this.RetakeTestApplicationID = -1;
             Mode = enMode.AddNew;
 
@@ -56,7 +69,6 @@ namespace DVLD_Business
             this.CreatedByUserID = CreatedByUserID;
             this.IsLocked = IsLocked;
             this.RetakeTestApplicationID = RetakeTestApplicationID;
-            this.RetakeTestAppInfo = clsApplication.Find(RetakeTestApplicationID);
             Mode = enMode.Update;
         }
 
@@ -249,13 +261,28 @@ namespace DVLD_Business
             return true;
         }
 
+        /// <summary>
+        /// Checks whether the test appointment follows the correct structural sequence (Vision -> Theory -> Practical).
+        /// </summary>
+        /// <param name="LocalDrivingLicenseApplicationID">The ID of the local driving license application.</param>
+        /// <param name="TestTypeID">The type of the test to validate its sequence.</param>
+        /// <returns>Returns <c>true</c> if the sequence is correct or if the appointment already exists; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// <para>NOTE FOR UI DEVELOPER:</para>
+        /// This function only validates the structural order and sequence of appointments. 
+        /// It DOES NOT check whether the applicant passed or failed the previous test.
+        /// </remarks>
         public static bool IsTestAppointmentInTheRightOrder(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
+            // Check if the test appointment is in the right order based on the test type.
+            // result not important here, only checking the sequence.
+
             if (TestTypeID == clsTestType.enTestType.None)
             {
                 return false;
             }
 
+            // If the appointment already exists, then it is in the right order.
             if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
             {
                 return true;
@@ -271,8 +298,9 @@ namespace DVLD_Business
             
         }
 
-        public static clsTestAppointment GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static clsTestAppointment GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
+            clsTestAppointment testAppointment;
 
             if(TestTypeID == clsTestType.enTestType.None)
             {
@@ -286,17 +314,30 @@ namespace DVLD_Business
 
             if (TestTypeID == clsTestType.enTestType.VisionTest)
             {
-                return new clsTestAppointment();
+                if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
+                {
+                    testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+                    testAppointment._RetakeTestAppInfo = GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
+                    return testAppointment;
+                }
+
+                return new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
             }
 
             // check is passed preveous test.
-            if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID-1))
+            if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID - 1))
             {
                 return null;
             }
 
+            if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
+            {
+                testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+                testAppointment._RetakeTestAppInfo = GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
+                return testAppointment;
+            }
 
-            return new clsTestAppointment();
+            return new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
         }
 
         public static clsApplication GetNewReTakeTestObj(int CreatedByUserID, int ApplicantPersonID)
