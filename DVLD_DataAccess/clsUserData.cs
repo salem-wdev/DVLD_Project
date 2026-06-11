@@ -487,6 +487,43 @@ namespace DVLD_DataAccess
             return isFound;
         }
 
+        public static bool ChangeUserCredentials(int UserID, string NewUserName, string NewPassword)
+        {
+
+            int rowsAffected = 0;
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"Update  Users  
+                            set UserName = @UserName,
+                                Password = @Password
+                            where UserID = @UserID";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@UserID", UserID);
+            command.Parameters.AddWithValue("@UserName", NewUserName);
+            command.Parameters.AddWithValue("@Password", NewPassword);
+
+            try
+            {
+                connection.Open();
+                rowsAffected = command.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+                return false;
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+            return (rowsAffected > 0);
+        }
+
         public static bool ChangePassword(int UserID, string NewPassword)
         {
 
