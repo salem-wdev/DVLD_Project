@@ -10,30 +10,30 @@ namespace DVLD_Business
     public class clsDetainedLicense
     {
         public enum enMode { AddNew = 0, Update = 1 };
-        public enMode Mode = enMode.AddNew;
+        public enMode Mode { private set; get; } = enMode.AddNew;
 
 
-        public int DetainID { set; get; }
-        public int LicenseID { set; get; }
-        public DateTime DetainDate { set; get; }
+        public int DetainID { private set; get; }
+        public int LicenseID { private set; get; }
+        public DateTime DetainDate { private set; get; }
 
-        public float FineFees { set; get; }
-        public int CreatedByUserID { set; get; }
-        public clsUser CreatedByUserInfo { set; get; }
-        public bool IsReleased { set; get; }
-        public DateTime ReleaseDate { set; get; }
-        public int ReleasedByUserID { set; get; }
-        public clsUser ReleasedByUserInfo { set; get; }
-        public int ReleaseApplicationID { set; get; }
+        public float FineFees { private set; get; }
+        public int CreatedByUserID { private set; get; }
+        public clsUser CreatedByUserInfo { private set; get; }
+        public bool IsReleased { private set; get; }
+        public DateTime ReleaseDate { private set; get; }
+        public int ReleasedByUserID { private set; get; }
+        public clsUser ReleasedByUserInfo { private set; get; }
+        public int ReleaseApplicationID { private set; get; }
 
-        public clsDetainedLicense()
+        private clsDetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
 
         {
             this.DetainID = -1;
-            this.LicenseID = -1;
+            this.LicenseID = LicenseID;
             this.DetainDate = DateTime.Now;
-            this.FineFees = 0;
-            this.CreatedByUserID = -1;
+            this.FineFees = FineFees;
+            this.CreatedByUserID = CreatedByUserID;
             this.IsReleased = false;
             this.ReleaseDate = DateTime.MaxValue;
             this.ReleasedByUserID = 0;
@@ -45,7 +45,7 @@ namespace DVLD_Business
 
         }
 
-        public clsDetainedLicense(int DetainID,
+        private clsDetainedLicense(int DetainID,
             int LicenseID, DateTime DetainDate,
             float FineFees, int CreatedByUserID,
             bool IsReleased, DateTime ReleaseDate,
