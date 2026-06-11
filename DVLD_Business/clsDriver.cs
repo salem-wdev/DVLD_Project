@@ -13,7 +13,18 @@ namespace DVLD_Business
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode { private set; get; } = enMode.AddNew;
 
-        public clsPerson PersonInfo;
+        private clsPerson _PersonInfo = null;
+        public clsPerson PersonInfo
+        {
+            get
+            {
+                if (_PersonInfo == null && this.PersonID != -1)
+                {
+                    _PersonInfo = clsPerson.Find(this.PersonID);
+                }
+                return _PersonInfo;
+            }
+        }
 
         public int DriverID { private set; get; }
         public int PersonID { private set; get; }
