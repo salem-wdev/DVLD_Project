@@ -34,13 +34,13 @@ namespace DVLD_Business
         public bool IsActive { get; private set; }
 
 
-        private clsUser()
+        private clsUser(int PersonID, string UserName, string Password)
         {
             this.UserID = -1;
-            this.PersonID = -1;
-            this.UserName = string.Empty;
-            this.Password = string.Empty;
-            this.IsActive = false;
+            this.PersonID = PersonID;
+            this.UserName = UserName;
+            this.Password = Password;
+            this.IsActive = true;
 
             Mode = enMode.AddNew;
         }
@@ -66,7 +66,6 @@ namespace DVLD_Business
             //{
             //    return false;
             //}
-            this.PersonID = _Person.PersonID;
 
             this.UserID = clsUserData.AddNewUser(this.PersonID, this.UserName,
                 this.Password, this.IsActive);
@@ -80,10 +79,9 @@ namespace DVLD_Business
             //{
             //    return false;
             //}
-            this.PersonID = _Person.PersonID;
 
-            return clsUserData.UpdateUser(this.UserID, this.PersonID, 
-                this.UserName, this.Password, this.IsActive);
+            return clsUserData.UpdateUser(this.UserID, this.UserName,
+                this.Password, this.IsActive);
         }
 
         public static bool Delete(int UserID)
@@ -263,7 +261,20 @@ namespace DVLD_Business
             return clsUserData.ChangeUserActivity(UserID, IsActive);
         }
 
+        public static clsUser CreateNewUser(int PersonID, string UserName, string Password)
+        {
+            if (!clsPerson.IsPersonExists(PersonID) || clsUser.IsUserExistsForPersonID(PersonID))
+            {
+                return null;
+            }
 
+            if(clsUser.IsUserExists(UserName))
+            {
+                return null;
+            }
+
+            return new clsUser(PersonID, UserName, Password);
+        }
 
     }
 }

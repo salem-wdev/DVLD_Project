@@ -255,20 +255,19 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateUser(int UserID, int PersonID, string UserName,
+        public static bool UpdateUser(int UserID, string UserName,
             string Password, bool IsActive)
         {
             int NumberOfEffectedRows = 0;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string Query = "UPDATE Users SET [PersonID] = @PersonID, " +
+            string Query = "UPDATE Users SET " +
                 "[UserName] = @UserName, [Password] = @Password," +
                 " [IsActive] = @IsActive WHERE [UserID] = @UserID";
 
             SqlCommand Command = new SqlCommand(Query, connection);
 
-            Command.Parameters.AddWithValue("@PersonID", PersonID);
             Command.Parameters.AddWithValue("@UserName", UserName);
             Command.Parameters.AddWithValue("@Password", Password);
             Command.Parameters.AddWithValue("@IsActive", IsActive);
