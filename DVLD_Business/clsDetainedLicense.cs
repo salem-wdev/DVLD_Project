@@ -192,6 +192,18 @@ namespace DVLD_Business
 
         public bool ReleaseDetainedLicense(int ReleasedByUserID, int ReleaseApplicationID)
         {
+            if(IsLicenseDetained(this.LicenseID))
+            {
+                return false;
+            }
+
+            if (!clsUser.IsUserExists(ReleasedByUserID) || !clsApplication.IsApplicationExists(ReleaseApplicationID))
+            {
+                return false;
+            }
+
+
+
             return clsDetainedLicenseData.ReleaseDetainedLicense(this.DetainID,
                    ReleasedByUserID, ReleaseApplicationID);
         }
