@@ -11,27 +11,26 @@ namespace DVLD_Business
     public class clsDriver
     {
         public enum enMode { AddNew = 0, Update = 1 };
-        public enMode Mode = enMode.AddNew;
+        public enMode Mode { private set; get; } = enMode.AddNew;
 
         public clsPerson PersonInfo;
 
-        public int DriverID { set; get; }
-        public int PersonID { set; get; }
-        public int CreatedByUserID { set; get; }
-        public DateTime CreatedDate { get; }
+        public int DriverID { private set; get; }
+        public int PersonID { private set; get; }
+        public int CreatedByUserID { private set; get; }
+        public DateTime CreatedDate { private set; get; }
 
-        public clsDriver()
+        private clsDriver()
 
         {
             this.DriverID = -1;
             this.PersonID = -1;
             this.CreatedByUserID = -1;
-            this.CreatedDate = DateTime.Now;
             Mode = enMode.AddNew;
 
         }
 
-        public clsDriver(int DriverID, int PersonID, int CreatedByUserID, DateTime CreatedDate)
+        private clsDriver(int DriverID, int PersonID, int CreatedByUserID, DateTime CreatedDate)
 
         {
             this.DriverID = DriverID;
@@ -48,7 +47,7 @@ namespace DVLD_Business
             //call DataAccess Layer 
 
             this.DriverID = clsDriverData.AddNewDriver(PersonID, CreatedByUserID);
-
+            this.CreatedDate = clsUtilData.GetServerDate();
 
             return (this.DriverID != -1);
         }
