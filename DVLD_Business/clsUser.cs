@@ -14,62 +14,33 @@ namespace DVLD_Business
         public enMode Mode { get; private set; }
 
         public int UserID { get; private set; }
-        private int _PersonID { get; set; }
-        public int PersonID 
-        {
-            get => _PersonID;
-            set
-            {
-                // Prevent changing PersonID if we're in Update mode to maintain data integrity
-                if (this.Mode == enMode.Update)
-                {
-                    return; 
-                }
-                _PersonID = value;
-            }
-        }
-
+        public int PersonID { get; private set; }
 
         private clsPerson _Person; 
 
         public clsPerson PersonInfo
         {
-            get => _Person; 
-            set
+            get
             {
-                _Person = value; 
-
-                if (value != null)
+                if (_Person == null && PersonID != -1)
                 {
-                    this._PersonID = value.PersonID;
+                    _Person = clsPerson.Find(this.PersonID);
                 }
+                return _Person;
             }
         }
-        private string _UserName;
-        public string UserName
-        {
-            get => this._UserName;
-            set
-            {
-                if (Mode == enMode.Update)
-                {
-                    return;
-                }
-                _UserName = value;
-            }
-        }
-        public string Password { get; set; }
-        public bool IsActive { get; set; }
+        public string UserName { get; private set; }
+        public string Password { get; private set; }
+        public bool IsActive { get; private set; }
 
 
-        public clsUser()
+        private clsUser()
         {
             this.UserID = -1;
             this.PersonID = -1;
             this.UserName = string.Empty;
             this.Password = string.Empty;
             this.IsActive = false;
-            this.PersonInfo = new clsPerson();
 
             Mode = enMode.AddNew;
         }
@@ -85,7 +56,6 @@ namespace DVLD_Business
             this.Password = Password;
             this.IsActive = IsActive;
 
-            this.PersonInfo = clsPerson.Find(PersonID);
 
             Mode = enMode.Update;
         }
