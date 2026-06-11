@@ -469,7 +469,6 @@ namespace DVLD_DataAccess
             return (effectedRows > 0);
         }
 
-
         public static bool DeactivateLicense(int LicenseID)
         {
 
@@ -506,6 +505,48 @@ namespace DVLD_DataAccess
 
             return (rowsAffected > 0);
         }
+
+        public static bool IsLicenseActive(int LicenseID)
+        {
+            bool isActive = false;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"SELECT [IsActive]
+                             FROM [dbo].[Licenses]
+                             WHERE LicenseID = @LicenseID";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@LicenseID", LicenseID);
+
+            try
+            {
+                connection.Open();
+
+                object result = command.ExecuteScalar();
+
+                if (result != null)
+                {
+                    isActive = (bool)result;
+                }
+            }
+
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+
+            return isActive;
+        }
+
 
     }
 }

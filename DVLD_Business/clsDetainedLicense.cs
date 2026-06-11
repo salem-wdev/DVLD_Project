@@ -10,30 +10,56 @@ namespace DVLD_Business
     public class clsDetainedLicense
     {
         public enum enMode { AddNew = 0, Update = 1 };
-        public enMode Mode = enMode.AddNew;
+        public enMode Mode { private set; get; } = enMode.AddNew;
 
 
-        public int DetainID { set; get; }
-        public int LicenseID { set; get; }
-        public DateTime DetainDate { set; get; }
+        public int DetainID { private set; get; }
+        public int LicenseID { private set; get; }
+        public DateTime DetainDate { private set; get; }
 
-        public float FineFees { set; get; }
-        public int CreatedByUserID { set; get; }
-        public clsUser CreatedByUserInfo { set; get; }
-        public bool IsReleased { set; get; }
-        public DateTime ReleaseDate { set; get; }
-        public int ReleasedByUserID { set; get; }
-        public clsUser ReleasedByUserInfo { set; get; }
-        public int ReleaseApplicationID { set; get; }
+        public float FineFees { private set; get; }
+        public int CreatedByUserID { private set; get; }
 
-        public clsDetainedLicense()
+        private clsUser _CreatedByUserInfo = null;
+        public clsUser CreatedByUserInfo
+        {
+            get
+            {
+                if (_CreatedByUserInfo == null && CreatedByUserID != -1)
+                {
+                    _CreatedByUserInfo = clsUser.Find(this.CreatedByUserID);
+                }
+                return _CreatedByUserInfo;
+            }
+        }
+
+        public bool IsReleased { private set; get; }
+        public DateTime ReleaseDate { private set; get; }
+        public int ReleasedByUserID { private set; get; }
+
+        private clsUser _ReleasedByUserInfo = null;
+        public clsUser ReleasedByUserInfo
+        {
+            get
+            {
+                if (_ReleasedByUserInfo == null && ReleasedByUserID != -1)
+                {
+                    _ReleasedByUserInfo = clsUser.Find(this.ReleasedByUserID);
+                }
+                return _ReleasedByUserInfo;
+            }
+        }
+
+        public int ReleaseApplicationID { private set; get; }
+
+        private clsDetainedLicense(int LicenseID, int CreatedByUserID)
 
         {
             this.DetainID = -1;
-            this.LicenseID = -1;
+            this.LicenseID = LicenseID;
             this.DetainDate = DateTime.Now;
             this.FineFees = 0;
-            this.CreatedByUserID = -1;
+            this.CreatedByUserID = CreatedByUserID;
             this.IsReleased = false;
             this.ReleaseDate = DateTime.MaxValue;
             this.ReleasedByUserID = 0;
@@ -45,7 +71,7 @@ namespace DVLD_Business
 
         }
 
-        public clsDetainedLicense(int DetainID,
+        private clsDetainedLicense(int DetainID,
             int LicenseID, DateTime DetainDate,
             float FineFees, int CreatedByUserID,
             bool IsReleased, DateTime ReleaseDate,
@@ -57,12 +83,10 @@ namespace DVLD_Business
             this.DetainDate = DetainDate;
             this.FineFees = FineFees;
             this.CreatedByUserID = CreatedByUserID;
-            this.CreatedByUserInfo = clsUser.Find(this.CreatedByUserID);
             this.IsReleased = IsReleased;
             this.ReleaseDate = ReleaseDate;
             this.ReleasedByUserID = ReleasedByUserID;
             this.ReleaseApplicationID = ReleaseApplicationID;
-            this.ReleasedByUserInfo = clsUser.FindByPersonID(this.ReleasedByUserID);
             Mode = enMode.Update;
         }
 
@@ -168,8 +192,30 @@ namespace DVLD_Business
 
         public bool ReleaseDetainedLicense(int ReleasedByUserID, int ReleaseApplicationID)
         {
+            if(IsLicenseDetained(this.LicenseID))
+            {
+                return false;
+            }
+
+            if (!clsUser.IsUserExists(ReleasedByUserID) || !clsApplication.IsApplicationExists(ReleaseApplicationID))
+            {
+                return false;
+            }
+
+
+
             return clsDetainedLicenseData.ReleaseDetainedLicense(this.DetainID,
                    ReleasedByUserID, ReleaseApplicationID);
+        }
+
+        public static clsDetainedLicense CreateNewDetainedLicense(int LicenseID, int CreatedByUserID)
+        {
+            if(!clsLicense.IsLicenseActive(LicenseID) || !clsUser.IsUserExists(CreatedByUserID))
+            {
+                return null;
+            }
+
+            return new clsDetainedLicense(LicenseID, CreatedByUserID);
         }
 
     }

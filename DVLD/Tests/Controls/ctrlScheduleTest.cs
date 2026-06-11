@@ -30,9 +30,7 @@ namespace DVLD.Tests.Controls
         private bool _IsPassedCurrentTest = false;
         private bool IsPassedPreviosTest = false;
 
-        private float retakeFees = 0.0f;
-        private float fees = 0.0f;
-        private float totalFees = 0.0f;
+        
 
         public clsTestType.enTestType TestTypeID
         {
@@ -84,20 +82,14 @@ namespace DVLD.Tests.Controls
         ///////////////////////////////////////////////////////////
         // Data
 
-        private void _CalculateFees()
-        {
-            if (_CreationMode == enCreationMode.RetakeTestSchedule)
-            {
-                retakeFees = (float)_TestAppointment.RetakeTestAppInfo.PaidFees;
-                lblRetakeAppFees.Text = $"${retakeFees}";
-            }
-            fees = (float)_LocalDrivingLicenseApplication.PaidFees + _LocalDrivingLicenseApplication.LicenseClassInfo.ClassFees;
-            totalFees = fees + retakeFees;
-
-            lblTotalFees.Text = totalFees.ToString();
-            _TestAppointment.PaidFees = totalFees;
-        }
-
+        
+        //private void _FillFees()
+        //{
+        //    if (_TestAppointment != null)
+        //    {
+        //        lblFees.Text = 
+        //    }
+        //}
         private void _ClearData()
         {
             _LocalDrivingLicenseApplicationID = -1;
@@ -130,16 +122,18 @@ namespace DVLD.Tests.Controls
 
             if (_CreationMode == enCreationMode.RetakeTestSchedule)
             {
-                lblRetakeTestAppID.Text = _TestAppointment.RetakeTestAppInfo.ApplicationID.ToString();
-                lblRetakeAppFees.Text = $"${retakeFees}";
-                lblTotalFees.Text = $"${_TestAppointment.PaidFees}";
+                if (_TestAppointment.RetakeTestAppInfo != null)
+                {
+                    lblRetakeTestAppID.Text = _TestAppointment.RetakeTestAppInfo.ApplicationID.ToString();
+                    lblRetakeAppFees.Text = $"${_TestAppointment.RetakeTestAppInfo.PaidFees}";
+                }
             }
             else
             {
                 lblRetakeTestAppID.Text = "N/A";
                 lblRetakeAppFees.Text = "N/A";
-                lblTotalFees.Text = $"${fees}";
             }
+            lblTotalFees.Text = $"${_TestAppointment.PaidFees}";
         }
 
         private void _DisplayData()
@@ -150,8 +144,12 @@ namespace DVLD.Tests.Controls
                 lblDrivingClass.Text = _LocalDrivingLicenseApplication.LicenseClassInfo.ClassName;
                 lblFullName.Text = _LocalDrivingLicenseApplication.PersonFullName;
                 lblTrial.Text = _LocalDrivingLicenseApplication.TotalTrialsPerTest(TestTypeID).ToString();
-                decimal fees = _LocalDrivingLicenseApplication.PaidFees + (decimal)_LocalDrivingLicenseApplication.LicenseClassInfo.ClassFees;
-                lblFees.Text = $"${fees}";
+                if (_TestAppointment.RetakeTestAppInfo != null)
+                    lblFees.Text = $"${_TestAppointment.PaidFees - (float)_TestAppointment.RetakeTestAppInfo.PaidFees}";
+                else
+                {
+                    lblFees.Text = $"${_TestAppointment.PaidFees}";
+                }
 
                 _DisplayRetakeTestData();
 
@@ -177,9 +175,7 @@ namespace DVLD.Tests.Controls
         {
             if (_Mode == enMode.AddNew)
             {
-                _TestAppointment.CreatedByUserID = clsGlobal.CurrentUser.UserID;
-                _TestAppointment.LocalDrivingLicenseApplicationID = _LocalDrivingLicenseApplicationID;
-                _TestAppointment.TestTypeID = _TestTypeID;
+                _TestAppointment = clsTestAppointment.GetNewTestAppointmentObject(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value);
             }
             _TestAppointment.AppointmentDate = dtpTestDate.Value;
         }
@@ -195,7 +191,6 @@ namespace DVLD.Tests.Controls
                     return false;
                 }
 
-                _TestAppointment.RetakeTestApplicationID = _TestAppointment.RetakeTestAppInfo.ApplicationID;
             }
 
 
@@ -222,12 +217,10 @@ namespace DVLD.Tests.Controls
 
 
 
-            _IsPassedCurrentTest = clsLocalDrivingLicenseApplication.DosPassTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
-            bool IsLocked = clsTestAppointment.IsTestAppointmentLocked(_LocalDrivingLicenseApplicationID, _TestTypeID);
-
+            
             if (_Mode == enMode.AddNew)
             {
-                if (!_IsPassedCurrentTest && IsLocked)
+                if (_TestAppointment.RetakeTestAppInfo != null)
                     _CreationMode = enCreationMode.RetakeTestSchedule;
                 else
                     _CreationMode = enCreationMode.FirstTimeSchedule;
@@ -235,7 +228,7 @@ namespace DVLD.Tests.Controls
 
             if (_Mode == enMode.Update)
             {
-                if (_TestAppointment.RetakeTestApplicationID != -1)
+                if (_TestAppointment.RetakeTestAppInfo != null)
                     _CreationMode = enCreationMode.RetakeTestSchedule;
                 else
                     _CreationMode = enCreationMode.FirstTimeSchedule;
@@ -249,7 +242,6 @@ namespace DVLD.Tests.Controls
             {
                 if (_TestAppointment.RetakeTestAppInfo == null)
                 {
-                    _TestAppointment.RetakeTestAppInfo = clsTestAppointment.GetNewReTakeTestObj(clsGlobal.CurrentUser.UserID, _LocalDrivingLicenseApplication.ApplicantPersonID);
                     _FillNewReTakeTestAppObj();
                 }
             }
@@ -285,7 +277,7 @@ namespace DVLD.Tests.Controls
             _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
 
 
-            _TestAppointment = clsTestAppointment.GetNewTestAppointmentObject(LocalDrivingLicenseApplicationID, TestTypeID);
+            _TestAppointment = clsTestAppointment.GetNewTestAppointmentObject(LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value);
 
             return _LocalDrivingLicenseApplication != null && _TestAppointment != null;
 
@@ -388,7 +380,6 @@ namespace DVLD.Tests.Controls
             if (_LocalDrivingLicenseApplication != null && _TestAppointment != null)
             {
                 _DisplayData();
-                _CalculateFees();
                 return true;
             }
             else

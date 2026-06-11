@@ -255,20 +255,19 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateUser(int UserID, int PersonID, string UserName,
+        public static bool UpdateUser(int UserID, string UserName,
             string Password, bool IsActive)
         {
             int NumberOfEffectedRows = 0;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string Query = "UPDATE Users SET [PersonID] = @PersonID, " +
+            string Query = "UPDATE Users SET " +
                 "[UserName] = @UserName, [Password] = @Password," +
                 " [IsActive] = @IsActive WHERE [UserID] = @UserID";
 
             SqlCommand Command = new SqlCommand(Query, connection);
 
-            Command.Parameters.AddWithValue("@PersonID", PersonID);
             Command.Parameters.AddWithValue("@UserName", UserName);
             Command.Parameters.AddWithValue("@Password", Password);
             Command.Parameters.AddWithValue("@IsActive", IsActive);
@@ -487,6 +486,43 @@ namespace DVLD_DataAccess
             return isFound;
         }
 
+        public static bool ChangeUserCredentials(int UserID, string NewUserName, string NewPassword)
+        {
+
+            int rowsAffected = 0;
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"Update  Users  
+                            set UserName = @UserName,
+                                Password = @Password
+                            where UserID = @UserID";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@UserID", UserID);
+            command.Parameters.AddWithValue("@UserName", NewUserName);
+            command.Parameters.AddWithValue("@Password", NewPassword);
+
+            try
+            {
+                connection.Open();
+                rowsAffected = command.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+                return false;
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+            return (rowsAffected > 0);
+        }
+
         public static bool ChangePassword(int UserID, string NewPassword)
         {
 
@@ -522,6 +558,35 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
+        public static bool ChangeUserActivity(int UserID, bool IsActive)
+        {
+            bool IsSucceed = false;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string Query = @"UPDATE [dbo].[Users]
+                               SET 
+                                  [IsActive] = @IsActive
+                             WHERE UserID = @UserID";
+
+            SqlCommand command = new SqlCommand(Query, connection);
+            command.Parameters.AddWithValue("@UserID", UserID);
+            command.Parameters.AddWithValue("@IsActive", IsActive);
+
+            try
+            {
+                connection.Open();
+                IsSucceed = (command.ExecuteNonQuery() > 0);
+            }
+            catch { }
+            finally
+            {
+                connection.Close();
+            }
+
+            return IsSucceed;
+
+        }
 
     }
 }

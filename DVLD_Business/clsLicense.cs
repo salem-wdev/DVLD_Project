@@ -186,12 +186,13 @@ namespace DVLD_Business
 
         }
 
-        
-
         public bool Save()
         {
 
-
+            if (this.IsDetained)
+            {
+                return false;
+            }
 
             switch (Mode)
             {
@@ -381,6 +382,11 @@ namespace DVLD_Business
                 return Newlicense;
 
             }
+        }
+
+        public static bool IsLicenseActive(int LicenseID)
+        {
+            return clsLicenseData.IsLicenseActive(LicenseID);
         }
 
     }
