@@ -19,11 +19,37 @@ namespace DVLD_Business
 
         public float FineFees { private set; get; }
         public int CreatedByUserID { private set; get; }
-        public clsUser CreatedByUserInfo { private set; get; }
+
+        private clsUser _CreatedByUserInfo = null;
+        public clsUser CreatedByUserInfo
+        {
+            get
+            {
+                if (_CreatedByUserInfo == null && CreatedByUserID != -1)
+                {
+                    _CreatedByUserInfo = clsUser.Find(this.CreatedByUserID);
+                }
+                return _CreatedByUserInfo;
+            }
+        }
+
         public bool IsReleased { private set; get; }
         public DateTime ReleaseDate { private set; get; }
         public int ReleasedByUserID { private set; get; }
-        public clsUser ReleasedByUserInfo { private set; get; }
+
+        private clsUser _ReleasedByUserInfo = null;
+        public clsUser ReleasedByUserInfo
+        {
+            get
+            {
+                if (_ReleasedByUserInfo == null && ReleasedByUserID != -1)
+                {
+                    _ReleasedByUserInfo = clsUser.Find(this.ReleasedByUserID);
+                }
+                return _ReleasedByUserInfo;
+            }
+        }
+
         public int ReleaseApplicationID { private set; get; }
 
         private clsDetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
@@ -57,12 +83,10 @@ namespace DVLD_Business
             this.DetainDate = DetainDate;
             this.FineFees = FineFees;
             this.CreatedByUserID = CreatedByUserID;
-            this.CreatedByUserInfo = clsUser.Find(this.CreatedByUserID);
             this.IsReleased = IsReleased;
             this.ReleaseDate = ReleaseDate;
             this.ReleasedByUserID = ReleasedByUserID;
             this.ReleaseApplicationID = ReleaseApplicationID;
-            this.ReleasedByUserInfo = clsUser.FindByPersonID(this.ReleasedByUserID);
             Mode = enMode.Update;
         }
 
