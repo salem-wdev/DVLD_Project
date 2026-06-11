@@ -186,12 +186,13 @@ namespace DVLD_Business
 
         }
 
-        
-
         public bool Save()
         {
 
-
+            if (this.IsDetained)
+            {
+                return false;
+            }
 
             switch (Mode)
             {
