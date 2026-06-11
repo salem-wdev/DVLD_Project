@@ -220,6 +220,34 @@ namespace DVLD_Business
             }
         }
 
+        public bool ChangeUserCredentials(string NewUserName, string NewPassword)
+        {
+            if (ChangeUserCredentials(this.UserID, NewUserName, NewPassword))
+            {
+                this.UserName = NewUserName;
+                this.Password = NewPassword;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool ChangeUserActivity(bool IsActive)
+        {
+            if (ChangeUserActivity(this.UserID, IsActive))
+            {
+                this.IsActive = IsActive;
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool ChangeUserCredentials(int UserID, string NewUserName, string NewPassword)
+        {
+            return clsUserData.ChangeUserCredentials(UserID, NewUserName, NewPassword);
+        }
+
         public static bool ChangePassword(int UserID, string NewPassword)
         {
             return clsUserData.ChangePassword(UserID, NewPassword);
@@ -229,6 +257,13 @@ namespace DVLD_Business
         {
             return clsUserData.DoesPersonHaveUser44(PersonID);
         }
+
+        public static bool ChangeUserActivity(int UserID, bool IsActive)
+        {
+            return clsUserData.ChangeUserActivity(UserID, IsActive);
+        }
+
+
 
     }
 }
