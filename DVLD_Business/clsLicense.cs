@@ -384,6 +384,11 @@ namespace DVLD_Business
             }
         }
 
+        public static bool IsLicenseActive(int LicenseID)
+        {
+            return clsLicenseData.IsLicenseActive(LicenseID);
+        }
+
     }
 
 }
