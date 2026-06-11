@@ -31,12 +31,13 @@ namespace DVLD_Business
         public int CreatedByUserID { private set; get; }
         public DateTime CreatedDate { private set; get; }
 
-        private clsDriver()
+        private clsDriver(int PersonID, int CreatedByUserID)
 
         {
             this.DriverID = -1;
-            this.PersonID = -1;
-            this.CreatedByUserID = -1;
+            this.PersonID = PersonID;
+            this.CreatedByUserID = CreatedByUserID;
+            this.CreatedDate = DateTime.Now;
             Mode = enMode.AddNew;
 
         }
@@ -48,7 +49,6 @@ namespace DVLD_Business
             this.PersonID = PersonID;
             this.CreatedByUserID = CreatedByUserID;
             this.CreatedDate = CreatedDate;
-            this.PersonInfo = clsPerson.Find(PersonID);
 
             Mode = enMode.Update;
         }
@@ -135,6 +135,17 @@ namespace DVLD_Business
             }
 
             return false;
+        }
+
+        public static clsDriver CreateNewDriver(int PersonID, int CreatedByUserID)
+        {
+            if (!clsPerson.IsPersonExists(PersonID)||!clsUser.IsUserExists(CreatedByUserID))
+            {
+                return null;
+            }
+
+            return new clsDriver(PersonID, CreatedByUserID);
+
         }
     }
 }
