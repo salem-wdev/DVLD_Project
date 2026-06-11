@@ -522,6 +522,35 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
+        public static bool ChangeUserActivity(int UserID, bool IsActive)
+        {
+            bool IsSucceed = false;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string Query = @"UPDATE [dbo].[Users]
+                               SET 
+                                  [IsActive] = @IsActive
+                             WHERE UserID = @UserID";
+
+            SqlCommand command = new SqlCommand(Query, connection);
+            command.Parameters.AddWithValue("@UserID", UserID);
+            command.Parameters.AddWithValue("@IsActive", IsActive);
+
+            try
+            {
+                connection.Open();
+                IsSucceed = (command.ExecuteNonQuery() > 0);
+            }
+            catch { }
+            finally
+            {
+                connection.Close();
+            }
+
+            return IsSucceed;
+
+        }
 
     }
 }
