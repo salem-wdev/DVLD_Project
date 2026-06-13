@@ -203,6 +203,11 @@ namespace DVLD_Business
                     }
                     else
                     {
+                        if (this.RetakeTestApplicationID != -1)
+                        {
+                            // Delete the retake test application if the test appointment save fails.
+                            clsApplication.Delete(this.RetakeTestApplicationID);
+                        }
                         return false;
                     }
 
