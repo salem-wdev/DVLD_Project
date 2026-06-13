@@ -26,7 +26,7 @@ namespace DVLD_Business
             }
             set
             {
-                if (value => clsUtilData.GetServerDate())
+                if (value >= clsUtilData.GetServerDate())
                 {
                     if (IsLocked == false)
                         _AppointmentDate = value;
