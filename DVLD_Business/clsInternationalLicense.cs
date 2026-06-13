@@ -75,13 +75,7 @@ namespace DVLD_Business
         private bool _AddNewInternationalLicense()
         {
 
-            if (!IsDriverEligibleForInternationalLicense(DriverID, out int LocalLicenseID))
-            {
-                return false;
-            }
-
-            this.IssuedUsingLocalLicenseID = LocalLicenseID;
-
+           
             //call DataAccess Layer 
 
             this.InternationalLicenseID = 
@@ -151,7 +145,7 @@ namespace DVLD_Business
             if (!base.Save())
                 return false;
 
-            switch (Mode)
+            switch (this.Mode)
             {
                 case enMode.AddNew:
                     if (_AddNewInternationalLicense())
