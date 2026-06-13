@@ -114,6 +114,11 @@ namespace DVLD_Business
                 ref IssuedUsingLocalLicenseID,
             ref IssueDate, ref ExpirationDate, ref IsActive, ref CreatedByUserID))
             {
+                if (ExpirationDate < clsUtilData.GetServerDate())
+                {
+                    IsActive = false;
+                }
+
                 //now we find the base application
                 clsApplication Application = clsApplication.Find(ApplicationID);
 
@@ -138,6 +143,8 @@ namespace DVLD_Business
         public override bool Save()
         {
 
+            
+
             //Because of inheritance first we call the save method in the base class,
             //it will take care of adding all information to the application table.
             base.Mode = (clsApplication.enMode)Mode;
@@ -155,6 +162,7 @@ namespace DVLD_Business
                     }
                     else
                     {
+                        clsApplication.Delete(this.ApplicationID);
                         return false;
                     }
 
