@@ -402,6 +402,11 @@ namespace DVLD_Business
             return clsLicenseData.DeactivateLicense(LicenseID);
         }
 
+        public static bool DeactivateExpiredLicenses()
+        {
+            return clsLicenseData.DeactivateExpiredLicenses();
+        }
+
     }
 
 }

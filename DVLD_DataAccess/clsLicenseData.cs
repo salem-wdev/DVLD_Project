@@ -594,6 +594,39 @@ namespace DVLD_DataAccess
             return isActive;
         }
 
+        public static bool DeactivateExpiredLicenses()
+        {
 
+            int rowsAffected = 0;
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"UPDATE [dbo].[Licenses]
+                             SET [IsActive] = 0
+                             WHERE ExpirationDate < GETDATE() 
+                               AND IsActive = 1;";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+
+
+            try
+            {
+                connection.Open();
+                rowsAffected = command.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+                return false;
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+            return (rowsAffected > 0);
+        }
     }
 }
