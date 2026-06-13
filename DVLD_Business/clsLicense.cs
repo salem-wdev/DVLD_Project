@@ -19,7 +19,7 @@ namespace DVLD_Business
         public int LicenseID { private set; get; }
         public int ApplicationID { private set; get; }
         public int DriverID { private set; get; }
-        public int LicenseClassID { protected set; get; }
+        public int LicenseClassID { private set; get; }
 
         private DateTime _IssueDate;
         private DateTime _ExpirationDate;
@@ -28,7 +28,7 @@ namespace DVLD_Business
         public DateTime ExpirationDate { get => _ExpirationDate; }
         public string Notes { set; get; }
         public float PaidFees { private set; get; }
-        public bool IsActive { protected set; get; }
+        public bool IsActive { private set; get; }
         public enIssueReason IssueReason { private set; get; }
         public string IssueReasonText
         {
@@ -198,11 +198,6 @@ namespace DVLD_Business
         public bool Save()
         {
 
-            if (Mode == enMode.Update && (this.IsDetained || !IsLicenseActive(this.LicenseID)))
-            {
-                return false;
-            }
-
             switch (Mode)
             {
                 case enMode.AddNew:
@@ -268,6 +263,9 @@ namespace DVLD_Business
             return clsLicenseData.GetActiveLicenseIDByDriverID(DriverID, LicenseClassID);
         }
 
+        // TODO: Technical Debt - Implement a dedicated Service Layer (Business Manager) to handle
+        // license state transitions and logic validation, decoupling business rules from DataAccess 
+        // and moving towards a Unit of Work pattern for atomic database operations.
         private static clsLicense _PrepareObj(clsApplication.enApplicationType ApplicationType,
             int ApplicationID, int DriverID, int LicenseClassID,
             int LocalDrivingLicenseApplicationID)
@@ -278,7 +276,6 @@ namespace DVLD_Business
 
             if (ApplicationType == clsApplication.enApplicationType.RetakeTest ||
         ApplicationType == clsApplication.enApplicationType.ReleaseDetainedDrivingLicense ||
-        ApplicationType == clsApplication.enApplicationType.NewInternationalLicense ||
         ApplicationType == clsApplication.enApplicationType.NewInternationalLicense)
             {
                 return null;
@@ -290,7 +287,7 @@ namespace DVLD_Business
                 OldLicense = clsLicense.Find(GetActiveLicenseIDByDriverID(DriverID, LicenseClassID));
                 if (OldLicense != null)
                 {
-                    if (!OldLicense.IsActive)
+                    if (!IsLicenseActive(OldLicense.LicenseID))
                     {
                         return null;
                     }
