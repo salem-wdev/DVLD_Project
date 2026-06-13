@@ -241,5 +241,10 @@ namespace DVLD_Business
             return InternationalLicense;
         }
 
+        public static bool DeactvateExpiredLicenses()
+        {
+            return clsInternationalLicenseData.DeactvateInternationalLicensesforExpiredLocalLicenses();
+        }
+
     }
 }
