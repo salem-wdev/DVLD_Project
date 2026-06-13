@@ -161,8 +161,17 @@ namespace DVLD_Business
                     }
 
                 case enMode.Update:
+                    clsLicense license = clsLicense.Find(IssuedUsingLocalLicenseID);
 
-                    return _UpdateInternationalLicense();
+                    if (license == null || license.ExpirationDate < clsUtilData.GetServerDate()
+                        || license.IsActive == false
+                        || clsDetainedLicense.IsLicenseDetained(IssuedUsingLocalLicenseID))
+                    {
+                        IsActive = false;
+                        return false;
+                    }
+                    
+                        return _UpdateInternationalLicense();
 
             }
 
