@@ -670,5 +670,39 @@ namespace DVLD_DataAccess
             return IsFound;
         }
 
+        public static bool LockExpiredTestAppointments()
+        {
+
+            int EffectedRows = 0;
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"UPDATE [dbo].[TestAppointments]
+                               SET IsLocked = 1
+                             WHERE AppointmentDate < GETDATE()
+                             AND IsLocked = 0;";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+
+            try
+            {
+                connection.Open();
+                EffectedRows = command.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+            return EffectedRows > 0;
+        }
+
     }
 }
