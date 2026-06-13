@@ -229,6 +229,12 @@ namespace DVLD_Business
 
                 case enMode.Update:
 
+                    if(this._AppointmentDate< clsUtilData.GetServerDate())
+                    {
+                        this.IsLocked = true;
+                        return false;
+                    }
+
                     if (clsTestAppointmentData.GetIsAppointmentLockedByID(this.TestAppointmentID))
                     {
                         return false;
