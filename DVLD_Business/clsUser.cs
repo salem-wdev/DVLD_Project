@@ -31,7 +31,7 @@ namespace DVLD_Business
         }
         public string UserName { get; private set; }
         public string Password { get; private set; }
-        public bool IsActive { get; private set; }
+        public bool IsActive { get; set; }
 
 
         private clsUser(int PersonID, string UserName, string Password)
@@ -190,7 +190,8 @@ namespace DVLD_Business
         {
             return clsUserData.GetAllUsers();
         }
-
+        // TODO: Consider moving validation logic for IsActive/Credentials to a centralized 
+        // 'ValidateBusinessRules()' method within clsUser before calling Save().
         public bool Save()
         {
             switch (Mode)

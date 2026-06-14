@@ -17,20 +17,20 @@ namespace DVLD
         {
             if (!clsLicense.DeactivateExpiredLicenses())
             {
-                MessageBox.Show("An error occurred while deactivating expired licenses. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                //MessageBox.Show("An error occurred while deactivating expired licenses. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //return;
             }
 
             if (!clsInternationalLicense.DeactvateExpiredLicenses())
             {
-                MessageBox.Show("An error occurred while deactivating expired international licenses. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                //MessageBox.Show("An error occurred while deactivating expired international licenses. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //return;
             }
 
             if (!clsTestAppointment.LockExpiredTestAppointments())
             {
-                MessageBox.Show("An error occurred while locking expired test appointments. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                //MessageBox.Show("An error occurred while locking expired test appointments. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //return;
             }
 
             Application.EnableVisualStyles();
