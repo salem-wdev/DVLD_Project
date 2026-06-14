@@ -26,11 +26,12 @@ namespace DVLD.Licenses.Local_Licenses
 
             if (_Driver == null)
             {
-                _Driver = new clsDriver();
-                _Driver.PersonID = _LocalDrivingLicenseApplication.ApplicantPersonID;
-                _Driver.CreatedByUserID = clsGlobal.CurrentUser.UserID;
+                _Driver = clsDriver.CreateNewDriver(_LocalDrivingLicenseApplication.ApplicantPersonID, clsGlobal.CurrentUser.UserID);
+                if (_Driver.Save())
+                {
                 _DriverID = _Driver.DriverID;
-                return _Driver.Save();
+                    return true;
+                }
             }
 
             _DriverID = _Driver.DriverID;
