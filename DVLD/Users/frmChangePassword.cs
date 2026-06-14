@@ -103,8 +103,7 @@ namespace DVLD.Users
                 return;
             }
 
-            _User.Password = txtNewPassword.Text;
-
+            
 
             if (_User.ChangeUserCredentials(_User.UserName, txtNewPassword.Text.Trim()))
             {
@@ -160,6 +159,17 @@ namespace DVLD.Users
         {
             TextBox text = sender as TextBox;
 
+            if (string.IsNullOrWhiteSpace(text.Text.Trim()))
+            {
+                errorProvider1.SetError(text, $"{text.Tag} is required.");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider1.SetError(text, string.Empty);
+                e.Cancel = false;
+            }
+
             if (txtNewPassword.Text.Trim() != txtConfirmPassword.Text.Trim())
             {
                 errorProvider1.SetError(text, $"Password is not matching.");
@@ -173,16 +183,6 @@ namespace DVLD.Users
             }
 
 
-            if (string.IsNullOrWhiteSpace(text.Text.Trim()))
-            {
-                errorProvider1.SetError(text, $"{text.Tag} is required.");
-                e.Cancel = true;
-            }
-            else
-            {
-                errorProvider1.SetError(text, string.Empty);
-                e.Cancel = false;
-            }
         }
     }
 }
