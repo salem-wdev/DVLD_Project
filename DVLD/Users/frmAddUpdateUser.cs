@@ -42,7 +42,7 @@ namespace DVLD.Users
             {
                 lblTitle.Text = "Add New User";
                 this.Text = "Add New User";
-                _User = new clsUser();
+                _User = null;
 
                 tpLoginInfo.Enabled = false;
 
@@ -149,10 +149,6 @@ namespace DVLD.Users
             tpLoginInfo.Enabled = true;
             btnNext.Enabled = true;
 
-            if (_User != null)
-            {
-                _User.PersonID = PersonID;
-            }
 
 
             btnSave.Enabled = _IsbtnSaveReadyToEnable();
@@ -238,23 +234,39 @@ namespace DVLD.Users
                 btnSave.Enabled = false;
                 return;
             }
-
-            _User.UserName = txtUserName.Text;
-            _User.Password = txtPassword.Text;
-            _User.IsActive = chkIsActive.Checked;
-            _User.PersonID = ctrlPersonCardWithFilter1.PersonID;
-
-            if (_User.Save())
+            if (_Mode == enMode.AddNew)
             {
-                _Mode = enMode.Update;
-                MessageBox.Show("Saved successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                lblTitle.Text = "Update User";
-                this.Text = "Update User";
+                _User = clsUser.CreateNewUser(ctrlPersonCardWithFilter1.PersonID, txtUserName.Text.Trim(), txtPassword.Text.Trim());
+                _User.IsActive = chkIsActive.Checked;
+
+                if (_User.Save())
+                {
+                    _Mode = enMode.Update;
+                    MessageBox.Show("Saved successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    lblTitle.Text = "Update User";
+                    this.Text = "Update User";
+                }
+                else
+                {
+                    MessageBox.Show("Save failed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             else
             {
-                MessageBox.Show("Save failed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (_User.ChangeUserCredentials(txtUserName.Text.Trim(), txtPassword.Text.Trim()) && _User.ChangeUserActivity(chkIsActive.Checked) && _User.ChangeUserActivity(chkIsActive.Checked))
+                {
+                    MessageBox.Show("Updated successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                { 
+                    MessageBox.Show("Update failed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                
             }
+
+
+            
 
             txtPassword.Focus();
 
