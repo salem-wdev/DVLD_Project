@@ -75,13 +75,7 @@ namespace DVLD_Business
         private bool _AddNewInternationalLicense()
         {
 
-            if (!IsDriverEligibleForInternationalLicense(DriverID, out int LocalLicenseID))
-            {
-                return false;
-            }
-
-            this.IssuedUsingLocalLicenseID = LocalLicenseID;
-
+           
             //call DataAccess Layer 
 
             this.InternationalLicenseID = 
@@ -114,6 +108,11 @@ namespace DVLD_Business
                 ref IssuedUsingLocalLicenseID,
             ref IssueDate, ref ExpirationDate, ref IsActive, ref CreatedByUserID))
             {
+                if (ExpirationDate < clsUtilData.GetServerDate())
+                {
+                    IsActive = false;
+                }
+
                 //now we find the base application
                 clsApplication Application = clsApplication.Find(ApplicationID);
 
@@ -138,13 +137,15 @@ namespace DVLD_Business
         public override bool Save()
         {
 
+            
+
             //Because of inheritance first we call the save method in the base class,
             //it will take care of adding all information to the application table.
             base.Mode = (clsApplication.enMode)Mode;
             if (!base.Save())
                 return false;
 
-            switch (Mode)
+            switch (this.Mode)
             {
                 case enMode.AddNew:
                     if (_AddNewInternationalLicense())
@@ -155,12 +156,22 @@ namespace DVLD_Business
                     }
                     else
                     {
+                        clsApplication.Delete(this.ApplicationID);
                         return false;
                     }
 
                 case enMode.Update:
+                    clsLicense license = clsLicense.Find(IssuedUsingLocalLicenseID);
 
-                    return _UpdateInternationalLicense();
+                    if (license == null || license.ExpirationDate < clsUtilData.GetServerDate()
+                        || license.IsActive == false
+                        || clsDetainedLicense.IsLicenseDetained(IssuedUsingLocalLicenseID))
+                    {
+                        IsActive = false;
+                        return false;
+                    }
+                    
+                        return _UpdateInternationalLicense();
 
             }
 
@@ -228,6 +239,11 @@ namespace DVLD_Business
             InternationalLicense.IsActive = true;
 
             return InternationalLicense;
+        }
+
+        public static bool DeactvateExpiredLicenses()
+        {
+            return clsInternationalLicenseData.DeactvateInternationalLicensesforExpiredLocalLicenses();
         }
 
     }

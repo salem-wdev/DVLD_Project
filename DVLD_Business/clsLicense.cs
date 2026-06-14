@@ -18,17 +18,17 @@ namespace DVLD_Business
 
         public int LicenseID { private set; get; }
         public int ApplicationID { private set; get; }
-        public int DriverID { private set; get; } 
-        public int LicenseClassID { protected set; get; }
+        public int DriverID { private set; get; }
+        public int LicenseClassID { private set; get; }
 
-        private DateTime _IssueDate; 
+        private DateTime _IssueDate;
         private DateTime _ExpirationDate;
 
-        public DateTime IssueDate { get => _IssueDate;}
-        public DateTime ExpirationDate { get => _ExpirationDate;}
+        public DateTime IssueDate { get => _IssueDate; }
+        public DateTime ExpirationDate { get => _ExpirationDate; }
         public string Notes { set; get; }
         public float PaidFees { private set; get; }
-        public bool IsActive { protected set; get; }
+        public bool IsActive { private set; get; }
         public enIssueReason IssueReason { private set; get; }
         public string IssueReasonText
         {
@@ -49,7 +49,7 @@ namespace DVLD_Business
         {
             get
             {
-                if(_DriverInfo == null && DriverID != -1)
+                if (_DriverInfo == null && DriverID != -1)
                 {
                     _DriverInfo = clsDriver.FindByDriverID(this.DriverID);
                 }
@@ -62,7 +62,7 @@ namespace DVLD_Business
         {
             get
             {
-                if(_DetainedInfo == null && this.LicenseID != -1)
+                if (_DetainedInfo == null && this.LicenseID != -1)
                 {
                     _DetainedInfo = clsDetainedLicense.FindByLicenseID(this.LicenseID);
                 }
@@ -168,13 +168,22 @@ namespace DVLD_Business
             string Notes = "";
             float PaidFees = 0; bool IsActive = true; int CreatedByUserID = 1;
             byte IssueReason = 1;
+
+
             if (clsLicenseData.GetLicenseInfoByID(LicenseID, ref ApplicationID, ref DriverID, ref LicenseClass,
             ref IssueDate, ref ExpirationDate, ref Notes,
             ref PaidFees, ref IsActive, ref IssueReason, ref CreatedByUserID))
+            {
+                if (ExpirationDate < clsUtilData.GetServerDate())
+                {
+                    IsActive = false;
+                }
 
                 return new clsLicense(LicenseID, ApplicationID, DriverID, LicenseClass,
-                                     IssueDate, ExpirationDate, Notes,
-                                     PaidFees, IsActive, (enIssueReason)IssueReason, CreatedByUserID);
+                                 IssueDate, ExpirationDate, Notes,
+                                 PaidFees, IsActive, (enIssueReason)IssueReason, CreatedByUserID);
+            }
+
             else
                 return null;
 
@@ -188,11 +197,6 @@ namespace DVLD_Business
 
         public bool Save()
         {
-
-            if (this.IsDetained)
-            {
-                return false;
-            }
 
             switch (Mode)
             {
@@ -219,12 +223,12 @@ namespace DVLD_Business
                     {
                         return false;
                     }
-                   
+
                 case enMode.Update:
 
-                            return _UpdateLicense();
+                    return _UpdateLicense();
 
-                        }
+            }
 
             return false;
         }
@@ -259,6 +263,9 @@ namespace DVLD_Business
             return clsLicenseData.GetActiveLicenseIDByDriverID(DriverID, LicenseClassID);
         }
 
+        // TODO: Technical Debt - Implement a dedicated Service Layer (Business Manager) to handle
+        // license state transitions and logic validation, decoupling business rules from DataAccess 
+        // and moving towards a Unit of Work pattern for atomic database operations.
         private static clsLicense _PrepareObj(clsApplication.enApplicationType ApplicationType,
             int ApplicationID, int DriverID, int LicenseClassID,
             int LocalDrivingLicenseApplicationID)
@@ -269,7 +276,6 @@ namespace DVLD_Business
 
             if (ApplicationType == clsApplication.enApplicationType.RetakeTest ||
         ApplicationType == clsApplication.enApplicationType.ReleaseDetainedDrivingLicense ||
-        ApplicationType == clsApplication.enApplicationType.NewInternationalLicense || 
         ApplicationType == clsApplication.enApplicationType.NewInternationalLicense)
             {
                 return null;
@@ -277,15 +283,16 @@ namespace DVLD_Business
 
             if (ApplicationType == clsApplication.enApplicationType.RenewDrivingLicense)
             {
+                // TODO: Get License ID if it's active or not for renewal
                 OldLicense = clsLicense.Find(GetActiveLicenseIDByDriverID(DriverID, LicenseClassID));
                 if (OldLicense != null)
                 {
-                    if(!OldLicense.IsActive)
+                    if (!IsLicenseActive(OldLicense.LicenseID))
                     {
                         return null;
                     }
 
-                    if (OldLicense.ExpirationDate > DateTime.Now)
+                    if (OldLicense.ExpirationDate > clsUtilData.GetServerDate())
                     {
                         return null;
                     }
@@ -354,7 +361,8 @@ namespace DVLD_Business
         /// Can be omitted or left as -1 for renewals and replacements.
         /// </param>
         /// <returns>A populated <see cref="clsLicense"/> object if validation passes; otherwise, returns <c>null</c>.</returns>
-        
+
+        // TODO: Overloading factory method to send License ID directly for renwal
         public static clsLicense GetNewLicenseObj(int ApplicationID, int DriverID, int LicenseClassID, int CreatedByUser, int LocalDrivingLicenseApplicationID = -1)
         {
 
@@ -387,6 +395,16 @@ namespace DVLD_Business
         public static bool IsLicenseActive(int LicenseID)
         {
             return clsLicenseData.IsLicenseActive(LicenseID);
+        }
+
+        public static bool DeactivateLicense(int LicenseID)
+        {
+            return clsLicenseData.DeactivateLicense(LicenseID);
+        }
+
+        public static bool DeactivateExpiredLicenses()
+        {
+            return clsLicenseData.DeactivateExpiredLicenses();
         }
 
     }

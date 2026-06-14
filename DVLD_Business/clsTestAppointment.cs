@@ -16,7 +16,23 @@ namespace DVLD_Business
         public int TestAppointmentID { private set; get; }
         public clsTestType.enTestType TestTypeID { private set; get; }
         public int LocalDrivingLicenseApplicationID { private set; get; }
-        public DateTime AppointmentDate { set; get; }
+
+        private DateTime _AppointmentDate;
+        public DateTime AppointmentDate
+        {
+            get
+            {
+                return _AppointmentDate;
+            }
+            set
+            {
+                if (value >= clsUtilData.GetServerDate())
+                {
+                    if (IsLocked == false)
+                        _AppointmentDate = value;
+                }
+            }
+        }
         public float PaidFees { private set; get; } = 0.0f;
         public int CreatedByUserID { private set; get; }
         public bool IsLocked { protected set; get; }
@@ -26,7 +42,7 @@ namespace DVLD_Business
         public clsApplication RetakeTestAppInfo
         {
             get
-            { 
+            {
                 if (_RetakeTestAppInfo == null && RetakeTestApplicationID != -1)
                 {
                     _RetakeTestAppInfo = clsApplication.Find(RetakeTestApplicationID);
@@ -47,7 +63,7 @@ namespace DVLD_Business
             this.TestAppointmentID = -1;
             this.TestTypeID = TestTypeID;
             this.LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
-            this.AppointmentDate = AppointmentDate;
+            this._AppointmentDate = AppointmentDate;
             this.PaidFees = 0;
             this.IsLocked = false;
             this.CreatedByUserID = CreatedByUserID;
@@ -64,7 +80,7 @@ namespace DVLD_Business
             this.TestAppointmentID = TestAppointmentID;
             this.TestTypeID = TestTypeID;
             this.LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
-            this.AppointmentDate = AppointmentDate;
+            this._AppointmentDate = AppointmentDate;
             this.PaidFees = PaidFees;
             this.CreatedByUserID = CreatedByUserID;
             this.IsLocked = IsLocked;
@@ -99,24 +115,38 @@ namespace DVLD_Business
             if (clsTestAppointmentData.GetTestAppointmentInfoByID(TestAppointmentID, ref TestTypeID, ref LocalDrivingLicenseApplicationID,
             ref AppointmentDate, ref PaidFees, ref CreatedByUserID, ref IsLocked, ref RetakeTestApplicationID))
 
+            {
+                if (AppointmentDate < clsUtilData.GetServerDate())
+                {
+                    IsLocked = true;
+                }
+
                 return new clsTestAppointment(TestAppointmentID, (clsTestType.enTestType)TestTypeID, LocalDrivingLicenseApplicationID,
-             AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
+          AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
+            }
             else
                 return null;
 
         }
 
-        public static clsTestAppointment FindByLocalDrivingLicenseApplicationID(int LocalDrivingLicenseApplicationID,clsTestType.enTestType TestTypeID)
+        public static clsTestAppointment FindByLocalDrivingLicenseApplicationID(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            int TestAppointmentID = -1; 
+            int TestAppointmentID = -1;
             DateTime AppointmentDate = DateTime.Now; float PaidFees = 0;
             int CreatedByUserID = -1; bool IsLocked = false; int RetakeTestApplicationID = -1;
 
             if (clsTestAppointmentData.GetTestAppointmentInfoByLocalDrivingLicenseApplicationID(LocalDrivingLicenseApplicationID, (int)TestTypeID, ref TestAppointmentID,
             ref AppointmentDate, ref PaidFees, ref CreatedByUserID, ref IsLocked, ref RetakeTestApplicationID))
 
+            {
+                if (AppointmentDate < clsUtilData.GetServerDate())
+                {
+                    IsLocked = true;
+                }
+
                 return new clsTestAppointment(TestAppointmentID, (clsTestType.enTestType)TestTypeID, LocalDrivingLicenseApplicationID,
-             AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
+          AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
+            }
             else
                 return null;
 
@@ -132,8 +162,15 @@ namespace DVLD_Business
             if (clsTestAppointmentData.GetLastTestAppointment(LocalDrivingLicenseApplicationID, (int)TestTypeID,
                 ref TestAppointmentID, ref AppointmentDate, ref PaidFees, ref CreatedByUserID, ref IsLocked, ref RetakeTestApplicationID))
 
+            {
+                if (AppointmentDate < clsUtilData.GetServerDate())
+                {
+                    IsLocked = true;
+                }
+
                 return new clsTestAppointment(TestAppointmentID, TestTypeID, LocalDrivingLicenseApplicationID,
-             AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
+         AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
+            }
             else
                 return null;
 
@@ -160,6 +197,7 @@ namespace DVLD_Business
         public bool Save()
         {
 
+
             if (RetakeTestAppInfo != null)
             {
                 if (!RetakeTestAppInfo.Save())
@@ -181,10 +219,21 @@ namespace DVLD_Business
                     }
                     else
                     {
+                        if (this.RetakeTestApplicationID != -1)
+                        {
+                            // Delete the retake test application if the test appointment save fails.
+                            clsApplication.Delete(this.RetakeTestApplicationID);
+                        }
                         return false;
                     }
 
                 case enMode.Update:
+
+                    if (this._AppointmentDate < clsUtilData.GetServerDate())
+                    {
+                        this.IsLocked = true;
+                        return false;
+                    }
 
                     if (clsTestAppointmentData.GetIsAppointmentLockedByID(this.TestAppointmentID))
                     {
@@ -247,7 +296,7 @@ namespace DVLD_Business
         {
             // If the test type is greater than VisionTest, then check if the previous test appointment is locked.
             if (TestTypeID == clsTestType.enTestType.VisionTest)
-            { 
+            {
                 return true;
             }
             // Check if the previous test appointment is locked.
@@ -285,7 +334,7 @@ namespace DVLD_Business
             {
                 return false;
             }
-            
+
             return true;
         }
 
@@ -321,9 +370,9 @@ namespace DVLD_Business
                 return false;
             }
 
-            
-                return true;
-            
+
+            return true;
+
         }
 
         private static clsTestAppointment _GetReadyObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
@@ -343,7 +392,7 @@ namespace DVLD_Business
         {
             clsTestAppointment testAppointment;
 
-            if(TestTypeID == clsTestType.enTestType.None)
+            if (TestTypeID == clsTestType.enTestType.None)
             {
                 return null;
             }
@@ -374,5 +423,9 @@ namespace DVLD_Business
             return clsApplication.GetNewApplicationobject(CreatedByUserID, ApplicantPersonID, clsApplication.enApplicationType.RetakeTest);
         }
 
+        public static bool LockExpiredTestAppointments()
+        {
+            return clsTestAppointmentData.LockExpiredTestAppointments();
+        }
     }
 }
