@@ -29,7 +29,7 @@ namespace DVLD.Licenses.Local_Licenses
                 _Driver = clsDriver.CreateNewDriver(_LocalDrivingLicenseApplication.ApplicantPersonID, clsGlobal.CurrentUser.UserID);
                 if (_Driver.Save())
                 {
-                _DriverID = _Driver.DriverID;
+                    _DriverID = _Driver.DriverID;
                     return true;
                 }
             }
@@ -87,7 +87,7 @@ namespace DVLD.Licenses.Local_Licenses
 
             _FillLicenseObj();
 
-            if (_License.Save())
+            if (_License != null && _License.Save())
             {
                 MessageBox.Show("License issued successfully.");
                 btnIssueLicense.Enabled = false;
