@@ -130,7 +130,10 @@ namespace DVLD.Applications.Local_Driving_License
         {
             if (_LocalLicenseApplication != null)
             {
-
+                if (_Mode == enMode.Update)
+                {
+                    _LocalLicenseApplication.LicenseClassID = (int)cbLicenseClass.SelectedValue;
+                }
                 if (_LocalLicenseApplication.Save())
                 {
                     _Mode = enMode.Update;
