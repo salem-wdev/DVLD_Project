@@ -174,7 +174,7 @@ namespace DVLD.Tests.Controls
 
         private void _FillTestAppointmentObj()
         {
-            if (_Mode == enMode.AddNew)
+            if (_TestAppointment == null)
             {
                 _TestAppointment = clsTestAppointment.GetNewTestAppointmentObject(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value);
             }
