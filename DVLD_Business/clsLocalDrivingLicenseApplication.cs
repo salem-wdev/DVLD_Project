@@ -16,7 +16,22 @@ namespace DVLD_Business
         public enMode Mode { get; protected set; } = enMode.AddNew;
 
         public int LocalDrivingLicenseApplicationID { private set; get; }
-        public int LicenseClassID { private set; get; }
+
+        private int _LicenseClassID = -1;
+        public int LicenseClassID
+        {
+
+            set
+            {
+                if (value != _LicenseClassID)
+                {
+                    _LicenseClassInfo = null;
+                    _LicenseClassID = value;
+                }
+            }
+
+            get => _LicenseClassID;
+        }
 
         private clsLicenseClass _LicenseClassInfo = null;
 
