@@ -74,7 +74,8 @@ namespace DVLD.Tests.Controls
         {
             InitializeComponent();
 
-            dtpTestDate.MinDate = DateTime.Today;
+            dtpTestDate.MinDate = DateTime.Now.AddMinutes(5);
+            dtpTestDate.Value = DateTime.Now.AddMinutes(10);
             btnSave.Enabled = false;
         }
 
