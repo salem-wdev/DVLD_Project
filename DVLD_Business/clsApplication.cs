@@ -32,7 +32,7 @@ namespace DVLD_Business
         public enApplicationType ApplicationTypeID { get; protected set; }
         private enApplicationStatus _ApplicationStatus;
         private DateTime _LastStatusDate;
-        public decimal PaidFees { get; set; }
+        public decimal PaidFees { get; internal set; }
         public int CreatedByUserID { get; protected set; }
 
         private clsUser _CreatedByUserInfo = null;
