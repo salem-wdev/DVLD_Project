@@ -167,7 +167,6 @@ namespace DVLD.Tests.Controls
             if (_TestAppointment.RetakeTestAppInfo.Mode == clsApplication.enMode.AddNew)
             {
 
-                _TestAppointment.RetakeTestAppInfo.PaidFees = _TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo.ApplicationTypeFees;
 
             }
         }
