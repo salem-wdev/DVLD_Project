@@ -390,7 +390,10 @@ namespace DVLD_Business
 
         public static clsTestAppointment GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
-            clsTestAppointment testAppointment;
+            if (AppointmentDate < clsUtilData.GetServerDate())
+            {
+                return null;
+            }
 
             if (TestTypeID == clsTestType.enTestType.None)
             {

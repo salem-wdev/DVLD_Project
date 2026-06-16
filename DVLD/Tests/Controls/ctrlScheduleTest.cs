@@ -74,7 +74,8 @@ namespace DVLD.Tests.Controls
         {
             InitializeComponent();
 
-            dtpTestDate.MinDate = DateTime.Today;
+            dtpTestDate.MinDate = DateTime.Now.AddMinutes(5);
+            dtpTestDate.Value = DateTime.Now.AddMinutes(10);
             btnSave.Enabled = false;
         }
 
@@ -166,14 +167,13 @@ namespace DVLD.Tests.Controls
             if (_TestAppointment.RetakeTestAppInfo.Mode == clsApplication.enMode.AddNew)
             {
 
-                _TestAppointment.RetakeTestAppInfo.PaidFees = _TestAppointment.RetakeTestAppInfo.ApplicationTypeInfo.ApplicationTypeFees;
 
             }
         }
 
         private void _FillTestAppointmentObj()
         {
-            if (_Mode == enMode.AddNew)
+            if (_TestAppointment == null)
             {
                 _TestAppointment = clsTestAppointment.GetNewTestAppointmentObject(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value);
             }
