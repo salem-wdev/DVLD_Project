@@ -44,7 +44,6 @@ namespace DVLD
         {
             frmUserInfo frm = new frmUserInfo(clsGlobal.CurrentUser.UserID);
             frm.ShowDialog();
-            clsGlobal.CurrentUser.PersonInfo = clsPerson.Find(clsGlobal.CurrentUser.PersonInfo.PersonID);
         }
 
         private void changePasswordToolStripMenuItem_Click(object sender, EventArgs e)
