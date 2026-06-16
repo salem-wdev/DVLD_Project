@@ -101,23 +101,7 @@ namespace DVLD.Applications.Local_Driving_License
             
         }
 
-        private void _FillApplicationWithData()
-        {
             
-            if (_LocalLicenseApplication.ApplicationTypeInfo != null)
-            {
-                _LocalLicenseApplication.PaidFees = _LocalLicenseApplication.ApplicationTypeInfo.ApplicationTypeFees + 15;
-            }
-            else 
-            {
-                _LocalLicenseApplication.PaidFees = 15;
-            }
-
-
-
-
-        }
-
         private void _FillcbLicenseClassWithData()
         {
             cbLicenseClass.DataSource = clsLicenseClass.GetAllLicenseClasses();
