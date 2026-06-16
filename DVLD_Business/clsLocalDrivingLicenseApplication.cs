@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static DVLD_Business.clsApplication;
+using static DVLD_Business.clsLicense;
 
 namespace DVLD_Business
 {
@@ -291,7 +292,38 @@ namespace DVLD_Business
 
         public static clsLocalDrivingLicenseApplication GetNewLocalDrivingLicenseApp(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
-            return new clsLocalDrivingLicenseApplication(LicenseClassID, CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
+            // if the application type is not new driving license
+            // we should not allow to create new application.
+            // other application types should be created by base application class.
+            if (ApplicationTypeID != clsApplication.enApplicationType.NewDrivingLicense)
+            {
+                return null;
+            }
+
+            // check if the user and person exist
+            if (clsUser.IsUserExists(CreatedByUserID) && clsPerson.IsPersonExists(ApplicantPersonID))
+            {
+
+                // TODO: if there is active application for the same person
+                // and license class we should not allow to create new application.
+                if (clsLicense.GetActiveLicenseIDByPersonID(ApplicantPersonID, LicenseClassID) != -1
+                    || clsApplication.GetActiveApplicationIDForLicenseClass(ApplicantPersonID, ApplicationTypeID, LicenseClassID) != -1)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+
+            decimal ApplicationTypeFees = 0;
+            ApplicationTypeFees = clsApplicationType.Find((int)ApplicationTypeID)?.ApplicationTypeFees ?? 0;
+
+            return new clsLocalDrivingLicenseApplication(LicenseClassID, CreatedByUserID, ApplicantPersonID, ApplicationTypeID)
+            {
+                PaidFees = ApplicationTypeFees
+            };
         }
 
     }
