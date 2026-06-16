@@ -236,7 +236,6 @@
             this.cbLicenseClass.Name = "cbLicenseClass";
             this.cbLicenseClass.Size = new System.Drawing.Size(270, 28);
             this.cbLicenseClass.TabIndex = 134;
-            this.cbLicenseClass.SelectedIndexChanged += new System.EventHandler(this.cbLicenseClass_SelectedIndexChanged);
             // 
             // pictureBox6
             // 
