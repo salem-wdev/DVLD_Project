@@ -97,6 +97,15 @@ namespace DVLD.Tests
                 return;
             }
 
+
+            if (MessageBox.Show("Are you sure you want to save this result." +
+                "\nCan not change this result.", "Warning", MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) 
+                == DialogResult.No)
+            {
+                return;
+            }
+
             _FillTestObjectWithData();
 
             if (_Test != null)
