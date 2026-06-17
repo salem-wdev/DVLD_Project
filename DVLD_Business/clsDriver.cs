@@ -137,7 +137,7 @@ namespace DVLD_Business
             return false;
         }
 
-        public static clsDriver CreateNewDriver(int PersonID, int CreatedByUserID)
+        internal static clsDriver CreateNewDriver(int PersonID, int CreatedByUserID)
         {
             if (!clsPerson.IsPersonExists(PersonID)||!clsUser.IsUserExists(CreatedByUserID))
             {
