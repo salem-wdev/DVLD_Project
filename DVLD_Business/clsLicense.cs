@@ -273,24 +273,85 @@ namespace DVLD_Business
             return clsLicenseData.GetActiveLicenseIDByDriverID(DriverID, LicenseClassID);
         }
 
-        // TODO: Technical Debt - Implement a dedicated Service Layer (Business Manager) to handle
-        // license state transitions and logic validation, decoupling business rules from DataAccess 
-        // and moving towards a Unit of Work pattern for atomic database operations.
-        private static clsLicense _PrepareObj(clsApplication.enApplicationType ApplicationType,
+        private static float _CalculatePaidFees(clsApplication.enApplicationType ApplicationType, int LicenseClassID)
+        {
+            float PaidFees = 0;
+            if (ApplicationType == clsApplication.enApplicationType.NewDrivingLicense)
+            {
+                PaidFees = clsLicenseClass.Find(LicenseClassID).ClassFees + (float)clsApplicationType.Find((int)clsApplication.enApplicationType.NewDrivingLicense).ApplicationTypeFees;
+            }
+            else if (ApplicationType == clsApplication.enApplicationType.RenewDrivingLicense)
+            {
+                PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.RenewDrivingLicense).ApplicationTypeFees;
+            }
+            else if (ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense)
+            {
+                PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReplaceDamagedDrivingLicense).ApplicationTypeFees;
+            }
+            else if (ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense)
+            {
+                PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReplaceLostDrivingLicense).ApplicationTypeFees;
+            }
+            return PaidFees;
+        }
+
+        private static clsLicense _PrepareNewLicense(clsApplication.enApplicationType ApplicationType,
             int ApplicationID, int PersonID, int LicenseClassID,
             int LocalDrivingLicenseApplicationID)
         {
-            clsLicense OldLicense = null;
             clsLicense NewLicense = null;
 
+            if (ApplicationType == clsApplication.enApplicationType.NewDrivingLicense)
+            {
+                if (LocalDrivingLicenseApplicationID < 0)
+                {
+                    return null;
+                }
 
-            if (ApplicationType == clsApplication.enApplicationType.RetakeTest ||
-        ApplicationType == clsApplication.enApplicationType.ReleaseDetainedDrivingLicense ||
-        ApplicationType == clsApplication.enApplicationType.NewInternationalLicense)
+                if (clsLocalDrivingLicenseApplication.IsLocalDrivingLicenseApplicationHasLicense(LocalDrivingLicenseApplicationID, LicenseClassID))
+                {
+                    return null;
+                }
+
+                if (clsLicense.GetActiveLicenseIDByPersonID(PersonID, LicenseClassID) != -1)
+                {
+                    return null;
+                }
+
+                if (!clsLocalDrivingLicenseApplication.DoesPassAllTests(LocalDrivingLicenseApplicationID))
+                {
+                    return null;
+                }
+                else
+                {
+                    NewLicense = new clsLicense();
+                    NewLicense.IssueReason = enIssueReason.FirstTime;
+                    NewLicense._DriverInfo = clsDriver.CreateNewDriver(PersonID, LicenseClassID);
+                    NewLicense.PaidFees = _CalculatePaidFees(ApplicationType, LicenseClassID);
+
+
+                    NewLicense.IsActive = true;
+                    if (NewLicense._DriverInfo != null)
+                    {
+                        return NewLicense;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            else
             {
                 return null;
             }
+        }
 
+        private static clsLicense _PrepareRenewLicense(clsApplication.enApplicationType ApplicationType,
+            int ApplicationID, int PersonID, int LicenseClassID)
+        {
+            clsLicense OldLicense = null;
+            clsLicense NewLicense = null;
             if (ApplicationType == clsApplication.enApplicationType.RenewDrivingLicense)
             {
                 // TODO: Get License ID if it's active or not for renewal
@@ -311,57 +372,21 @@ namespace DVLD_Business
 
                         NewLicense = new clsLicense(OldLicense);
                         NewLicense.IssueReason = enIssueReason.Renew;
-                        NewLicense.PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.RenewDrivingLicense).ApplicationTypeFees;
+                        NewLicense.PaidFees = _CalculatePaidFees(ApplicationType, LicenseClassID);
                         OldLicense.IsActive = false;
 
                     }
                 }
 
             }
+            return NewLicense;
+        }
 
-
-            if (ApplicationType == clsApplication.enApplicationType.NewDrivingLicense)
-            {
-                if(LocalDrivingLicenseApplicationID<0)
-                {
-                    return null;
-                }
-
-                if(clsLocalDrivingLicenseApplication.IsLocalDrivingLicenseApplicationHasLicense(LocalDrivingLicenseApplicationID, LicenseClassID))
-                {
-                    return null;
-                }
-
-                if (clsLicense.GetActiveLicenseIDByPersonID(PersonID, LicenseClassID) != -1)
-                {
-                    return null;
-                }
-
-                if (!clsLocalDrivingLicenseApplication.DoesPassAllTests(LocalDrivingLicenseApplicationID))
-                {
-                    return null;
-                }
-                else
-                {
-                    NewLicense = new clsLicense();
-                    NewLicense.IssueReason = enIssueReason.FirstTime;
-                    NewLicense._DriverInfo = clsDriver.CreateNewDriver(PersonID, LicenseClassID);
-                    NewLicense.PaidFees = clsLicenseClass.Find(LicenseClassID).ClassFees + (float)clsApplicationType.Find((int)clsApplication.enApplicationType.NewDrivingLicense).ApplicationTypeFees;
-
-
-                    NewLicense.IsActive = true;
-                    if (NewLicense._DriverInfo != null)
-                    {
-                        return NewLicense;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-            }
-
-
+        private static clsLicense _PrepareReplacementLicense(clsApplication.enApplicationType ApplicationType,
+            int ApplicationID, int PersonID, int LicenseClassID)
+        {
+            clsLicense OldLicense = null;
+            clsLicense NewLicense = null;
             if (ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense ||
                 ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense)
             {
@@ -375,22 +400,49 @@ namespace DVLD_Business
 
                     NewLicense = new clsLicense(OldLicense);
 
-                   if(ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense)
+                    if (ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense)
                     {
-                        NewLicense.PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReplaceDamagedDrivingLicense).ApplicationTypeFees;
+                        NewLicense.PaidFees = _CalculatePaidFees(ApplicationType, LicenseClassID);
                         NewLicense.IssueReason = enIssueReason.DamagedReplacement;
                     }
-                   else
+                    else
                     {
-                        NewLicense.PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReplaceLostDrivingLicense).ApplicationTypeFees;
+                        NewLicense.PaidFees = _CalculatePaidFees(ApplicationType, LicenseClassID);
                         NewLicense.IssueReason = enIssueReason.LostReplacement;
                     }
 
                     OldLicense.IsActive = false;
                 }
             }
-
             return NewLicense;
+        }
+
+        // TODO: Technical Debt - Implement a dedicated Service Layer (Business Manager) to handle
+        // license state transitions and logic validation, decoupling business rules from DataAccess 
+        // and moving towards a Unit of Work pattern for atomic database operations.
+        private static clsLicense _PrepareObj(clsApplication.enApplicationType ApplicationType,
+            int ApplicationID, int PersonID, int LicenseClassID,
+            int LocalDrivingLicenseApplicationID)
+        {
+
+            switch (ApplicationType)
+            {
+                case clsApplication.enApplicationType.RetakeTest:
+                case clsApplication.enApplicationType.ReleaseDetainedDrivingLicense:
+                case clsApplication.enApplicationType.NewInternationalLicense:
+                    return null;
+                case clsApplication.enApplicationType.RenewDrivingLicense:
+                    return _PrepareRenewLicense(ApplicationType, ApplicationID, PersonID, LicenseClassID);
+                case clsApplication.enApplicationType.NewDrivingLicense:
+                    return _PrepareNewLicense(ApplicationType, ApplicationID, PersonID, LicenseClassID,
+                    LocalDrivingLicenseApplicationID);
+                case clsApplication.enApplicationType.ReplaceDamagedDrivingLicense:
+                case clsApplication.enApplicationType.ReplaceLostDrivingLicense:
+                    return _PrepareReplacementLicense(ApplicationType, ApplicationID, PersonID, LicenseClassID);
+                default:
+                    return null;
+
+            }
 
         }
 
