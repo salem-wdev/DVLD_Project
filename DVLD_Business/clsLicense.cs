@@ -296,7 +296,7 @@ namespace DVLD_Business
         }
 
         private static clsLicense _PrepareNewLicense(clsApplication.enApplicationType ApplicationType,
-            int ApplicationID, int PersonID, int LicenseClassID,
+            int ApplicationID, int PersonID, int LicenseClassID, int CreatedByUserID,
             int LocalDrivingLicenseApplicationID)
         {
             clsLicense NewLicense = null;
@@ -326,7 +326,11 @@ namespace DVLD_Business
                 {
                     NewLicense = new clsLicense();
                     NewLicense.IssueReason = enIssueReason.FirstTime;
-                    NewLicense._DriverInfo = clsDriver.CreateNewDriver(PersonID, LicenseClassID);
+                    if ((NewLicense._DriverInfo = clsDriver.FindByPersonID(PersonID)) == null)
+                    {
+                        NewLicense._DriverInfo = clsDriver.CreateNewDriver(PersonID, CreatedByUserID);
+                    }
+
                     NewLicense.PaidFees = _CalculatePaidFees(ApplicationType, LicenseClassID);
 
 
@@ -421,7 +425,7 @@ namespace DVLD_Business
         // license state transitions and logic validation, decoupling business rules from DataAccess 
         // and moving towards a Unit of Work pattern for atomic database operations.
         private static clsLicense _PrepareObj(clsApplication.enApplicationType ApplicationType,
-            int ApplicationID, int PersonID, int LicenseClassID,
+            int ApplicationID, int PersonID, int LicenseClassID, int CreatedByUserID,
             int LocalDrivingLicenseApplicationID)
         {
 
@@ -434,7 +438,7 @@ namespace DVLD_Business
                 case clsApplication.enApplicationType.RenewDrivingLicense:
                     return _PrepareRenewLicense(ApplicationType, ApplicationID, PersonID, LicenseClassID);
                 case clsApplication.enApplicationType.NewDrivingLicense:
-                    return _PrepareNewLicense(ApplicationType, ApplicationID, PersonID, LicenseClassID,
+                    return _PrepareNewLicense(ApplicationType, ApplicationID, PersonID, LicenseClassID, CreatedByUserID,
                     LocalDrivingLicenseApplicationID);
                 case clsApplication.enApplicationType.ReplaceDamagedDrivingLicense:
                 case clsApplication.enApplicationType.ReplaceLostDrivingLicense:
@@ -452,7 +456,7 @@ namespace DVLD_Business
         /// <param name="ApplicationID">The ID of the application associated with this license.</param>
         /// <param name="DriverID">The ID of the driver receiving the license.</param>
         /// <param name="LicenseClassID">The ID of the target license class.</param>
-        /// <param name="CreatedByUser">The ID of the user who is creating this license.</param>
+        /// <param name="CreatedByUserID">The ID of the user who is creating this license.</param>
         /// <param name="LocalDrivingLicenseApplicationID">
         /// Optional (Defaults to -1). Required only for first-time license issuance to verify that all required tests are passed. 
         /// Can be omitted or left as -1 for renewals and replacements.
@@ -460,7 +464,7 @@ namespace DVLD_Business
         /// <returns>A populated <see cref="clsLicense"/> object if validation passes; otherwise, returns <c>null</c>.</returns>
 
         // TODO: Overloading factory method to send License ID directly for renwal
-        public static clsLicense GetNewLicenseObj(int ApplicationID, int PersonID, int LicenseClassID, int CreatedByUser, int LocalDrivingLicenseApplicationID = -1)
+        public static clsLicense GetNewLicenseObj(int ApplicationID, int PersonID, int LicenseClassID, int CreatedByUserID, int LocalDrivingLicenseApplicationID = -1)
         {
             
 
@@ -469,7 +473,7 @@ namespace DVLD_Business
             //throw new NotImplementedException("Most prevent international license to throw here");
             //throw new NotImplementedException("Most declare issue reason");
 
-            clsLicense Newlicense = _PrepareObj(ApplicationType, ApplicationID, PersonID, LicenseClassID, LocalDrivingLicenseApplicationID);
+            clsLicense Newlicense = _PrepareObj(ApplicationType, ApplicationID, PersonID, LicenseClassID, CreatedByUserID, LocalDrivingLicenseApplicationID);
 
             if (Newlicense == null)
             {
@@ -479,7 +483,7 @@ namespace DVLD_Business
             {
                 Newlicense.ApplicationID = ApplicationID;
                 Newlicense.LicenseClassID = LicenseClassID;
-                Newlicense.CreatedByUserID = CreatedByUser;
+                Newlicense.CreatedByUserID = CreatedByUserID;
 
                 Newlicense.IsActive = true;
                     return Newlicense;
