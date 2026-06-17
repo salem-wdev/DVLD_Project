@@ -16,7 +16,7 @@ namespace DVLD_Business
         public int TestID { private set; get; }
         public int TestAppointmentID { private set; get; }
         public bool TestResult { private set; get; }
-        public string Notes { private set; get; }
+        public string Notes { set; get; }
         public int CreatedByUserID { private set; get; }
 
         private clsTestAppointment _TestAppointmentInfo = null;
