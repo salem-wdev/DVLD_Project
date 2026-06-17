@@ -20,28 +20,11 @@ namespace DVLD.Licenses.Local_Licenses
             _LocalDriverLicenseAppID = LocalDriverLicenseAppID;
         }
 
-        private bool _GetDeiver()
-        {
-            _Driver = clsDriver.FindByPersonID(_LocalDrivingLicenseApplication.ApplicantPersonID);
-
-            if (_Driver == null)
-            {
-                _Driver = clsDriver.CreateNewDriver(_LocalDrivingLicenseApplication.ApplicantPersonID, clsGlobal.CurrentUser.UserID);
-                if (_Driver.Save())
-                {
-                    _DriverID = _Driver.DriverID;
-                    return true;
-                }
-            }
-
-            _DriverID = _Driver.DriverID;
-            return _DriverID > -1;
-        }
 
         private void _FillLicenseObj()
         {
             _License = clsLicense.GetNewLicenseObj(_LocalDrivingLicenseApplication.ApplicationID,
-                _DriverID, _LocalDrivingLicenseApplication.LicenseClassID, clsGlobal.CurrentUser.UserID, _LocalDriverLicenseAppID);
+                _LocalDrivingLicenseApplication.ApplicantPersonID, _LocalDrivingLicenseApplication.LicenseClassID, clsGlobal.CurrentUser.UserID, _LocalDriverLicenseAppID);
             if (_License != null)
             {
 
@@ -78,12 +61,7 @@ namespace DVLD.Licenses.Local_Licenses
 
         private void btnIssueLicense_Click(object sender, EventArgs e)
         {
-            if (!_GetDeiver())
-            {
-                MessageBox.Show("Error saving driver information.");
-                btnIssueLicense.Enabled = false;
-                return;
-            }
+            
 
             _FillLicenseObj();
 
@@ -92,6 +70,7 @@ namespace DVLD.Licenses.Local_Licenses
                 MessageBox.Show("License issued successfully.");
                 btnIssueLicense.Enabled = false;
                 _LicenseID = _License.LicenseID;
+                _DriverID = _License.DriverID;
                 return;
             }
             else

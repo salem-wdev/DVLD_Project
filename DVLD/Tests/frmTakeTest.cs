@@ -43,12 +43,16 @@ namespace DVLD.Tests
             _Test = clsTest.GetNewTestObj(_AppointmentID, rbPass.Checked, txtNotes.Text, clsGlobal.CurrentUser.UserID);
         }
 
-        private void _LockTestScreen(string message)
+        private void _LockTestScreen(bool LockAllScreen, string message)
         {
-            btnSave.Enabled = false;
+            btnSave.Enabled = !LockAllScreen;
+            txtNotes.Enabled = !LockAllScreen;
+
+            rbPass.Enabled = false;
+            rbFail.Enabled = false;
+
             lblUserMessage.Visible = true;
             lblUserMessage.Text = message;
-            txtNotes.Enabled = false;
         }
 
         private void _LoadTest()
@@ -58,10 +62,18 @@ namespace DVLD.Tests
             if (_TestID != -1)
             {
                 _Test = clsTest.Find(_TestID);
+                if (_Test != null)
+                {
+                    this.Text = _TestType.ToString() + " Test";
 
-                _LockTestScreen("This test has already been taken.");
+                    _LockTestScreen(false, "This test has already been taken.");
 
-                _FillFormWithData();
+                    _FillFormWithData();
+                }
+                else
+                {
+                    _LockTestScreen(true, "Can not load test data");
+                }
             }
             else
             {
@@ -79,7 +91,7 @@ namespace DVLD.Tests
             }
             else
             {
-                _LockTestScreen("Unable to load test appointment data. Please try again later.");
+                _LockTestScreen(true, "Unable to load test appointment data. Please try again later.");
             }
         }
 
@@ -90,20 +102,36 @@ namespace DVLD.Tests
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (clsTestAppointment.IsTestAppointmentLocked(ctrlSecheduledTest1.TestAppointment.LocalDrivingLicenseApplicationID, _TestType))
+            //if (clsTestAppointment.IsTestAppointmentLocked(ctrlSecheduledTest1.TestAppointment.LocalDrivingLicenseApplicationID, _TestType))
+            //{
+            //    MessageBox.Show("This test appointment is locked. You cannot save changes.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    _LockTestScreen(false, "This test appointment is locked. You cannot save changes.");
+            //    return;
+            //}
+
+
+            if (MessageBox.Show("Are you sure you want to save this result." +
+                "\nCan not change this result.", "Warning", MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) 
+                == DialogResult.No)
             {
-                MessageBox.Show("This test appointment is locked. You cannot save changes.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                _LockTestScreen("This test appointment is locked. You cannot save changes.");
                 return;
             }
 
-            _FillTestObjectWithData();
+            if (_Test == null)
+            {
+                _FillTestObjectWithData();
+            }
+            else
+            {
+                _Test.Notes = txtNotes.Text;
+            }
 
             if (_Test != null)
             {
                 if (_Test.Save())
                 {
-                    _LockTestScreen("Test data saved successfully.");
+                    _LockTestScreen(false, "Test data saved successfully.");
                     _TestID = _Test.TestID;
                 }
                 else
@@ -114,7 +142,7 @@ namespace DVLD.Tests
             else
             {
                 MessageBox.Show("No test data available to save.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                _LockTestScreen("No test data available to save.");
+                _LockTestScreen(true, "No test data available to save.");
                 return;
             }
         }
