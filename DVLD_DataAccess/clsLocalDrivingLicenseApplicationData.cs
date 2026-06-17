@@ -429,5 +429,51 @@ namespace DVLD_DataAccess
             return Result;
 
         }
+
+        public static bool GetIsLocalDrivingLicenseApplicationHasLicense(int LocalDrivingLicenseApplicationID, int LicenseClassID)
+        {
+            bool HasLicense = false;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"SELECT TOP (1) 1 
+                            FROM   Licenses L 
+                            INNER JOIN LocalDrivingLicenseApplications 
+                                ON L.ApplicationID = LocalDrivingLicenseApplications.ApplicationID
+                            WHERE  LocalDrivingLicenseApplications.LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID 
+                              AND  LocalDrivingLicenseApplications.LicenseClassID = @LicenseClassID;";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
+            command.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
+
+            try
+            {
+                connection.Open();
+
+                object result = command.ExecuteScalar();
+
+
+                HasLicense = result != null;
+
+            }
+
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+
+            return HasLicense;
+        }
+
+
     }
 }

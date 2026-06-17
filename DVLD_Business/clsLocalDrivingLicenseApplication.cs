@@ -326,5 +326,10 @@ namespace DVLD_Business
             };
         }
 
+        public static bool IsLocalDrivingLicenseApplicationHasLicense(int LocalDrivingLicenseApplicationID, int LicenseClassID)
+        {
+            return clsLocalDrivingLicenseApplicationData.GetIsLocalDrivingLicenseApplicationHasLicense(LocalDrivingLicenseApplicationID, LicenseClassID);
+        }
+
     }
 }
