@@ -234,6 +234,7 @@ namespace DVLD.Applications.LocalDrivingLicense
             scheduleStreetTestToolStripMenuItem.Enabled = false;
             scheduleWrittenTestToolStripMenuItem.Enabled = false;
             scheduleVisionTestToolStripMenuItem.Enabled = false;
+            ScheduleTestsMenue.Enabled = true;
 
             // Enable Tests menu items based on number of passed tests.
 
@@ -251,7 +252,7 @@ namespace DVLD.Applications.LocalDrivingLicense
                     scheduleStreetTestToolStripMenuItem.Enabled = true;
                     break;
                 case clsTestType.enTestType.StreetTest:
-                    // All tests passed, no further tests to schedule.
+                    ScheduleTestsMenue.Enabled = false;
                     break;
             }
 
