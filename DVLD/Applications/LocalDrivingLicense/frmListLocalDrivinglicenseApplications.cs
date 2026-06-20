@@ -214,6 +214,21 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         }
 
+        private void _HandleItemActionsEnabling()
+        {
+            editToolStripMenuItem.Enabled = false;
+            DeleteApplicationToolStripMenuItem.Enabled = false;
+            CancelApplicaitonToolStripMenuItem.Enabled = false;
+
+            string ApplicationStatus = dgvLocalDrivingLicenseApplications.CurrentRow.Cells["Status"].Value.ToString();
+            if (ApplicationStatus != "Completed")
+            {
+                editToolStripMenuItem.Enabled = true;
+                DeleteApplicationToolStripMenuItem.Enabled = true;
+                CancelApplicaitonToolStripMenuItem.Enabled = true;
+            }
+        }
+
         private void _HandleTsetsEnabling()
         {
             scheduleStreetTestToolStripMenuItem.Enabled = false;
@@ -278,6 +293,8 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void cmsApplications_Opening(object sender, CancelEventArgs e)
         {
+            _HandleItemActionsEnabling();
+
             _HandleTsetsEnabling();
 
             _HandleLicenseEnabling();
