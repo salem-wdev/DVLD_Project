@@ -109,8 +109,8 @@ namespace DVLD.Tests.Controls
             lblFullName.Text = "[???????]";
             lblTrial.Text = "[??]";
             dtpTestDate.Value = DateTime.Today;
-            lblFees.Text = "[$$$]";
-            lblRetakeTestAppID.Text = "[??]";
+            lblFees.Text = "[N/A]";
+            lblRetakeTestAppID.Text = "[N/A]";
             lblRetakeAppFees.Text = "[$$$]";
             lblTotalFees.Text = "[$$$]";
 
@@ -125,7 +125,8 @@ namespace DVLD.Tests.Controls
             {
                 if (_TestAppointment.RetakeTestAppInfo != null)
                 {
-                    lblRetakeTestAppID.Text = _TestAppointment.RetakeTestAppInfo.ApplicationID.ToString();
+                    int appID = _TestAppointment.RetakeTestAppInfo.ApplicationID;
+                    lblRetakeTestAppID.Text = appID > 0 ? appID.ToString() : "N/A";
                     lblRetakeAppFees.Text = $"${_TestAppointment.RetakeTestAppInfo.PaidFees}";
                 }
             }
@@ -400,7 +401,10 @@ namespace DVLD.Tests.Controls
             {
                 MessageBox.Show("Data saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if (_CreationMode == enCreationMode.RetakeTestSchedule)
-                    lblRetakeTestAppID.Text = _TestAppointment.RetakeTestAppInfo.ApplicationID.ToString();
+                {
+                    int appID = _TestAppointment.RetakeTestAppInfo.ApplicationID;
+                    lblRetakeTestAppID.Text = appID > 0 ? appID.ToString() : "N/A";
+                }
             }
             else
             {
