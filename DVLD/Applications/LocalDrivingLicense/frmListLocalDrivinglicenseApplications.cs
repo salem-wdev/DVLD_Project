@@ -216,35 +216,29 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void _HandleTsetsEnabling()
         {
+            scheduleStreetTestToolStripMenuItem.Enabled = false;
+            scheduleWrittenTestToolStripMenuItem.Enabled = false;
+            scheduleVisionTestToolStripMenuItem.Enabled = false;
 
             // Enable Tests menu items based on number of passed tests.
 
-            bool scheduleVisionTest = false;
-            bool scheduleWrittenTest = false;
-            bool scheduleStreetTest = false;
-            clsTestType.enTestType NumberOfPssedTests = (clsTestType.enTestType)dgvLocalDrivingLicenseApplications.CurrentRow.Cells["PassedTestCount"].Value;
+            clsTestType.enTestType NumberOfPssedTests = (clsTestType.enTestType)dgvLocalDrivingLicenseApplications.CurrentRow.Cells["PassedTestCount"].Value <= 0 ? clsTestType.enTestType.None : (clsTestType.enTestType)dgvLocalDrivingLicenseApplications.CurrentRow.Cells["PassedTestCount"].Value;
 
-            if(NumberOfPssedTests == 0)
+            switch (NumberOfPssedTests)
             {
-                NumberOfPssedTests = clsTestType.enTestType.None;
+                case clsTestType.enTestType.None:
+                    scheduleVisionTestToolStripMenuItem.Enabled = true;
+                    break;
+                case clsTestType.enTestType.VisionTest:
+                    scheduleWrittenTestToolStripMenuItem.Enabled = true;
+                    break;
+                case clsTestType.enTestType.WrittenTest:
+                    scheduleStreetTestToolStripMenuItem.Enabled = true;
+                    break;
+                case clsTestType.enTestType.StreetTest:
+                    // All tests passed, no further tests to schedule.
+                    break;
             }
-
-            if (NumberOfPssedTests == clsTestType.enTestType.None)
-            {
-                scheduleVisionTest = true;
-            }
-            else if (NumberOfPssedTests == clsTestType.enTestType.VisionTest)
-            {
-                scheduleWrittenTest = true;
-            }
-            else if (NumberOfPssedTests == clsTestType.enTestType.WrittenTest)
-            {
-                scheduleStreetTest = true;
-            }
-
-            scheduleStreetTestToolStripMenuItem.Enabled = scheduleStreetTest;
-            scheduleWrittenTestToolStripMenuItem.Enabled = scheduleWrittenTest;
-            scheduleVisionTestToolStripMenuItem.Enabled = scheduleVisionTest;
 
         }
 
