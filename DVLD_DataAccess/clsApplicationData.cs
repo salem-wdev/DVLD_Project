@@ -411,7 +411,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateStatus(int ApplicationID, short NewStatus)
+        public static bool UpdateStatus(int ApplicationID, short NewStatus,DateTime LastStatusDate)
         {
 
             int rowsAffected = 0;
@@ -427,7 +427,7 @@ namespace DVLD_DataAccess
 
             command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
             command.Parameters.AddWithValue("@NewStatus", NewStatus);
-            command.Parameters.AddWithValue("@LastStatusDate", DateTime.Now);
+            command.Parameters.AddWithValue("@LastStatusDate", LastStatusDate);
             
 
             try

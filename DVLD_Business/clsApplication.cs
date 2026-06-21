@@ -265,7 +265,7 @@ namespace DVLD_Business
             if (!CanBeEdited())
                 return false;
 
-            return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled);
+            return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled, clsBusinessSettings.GetServerDateTime());
         }
 
         public bool SetComplete()
@@ -273,7 +273,7 @@ namespace DVLD_Business
             if (!CanBeEdited())
                 return false;
 
-            return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Completed);
+            return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Completed, clsBusinessSettings.GetServerDateTime());
         }
 
         public virtual bool Save()
