@@ -137,7 +137,10 @@ namespace DVLD_Business
         public override bool Save()
         {
 
-            
+            if(GetApplicationStatus(this.ApplicationID)!= enApplicationStatus.New)
+            {
+                return false;
+            }
 
             //Because of inheritance first we call the save method in the base class,
             //it will take care of adding all information to the application table.
