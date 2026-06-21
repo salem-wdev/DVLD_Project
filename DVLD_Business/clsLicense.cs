@@ -159,7 +159,12 @@ namespace DVLD_Business
                this.IsActive, (byte)this.IssueReason, this.CreatedByUserID);
 
 
-            return (this.LicenseID != -1);
+            if (this.LicenseID != -1 && clsApplication.SetComplete(this.ApplicationID))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private bool _UpdateLicense()

@@ -273,6 +273,14 @@ namespace DVLD_Business
             if (!CanBeEdited())
                 return false;
 
+            return SetComplete(ApplicationID);
+        }
+
+        public static bool SetComplete(int ApplicationID)
+        {
+            if (!CanBeEdited(ApplicationID))
+                return false;
+
             return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Completed, clsBusinessSettings.GetServerDateTime());
         }
 
