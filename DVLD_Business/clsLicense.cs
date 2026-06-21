@@ -142,6 +142,11 @@ namespace DVLD_Business
 
         private bool _AddNewLicense()
         {
+            if (clsApplication.GetApplicationStatus(ApplicationID) != clsApplication.enApplicationStatus.New)
+            {
+                return false;
+            }
+
             //call DataAccess Layer 
 
             if (this.IssueReason == enIssueReason.FirstTime)
@@ -471,7 +476,10 @@ namespace DVLD_Business
         // TODO: Overloading factory method to send License ID directly for renwal
         public static clsLicense GetNewLicenseObj(int ApplicationID, int PersonID, int LicenseClassID, int CreatedByUserID, int LocalDrivingLicenseApplicationID = -1)
         {
-            
+            if (clsApplication.GetApplicationStatus(ApplicationID) != clsApplication.enApplicationStatus.New)
+            {
+                return null;
+            }
 
             clsApplication.enApplicationType ApplicationType = clsApplication.GetApplicationTypeID(ApplicationID);
 
