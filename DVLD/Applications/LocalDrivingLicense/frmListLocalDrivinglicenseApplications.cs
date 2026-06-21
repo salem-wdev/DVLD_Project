@@ -7,6 +7,7 @@ using System;
 using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
+using static DVLD_Business.clsApplication;
 
 namespace DVLD.Applications.LocalDrivingLicense
 {
@@ -214,37 +215,55 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         }
 
+        private void _HandleItemActionsEnabling()
+        {
+            editToolStripMenuItem.Enabled = false;
+            DeleteApplicationToolStripMenuItem.Enabled = false;
+            CancelApplicaitonToolStripMenuItem.Enabled = false;
+
+            string ApplicationStatus = dgvLocalDrivingLicenseApplications.CurrentRow.Cells["Status"].Value.ToString();
+            if (ApplicationStatus == "New")
+            {
+                editToolStripMenuItem.Enabled = true;
+                DeleteApplicationToolStripMenuItem.Enabled = true;
+                CancelApplicaitonToolStripMenuItem.Enabled = true;
+            }
+        }
+
         private void _HandleTsetsEnabling()
         {
+            scheduleStreetTestToolStripMenuItem.Enabled = false;
+            scheduleWrittenTestToolStripMenuItem.Enabled = false;
+            scheduleVisionTestToolStripMenuItem.Enabled = false;
+            if (dgvLocalDrivingLicenseApplications.CurrentRow.Cells["Status"].Value.ToString()== "New")
+            {
+                ScheduleTestsMenue.Enabled = true;
+            }
+            else
+            {
+                ScheduleTestsMenue.Enabled = false;
+            }
+
 
             // Enable Tests menu items based on number of passed tests.
 
-            bool scheduleVisionTest = false;
-            bool scheduleWrittenTest = false;
-            bool scheduleStreetTest = false;
-            clsTestType.enTestType NumberOfPssedTests = (clsTestType.enTestType)dgvLocalDrivingLicenseApplications.CurrentRow.Cells["PassedTestCount"].Value;
+            clsTestType.enTestType NumberOfPssedTests = (clsTestType.enTestType)dgvLocalDrivingLicenseApplications.CurrentRow.Cells["PassedTestCount"].Value <= 0 ? clsTestType.enTestType.None : (clsTestType.enTestType)dgvLocalDrivingLicenseApplications.CurrentRow.Cells["PassedTestCount"].Value;
 
-            if(NumberOfPssedTests == 0)
+            switch (NumberOfPssedTests)
             {
-                NumberOfPssedTests = clsTestType.enTestType.None;
+                case clsTestType.enTestType.None:
+                    scheduleVisionTestToolStripMenuItem.Enabled = true;
+                    break;
+                case clsTestType.enTestType.VisionTest:
+                    scheduleWrittenTestToolStripMenuItem.Enabled = true;
+                    break;
+                case clsTestType.enTestType.WrittenTest:
+                    scheduleStreetTestToolStripMenuItem.Enabled = true;
+                    break;
+                case clsTestType.enTestType.StreetTest:
+                    ScheduleTestsMenue.Enabled = false;
+                    break;
             }
-
-            if (NumberOfPssedTests == clsTestType.enTestType.None)
-            {
-                scheduleVisionTest = true;
-            }
-            else if (NumberOfPssedTests == clsTestType.enTestType.VisionTest)
-            {
-                scheduleWrittenTest = true;
-            }
-            else if (NumberOfPssedTests == clsTestType.enTestType.WrittenTest)
-            {
-                scheduleStreetTest = true;
-            }
-
-            scheduleStreetTestToolStripMenuItem.Enabled = scheduleStreetTest;
-            scheduleWrittenTestToolStripMenuItem.Enabled = scheduleWrittenTest;
-            scheduleVisionTestToolStripMenuItem.Enabled = scheduleVisionTest;
 
         }
 
@@ -284,6 +303,16 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void cmsApplications_Opening(object sender, CancelEventArgs e)
         {
+            string ApplicationStatus = dgvLocalDrivingLicenseApplications.CurrentRow.Cells["Status"].Value.ToString();
+
+            if (ApplicationStatus == "Cancle")
+            {
+                cmsApplications.Enabled = false;
+                showDetailsToolStripMenuItem.Enabled = true;
+            }
+
+            _HandleItemActionsEnabling();
+
             _HandleTsetsEnabling();
 
             _HandleLicenseEnabling();

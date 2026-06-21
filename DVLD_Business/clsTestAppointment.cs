@@ -90,6 +90,12 @@ namespace DVLD_Business
 
         private bool _AddNewTestAppointment()
         {
+            clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
+            if (LocalDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
+            {
+                return false;
+            }
+
             //call DataAccess Layer 
 
             this.TestAppointmentID = clsTestAppointmentData.AddNewTestAppointment((int)this.TestTypeID, this.LocalDrivingLicenseApplicationID,
@@ -390,6 +396,12 @@ namespace DVLD_Business
 
         public static clsTestAppointment GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
+            clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
+            if(LocalDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
+            {
+                return null;
+            }
+
             if (AppointmentDate < clsUtilData.GetServerDate())
             {
                 return null;

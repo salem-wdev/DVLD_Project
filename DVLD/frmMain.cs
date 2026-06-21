@@ -1,6 +1,7 @@
 ﻿using DVLD.Applications.Application_Types;
 using DVLD.Applications.Local_Driving_License;
 using DVLD.Applications.LocalDrivingLicense;
+using DVLD.Drivers;
 using DVLD.Global_Classes;
 using DVLD.People.Forms;
 using DVLD.Tests.Test_Types;
@@ -69,7 +70,9 @@ namespace DVLD
 
         private void driversToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            frmListDrivers frm = new frmListDrivers();
+            frm.ShowDialog();
+            //MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void applecationsToolStripMenuItem_Click(object sender, EventArgs e)

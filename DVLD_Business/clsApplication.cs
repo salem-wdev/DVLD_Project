@@ -265,7 +265,12 @@ namespace DVLD_Business
             if (!CanBeEdited())
                 return false;
 
-            return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled);
+            if(clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled, clsBusinessSettings.GetServerDateTime()))
+            {
+                this._ApplicationStatus = enApplicationStatus.Cancelled;
+                return true;
+            }
+            return false;
         }
 
         public bool SetComplete()
@@ -273,7 +278,20 @@ namespace DVLD_Business
             if (!CanBeEdited())
                 return false;
 
-            return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Completed);
+            if (SetComplete(ApplicationID))
+            {
+                this._ApplicationStatus = enApplicationStatus.Completed;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool SetComplete(int ApplicationID)
+        {
+            if (!CanBeEdited(ApplicationID))
+                return false;
+
+            return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Completed, clsBusinessSettings.GetServerDateTime());
         }
 
         public virtual bool Save()
@@ -343,6 +361,11 @@ namespace DVLD_Business
         public static enApplicationType GetApplicationTypeID(int ApplicationID)
         {
             return (enApplicationType)clsApplicationData.GetApplicationTypeID(ApplicationID);
+        }
+
+        public static enApplicationStatus GetApplicationStatus(int ApplicationID)
+        {
+            return (enApplicationStatus)clsApplicationData.GetApplicationStatus(ApplicationID);
         }
 
         internal static clsApplication GetNewApplicationobject(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)

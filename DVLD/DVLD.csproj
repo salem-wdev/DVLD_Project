@@ -64,6 +64,12 @@
     <Compile Include="Applications\Controls\ctrlApplicationBasicInfo.Designer.cs">
       <DependentUpon>ctrlApplicationBasicInfo.cs</DependentUpon>
     </Compile>
+    <Compile Include="Drivers\frmListDrivers.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Drivers\frmListDrivers.Designer.cs">
+      <DependentUpon>frmListDrivers.cs</DependentUpon>
+    </Compile>
     <Compile Include="Licenses\Controls\ctrlDriverLicenses.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -276,6 +282,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Applications\Controls\ctrlApplicationBasicInfo.resx">
       <DependentUpon>ctrlApplicationBasicInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Drivers\frmListDrivers.resx">
+      <DependentUpon>frmListDrivers.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Licenses\Controls\ctrlDriverLicenses.resx">
       <DependentUpon>ctrlDriverLicenses.cs</DependentUpon>

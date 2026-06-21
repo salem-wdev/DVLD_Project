@@ -21,7 +21,7 @@ namespace DVLD.Global_Classes
 
                 string filePath = currentDirectory + "\\data.txt";
 
-                if (Username==""&& File.Exists(filePath))
+                if (Username == "" && File.Exists(filePath))
                 {
                     File.Delete(filePath);
                     return false;
@@ -29,7 +29,7 @@ namespace DVLD.Global_Classes
 
                 string DataToSave = Username + "#//#" + Password;
 
-                using(StreamWriter writer = new StreamWriter(filePath))
+                using (StreamWriter writer = new StreamWriter(filePath))
                 {
                     writer.WriteLine(DataToSave);
                     return true;
@@ -80,6 +80,11 @@ namespace DVLD.Global_Classes
 
             return false;
 
+        }
+
+        public static DateTime GetServerDateTime()
+        {
+            return clsBusinessSettings.GetServerDateTime();
         }
     }
 }

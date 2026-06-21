@@ -59,6 +59,12 @@ namespace DVLD.Tests
         {
             _TestID = ctrlSecheduledTest1.TestAppointment.TestID;
 
+            if(ctrlSecheduledTest1.TestAppointment.AppointmentDate<clsGlobal.GetServerDateTime())
+            {
+                _LockTestScreen(true, "Appointment has already passed.");
+                return;
+            }
+
             if (_TestID != -1)
             {
                 _Test = clsTest.Find(_TestID);

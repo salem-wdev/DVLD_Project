@@ -45,6 +45,8 @@ namespace DVLD.Tests
                 ctrlScheduleTest1.LoadData(_LocalDrivingLicenseApplicationID, _TestType, _TestAppointmentID);
 
             }
+
+            this.AcceptButton = ctrlScheduleTest1.SaveButtonAction;
         }
 
         private void btnClose_Click(object sender, EventArgs e)

@@ -174,9 +174,11 @@
             // 
             // frmTakeTest
             // 
+            this.AcceptButton = this.btnSave;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnableAllowFocusChange;
+            this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(603, 784);
             this.Controls.Add(this.ctrlSecheduledTest1);
             this.Controls.Add(this.lblUserMessage);

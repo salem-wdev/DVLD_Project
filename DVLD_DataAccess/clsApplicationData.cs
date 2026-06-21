@@ -411,7 +411,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateStatus(int ApplicationID, short NewStatus)
+        public static bool UpdateStatus(int ApplicationID, short NewStatus,DateTime LastStatusDate)
         {
 
             int rowsAffected = 0;
@@ -427,7 +427,7 @@ namespace DVLD_DataAccess
 
             command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
             command.Parameters.AddWithValue("@NewStatus", NewStatus);
-            command.Parameters.AddWithValue("@LastStatusDate", DateTime.Now);
+            command.Parameters.AddWithValue("@LastStatusDate", LastStatusDate);
             
 
             try
@@ -519,6 +519,44 @@ namespace DVLD_DataAccess
             }
 
             return ApplicationTypeID;
+        }
+
+        public static int GetApplicationStatus(int ApplicationID)
+        {
+            int ActiveApplicationID = -1;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"SELECT [ApplicationStatus]
+                             FROM [Applications]
+                             WHERE [ApplicationID] = @ApplicationID";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
+
+            try
+            {
+                connection.Open();
+                object result = command.ExecuteScalar();
+
+
+                if (result != null && int.TryParse(result.ToString(), out int AppID))
+                {
+                    ActiveApplicationID = AppID;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+                return ActiveApplicationID;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return ActiveApplicationID;
         }
 
 
