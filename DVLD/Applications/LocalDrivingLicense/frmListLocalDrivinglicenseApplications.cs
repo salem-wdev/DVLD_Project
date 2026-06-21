@@ -7,6 +7,7 @@ using System;
 using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
+using static DVLD_Business.clsApplication;
 
 namespace DVLD.Applications.LocalDrivingLicense
 {
@@ -221,7 +222,7 @@ namespace DVLD.Applications.LocalDrivingLicense
             CancelApplicaitonToolStripMenuItem.Enabled = false;
 
             string ApplicationStatus = dgvLocalDrivingLicenseApplications.CurrentRow.Cells["Status"].Value.ToString();
-            if (ApplicationStatus != "Completed")
+            if (ApplicationStatus == "New")
             {
                 editToolStripMenuItem.Enabled = true;
                 DeleteApplicationToolStripMenuItem.Enabled = true;
@@ -234,7 +235,15 @@ namespace DVLD.Applications.LocalDrivingLicense
             scheduleStreetTestToolStripMenuItem.Enabled = false;
             scheduleWrittenTestToolStripMenuItem.Enabled = false;
             scheduleVisionTestToolStripMenuItem.Enabled = false;
-            ScheduleTestsMenue.Enabled = true;
+            if (dgvLocalDrivingLicenseApplications.CurrentRow.Cells["Status"].Value.ToString()== "New")
+            {
+                ScheduleTestsMenue.Enabled = true;
+            }
+            else
+            {
+                ScheduleTestsMenue.Enabled = false;
+            }
+
 
             // Enable Tests menu items based on number of passed tests.
 
@@ -294,6 +303,14 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void cmsApplications_Opening(object sender, CancelEventArgs e)
         {
+            string ApplicationStatus = dgvLocalDrivingLicenseApplications.CurrentRow.Cells["Status"].Value.ToString();
+
+            if (ApplicationStatus == "Cancle")
+            {
+                cmsApplications.Enabled = false;
+                showDetailsToolStripMenuItem.Enabled = true;
+            }
+
             _HandleItemActionsEnabling();
 
             _HandleTsetsEnabling();
