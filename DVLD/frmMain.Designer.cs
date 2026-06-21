@@ -115,6 +115,7 @@
             this.toolStripSeparator3,
             this.releaseDetainedDrivingLicenseToolStripMenuItem,
             this.retakeTestToolStripMenuItem1});
+            this.drivingLicensesToolStripMenuItem.Image = global::DVLD.Properties.Resources.Driver_License_48;
             this.drivingLicensesToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.drivingLicensesToolStripMenuItem.Name = "drivingLicensesToolStripMenuItem";
             this.drivingLicensesToolStripMenuItem.Size = new System.Drawing.Size(419, 70);
