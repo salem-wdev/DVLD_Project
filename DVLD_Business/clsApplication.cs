@@ -265,7 +265,12 @@ namespace DVLD_Business
             if (!CanBeEdited())
                 return false;
 
-            return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled, clsBusinessSettings.GetServerDateTime());
+            if(clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled, clsBusinessSettings.GetServerDateTime()))
+            {
+                this._ApplicationStatus = enApplicationStatus.Cancelled;
+                return true;
+            }
+            return false;
         }
 
         public bool SetComplete()
@@ -273,7 +278,12 @@ namespace DVLD_Business
             if (!CanBeEdited())
                 return false;
 
-            return SetComplete(ApplicationID);
+            if (SetComplete(ApplicationID))
+            {
+                this._ApplicationStatus = enApplicationStatus.Completed;
+                return true;
+            }
+            return false;
         }
 
         public static bool SetComplete(int ApplicationID)
