@@ -363,6 +363,11 @@ namespace DVLD_Business
             return (enApplicationType)clsApplicationData.GetApplicationTypeID(ApplicationID);
         }
 
+        public static enApplicationStatus GetApplicationStatus(int ApplicationID)
+        {
+            return (enApplicationStatus)clsApplicationData.GetApplicationStatus(ApplicationID);
+        }
+
         internal static clsApplication GetNewApplicationobject(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
             clsApplication application = new clsApplication(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
