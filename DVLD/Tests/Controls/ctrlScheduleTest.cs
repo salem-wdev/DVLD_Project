@@ -30,7 +30,9 @@ namespace DVLD.Tests.Controls
         private bool _IsPassedCurrentTest = false;
         private bool IsPassedPreviosTest = false;
 
-        
+        // Using interface instead of solid class for more extensibility
+        public IButtonControl SaveButtonAction => btnSave;
+
 
         public clsTestType.enTestType TestTypeID
         {
