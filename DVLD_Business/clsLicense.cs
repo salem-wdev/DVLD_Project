@@ -122,19 +122,20 @@ namespace DVLD_Business
             Mode = enMode.Update;
         }
 
-        protected clsLicense(clsLicense NewLicense)
+        protected clsLicense(clsLicense OldLicense)
 
         {
-            this.ApplicationID = NewLicense.ApplicationID;
-            this.DriverID = NewLicense.DriverID;
-            this.LicenseClassID = NewLicense.LicenseClassID;
-            this._IssueDate = NewLicense.IssueDate;
-            this._ExpirationDate = NewLicense.ExpirationDate;
-            this.Notes = NewLicense.Notes;
-            this.PaidFees = NewLicense.PaidFees;
-            this.IsActive = NewLicense.IsActive;
-            this.IssueReason = NewLicense.IssueReason;
-            this.CreatedByUserID = NewLicense.CreatedByUserID;
+            this.LicenseID = OldLicense.LicenseID;
+            this.ApplicationID = OldLicense.ApplicationID;
+            this.DriverID = OldLicense.DriverID;
+            this.LicenseClassID = OldLicense.LicenseClassID;
+            this._IssueDate = OldLicense.IssueDate;
+            this._ExpirationDate = OldLicense.ExpirationDate;
+            this.Notes = OldLicense.Notes;
+            this.PaidFees = OldLicense.PaidFees;
+            this.IsActive = OldLicense.IsActive;
+            this.IssueReason = OldLicense.IssueReason;
+            this.CreatedByUserID = OldLicense.CreatedByUserID;
 
             Mode = enMode.AddNew;
         }
@@ -142,6 +143,7 @@ namespace DVLD_Business
 
         private bool _AddNewLicense()
         {
+            int OldLicenseID = -1;
             if (clsApplication.GetApplicationStatus(ApplicationID) != clsApplication.enApplicationStatus.New)
             {
                 return false;
@@ -158,6 +160,10 @@ namespace DVLD_Business
 
                 this.DriverID = _DriverInfo.DriverID;
             }
+            else
+            {
+                OldLicenseID = this.LicenseID;
+            }
 
             this.LicenseID = clsLicenseData.AddNewLicense(this.ApplicationID, this.DriverID, this.LicenseClassID,
                ref this._IssueDate, ref this._ExpirationDate, this.Notes, this.PaidFees,
@@ -166,6 +172,7 @@ namespace DVLD_Business
 
             if (this.LicenseID != -1 && clsApplication.SetComplete(this.ApplicationID))
             {
+                clsLicense.DeactivateLicense(OldLicenseID);
                 return true;
             }
 
