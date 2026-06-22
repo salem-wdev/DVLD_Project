@@ -291,25 +291,13 @@ namespace DVLD_Business
         }
 
         private static float _CalculatePaidFees(clsApplication.enApplicationType ApplicationType, int LicenseClassID)
-        {
-            float PaidFees = 0;
-            if (ApplicationType == clsApplication.enApplicationType.NewDrivingLicense)
+        { 
+            if(ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense
+                || ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense)
             {
-                PaidFees = clsLicenseClass.Find(LicenseClassID).ClassFees + (float)clsApplicationType.Find((int)clsApplication.enApplicationType.NewDrivingLicense).ApplicationTypeFees;
+                return (float)clsApplicationType.Find((int)ApplicationType).ApplicationTypeFees;
             }
-            else if (ApplicationType == clsApplication.enApplicationType.RenewDrivingLicense)
-            {
-                PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.RenewDrivingLicense).ApplicationTypeFees;
-            }
-            else if (ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense)
-            {
-                PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReplaceDamagedDrivingLicense).ApplicationTypeFees;
-            }
-            else if (ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense)
-            {
-                PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReplaceLostDrivingLicense).ApplicationTypeFees;
-            }
-            return PaidFees;
+            return clsLicenseClass.Find(LicenseClassID).ClassFees + (float)clsApplicationType.Find((int)ApplicationType).ApplicationTypeFees;
         }
 
         private static int _CreateNewApplicationID(int CreatedByUserID, int PersonID, clsApplication.enApplicationType ApplicationType)
