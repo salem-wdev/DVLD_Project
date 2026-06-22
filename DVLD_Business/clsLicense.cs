@@ -140,7 +140,9 @@ namespace DVLD_Business
             Mode = enMode.AddNew;
         }
 
-
+        // TODO: Refactor date handling. 
+        // Currently relying on DataAccess layer to override dates via ref parameters.
+        // Need to move expiration logic (Class Validity) here to comply with Rich Domain Model.
         private bool _AddNewLicense()
         {
             int OldLicenseID = -1;
