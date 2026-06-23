@@ -45,11 +45,10 @@ namespace DVLD_Business
 
         }
 
+        // To Get new constructor internaly
         private clsTest( int TestAppointmentID,
             bool TestResult, string Notes, int CreatedByUserID)
-
         {
-            this.TestID = TestID;
             this.TestAppointmentID = TestAppointmentID;
             this.TestResult = TestResult;
             this.Notes = Notes;
