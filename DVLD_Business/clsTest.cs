@@ -78,7 +78,14 @@ namespace DVLD_Business
                 this.TestResult, this.Notes, this.CreatedByUserID);
 
 
-            return (this.TestID != -1);
+            if (this.TestID == -1) return false;
+
+            if (TestAppointmentInfo.RetakeTestAppInfo != null && TestResult == true)
+            {
+                TestAppointmentInfo.RetakeTestAppInfo.SetComplete();
+            }
+
+            return true;
         }
 
         private bool _UpdateTest()
