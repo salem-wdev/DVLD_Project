@@ -113,5 +113,11 @@ namespace DVLD
             frmListLocalDrivinglicenseApplications frm = new frmListLocalDrivinglicenseApplications();
             frm.ShowDialog();
         }
+
+        private void retakeTestToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            frmListLocalDrivinglicenseApplications frm = new frmListLocalDrivinglicenseApplications();
+            frm.ShowDialog();
+        }
     }
 }

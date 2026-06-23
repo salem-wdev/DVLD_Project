@@ -191,6 +191,7 @@
             this.retakeTestToolStripMenuItem1.Name = "retakeTestToolStripMenuItem1";
             this.retakeTestToolStripMenuItem1.Size = new System.Drawing.Size(553, 38);
             this.retakeTestToolStripMenuItem1.Text = "Retake Test";
+            this.retakeTestToolStripMenuItem1.Click += new System.EventHandler(this.retakeTestToolStripMenuItem1_Click);
             // 
             // toolStripSeparator6
             // 
