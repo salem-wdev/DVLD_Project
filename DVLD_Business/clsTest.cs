@@ -24,7 +24,7 @@ namespace DVLD_Business
         {
             get
             {
-                if (_TestAppointmentInfo != null && TestAppointmentID != -1)
+                if (_TestAppointmentInfo == null && TestAppointmentID != -1)
                 {
                     _TestAppointmentInfo = clsTestAppointment.Find(TestAppointmentID);
                 }
