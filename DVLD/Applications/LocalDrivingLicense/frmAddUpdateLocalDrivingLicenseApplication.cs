@@ -223,6 +223,11 @@ namespace DVLD.Applications.Local_Driving_License
 
         }
 
+        private void frmAddUpdateLocalDrivingLicenseApplication_Activated(object sender, EventArgs e)
+        {
+            ctrlPersonCardWithFilter1.FilterFocus();
+        }
+
         ///////////////////////////////////////////////////////////////////
 
     }
