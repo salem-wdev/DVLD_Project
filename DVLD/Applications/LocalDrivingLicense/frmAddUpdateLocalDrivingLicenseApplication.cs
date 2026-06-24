@@ -214,6 +214,7 @@ namespace DVLD.Applications.Local_Driving_License
                 lblTitle.Text = "Update Local Driving License Application";
                 this.Text = "Update Local Driving License Application";
                 MessageBox.Show("Application saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ctrlPersonCardWithFilter1.FilterEnabled = false;
             }
             else
             {
