@@ -116,6 +116,11 @@ namespace DVLD.People.Controls
 
         }
 
+        public void FilterFocus()
+        {
+            txtFilterValue.Focus();
+        }
+
         public void LoadPersonInfo(int PersonID)
         {
             DataBackEvent(this, PersonID);
