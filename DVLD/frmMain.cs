@@ -75,11 +75,6 @@ namespace DVLD
             //MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void applecationsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
         private void frmMain_Load(object sender, EventArgs e)
         {
 
@@ -112,6 +107,52 @@ namespace DVLD
         {
             frmListLocalDrivinglicenseApplications frm = new frmListLocalDrivinglicenseApplications();
             frm.ShowDialog();
+        }
+
+        private void retakeTestToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            frmListLocalDrivinglicenseApplications frm = new frmListLocalDrivinglicenseApplications();
+            frm.ShowDialog();
+        }
+
+        private void internationalLicenseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void renewDrivingLicenseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ReplacementLostOrDamagedDrivingLicenseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void releaseDetainedDrivingLicenseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ManageDetainedLicensestoolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void detainLicenseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void releaseDetainedLicenseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ManageInternationaDrivingLicenseToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

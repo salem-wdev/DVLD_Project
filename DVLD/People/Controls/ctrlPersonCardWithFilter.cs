@@ -116,6 +116,11 @@ namespace DVLD.People.Controls
 
         }
 
+        public void FilterFocus()
+        {
+            txtFilterValue.Focus();
+        }
+
         public void LoadPersonInfo(int PersonID)
         {
             DataBackEvent(this, PersonID);
@@ -140,7 +145,7 @@ namespace DVLD.People.Controls
 
         private void ctrlPersonCardWithFilter_Load(object sender, EventArgs e)
         {
-            cbFilterBy.SelectedIndex = 0;
+            cbFilterBy.SelectedIndex = 1;
             txtFilterValue.Focus();
         }
 

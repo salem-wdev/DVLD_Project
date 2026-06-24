@@ -83,20 +83,20 @@ namespace DVLD_Business
             }
         }
 
-        private clsLicense()
+        private clsLicense(int ApplicationID, int LicenseClassID, int CreatedByUserID)
 
         {
             this.LicenseID = -1;
-            this.ApplicationID = -1;
+            this.ApplicationID = ApplicationID;
             this.DriverID = -1;
-            this.LicenseClassID = -1;
+            this.LicenseClassID = LicenseClassID;
             this._IssueDate = DateTime.Now;
             this._ExpirationDate = DateTime.Now;
             this.Notes = "";
             this.PaidFees = 0;
             this.IsActive = true;
             this.IssueReason = enIssueReason.FirstTime;
-            this.CreatedByUserID = -1;
+            this.CreatedByUserID = CreatedByUserID;
 
             Mode = enMode.AddNew;
 
@@ -122,26 +122,30 @@ namespace DVLD_Business
             Mode = enMode.Update;
         }
 
-        protected clsLicense(clsLicense NewLicense)
+        protected clsLicense(clsLicense OldLicense)
 
         {
-            this.ApplicationID = NewLicense.ApplicationID;
-            this.DriverID = NewLicense.DriverID;
-            this.LicenseClassID = NewLicense.LicenseClassID;
-            this._IssueDate = NewLicense.IssueDate;
-            this._ExpirationDate = NewLicense.ExpirationDate;
-            this.Notes = NewLicense.Notes;
-            this.PaidFees = NewLicense.PaidFees;
-            this.IsActive = NewLicense.IsActive;
-            this.IssueReason = NewLicense.IssueReason;
-            this.CreatedByUserID = NewLicense.CreatedByUserID;
+            this.LicenseID = OldLicense.LicenseID;
+            this.ApplicationID = OldLicense.ApplicationID;
+            this.DriverID = OldLicense.DriverID;
+            this.LicenseClassID = OldLicense.LicenseClassID;
+            this._IssueDate = OldLicense.IssueDate;
+            this._ExpirationDate = OldLicense.ExpirationDate;
+            this.Notes = OldLicense.Notes;
+            this.PaidFees = OldLicense.PaidFees;
+            this.IsActive = OldLicense.IsActive;
+            this.IssueReason = OldLicense.IssueReason;
+            this.CreatedByUserID = OldLicense.CreatedByUserID;
 
             Mode = enMode.AddNew;
         }
 
-
+        // TODO: Refactor date handling. 
+        // Currently relying on DataAccess layer to override dates via ref parameters.
+        // Need to move expiration logic (Class Validity) here to comply with Rich Domain Model.
         private bool _AddNewLicense()
         {
+            int OldLicenseID = -1;
             if (clsApplication.GetApplicationStatus(ApplicationID) != clsApplication.enApplicationStatus.New)
             {
                 return false;
@@ -158,6 +162,10 @@ namespace DVLD_Business
 
                 this.DriverID = _DriverInfo.DriverID;
             }
+            else
+            {
+                OldLicenseID = this.LicenseID;
+            }
 
             this.LicenseID = clsLicenseData.AddNewLicense(this.ApplicationID, this.DriverID, this.LicenseClassID,
                ref this._IssueDate, ref this._ExpirationDate, this.Notes, this.PaidFees,
@@ -166,6 +174,7 @@ namespace DVLD_Business
 
             if (this.LicenseID != -1 && clsApplication.SetComplete(this.ApplicationID))
             {
+                clsLicense.DeactivateLicense(OldLicenseID);
                 return true;
             }
 
@@ -284,29 +293,30 @@ namespace DVLD_Business
         }
 
         private static float _CalculatePaidFees(clsApplication.enApplicationType ApplicationType, int LicenseClassID)
+        { 
+            if(ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense
+                || ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense)
+            {
+                return (float)clsApplicationType.Find((int)ApplicationType).ApplicationTypeFees;
+            }
+            return clsLicenseClass.Find(LicenseClassID).ClassFees + (float)clsApplicationType.Find((int)ApplicationType).ApplicationTypeFees;
+        }
+
+        private static int _CreateNewApplicationID(int CreatedByUserID, int PersonID, clsApplication.enApplicationType ApplicationType)
         {
-            float PaidFees = 0;
-            if (ApplicationType == clsApplication.enApplicationType.NewDrivingLicense)
+            clsApplication application = clsApplication.GetNewApplicationobject(CreatedByUserID, PersonID, ApplicationType);
+            if(application != null)
             {
-                PaidFees = clsLicenseClass.Find(LicenseClassID).ClassFees + (float)clsApplicationType.Find((int)clsApplication.enApplicationType.NewDrivingLicense).ApplicationTypeFees;
+                if(application.Save())
+                {
+                    return application.ApplicationID;
+                }
             }
-            else if (ApplicationType == clsApplication.enApplicationType.RenewDrivingLicense)
-            {
-                PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.RenewDrivingLicense).ApplicationTypeFees;
-            }
-            else if (ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense)
-            {
-                PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReplaceDamagedDrivingLicense).ApplicationTypeFees;
-            }
-            else if (ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense)
-            {
-                PaidFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReplaceLostDrivingLicense).ApplicationTypeFees;
-            }
-            return PaidFees;
+            return -1;
         }
 
         private static clsLicense _PrepareNewLicense(clsApplication.enApplicationType ApplicationType,
-            int ApplicationID, int PersonID, int LicenseClassID, int CreatedByUserID,
+             int PersonID, int LicenseClassID, int CreatedByUserID,
             int LocalDrivingLicenseApplicationID)
         {
             clsLicense NewLicense = null;
@@ -334,7 +344,9 @@ namespace DVLD_Business
                 }
                 else
                 {
-                    NewLicense = new clsLicense();
+                    NewLicense = new clsLicense
+                        (_CreateNewApplicationID(CreatedByUserID, PersonID, ApplicationType)
+                        , LicenseClassID, CreatedByUserID);
                     NewLicense.IssueReason = enIssueReason.FirstTime;
                     if ((NewLicense._DriverInfo = clsDriver.FindByPersonID(PersonID)) == null)
                     {
@@ -361,8 +373,9 @@ namespace DVLD_Business
             }
         }
 
-        private static clsLicense _PrepareRenewLicense(clsApplication.enApplicationType ApplicationType,
-            int ApplicationID, int PersonID, int LicenseClassID)
+        private static clsLicense _PrepareRenewLicense
+            (clsApplication.enApplicationType ApplicationType,
+             int PersonID, int LicenseClassID)
         {
             clsLicense OldLicense = null;
             clsLicense NewLicense = null;
@@ -377,7 +390,7 @@ namespace DVLD_Business
                         return null;
                     }
 
-                    if (OldLicense.ExpirationDate > clsUtilData.GetServerDate())
+                    if (OldLicense.ExpirationDate > clsUtilData.GetServerDate().AddMonths(1))
                     {
                         return null;
                     }
@@ -396,8 +409,9 @@ namespace DVLD_Business
             return NewLicense;
         }
 
-        private static clsLicense _PrepareReplacementLicense(clsApplication.enApplicationType ApplicationType,
-            int ApplicationID, int PersonID, int LicenseClassID)
+        private static clsLicense _PrepareReplacementLicense
+            (clsApplication.enApplicationType ApplicationType,
+             int PersonID, int LicenseClassID)
         {
             clsLicense OldLicense = null;
             clsLicense NewLicense = null;
@@ -435,7 +449,7 @@ namespace DVLD_Business
         // license state transitions and logic validation, decoupling business rules from DataAccess 
         // and moving towards a Unit of Work pattern for atomic database operations.
         private static clsLicense _PrepareObj(clsApplication.enApplicationType ApplicationType,
-            int ApplicationID, int PersonID, int LicenseClassID, int CreatedByUserID,
+            int PersonID, int LicenseClassID, int CreatedByUserID,
             int LocalDrivingLicenseApplicationID)
         {
 
@@ -446,13 +460,13 @@ namespace DVLD_Business
                 case clsApplication.enApplicationType.NewInternationalLicense:
                     return null;
                 case clsApplication.enApplicationType.RenewDrivingLicense:
-                    return _PrepareRenewLicense(ApplicationType, ApplicationID, PersonID, LicenseClassID);
+                    return _PrepareRenewLicense(ApplicationType, PersonID, LicenseClassID);
                 case clsApplication.enApplicationType.NewDrivingLicense:
-                    return _PrepareNewLicense(ApplicationType, ApplicationID, PersonID, LicenseClassID, CreatedByUserID,
+                    return _PrepareNewLicense(ApplicationType, PersonID, LicenseClassID, CreatedByUserID,
                     LocalDrivingLicenseApplicationID);
                 case clsApplication.enApplicationType.ReplaceDamagedDrivingLicense:
                 case clsApplication.enApplicationType.ReplaceLostDrivingLicense:
-                    return _PrepareReplacementLicense(ApplicationType, ApplicationID, PersonID, LicenseClassID);
+                    return _PrepareReplacementLicense(ApplicationType, PersonID, LicenseClassID);
                 default:
                     return null;
 
@@ -474,7 +488,8 @@ namespace DVLD_Business
         /// <returns>A populated <see cref="clsLicense"/> object if validation passes; otherwise, returns <c>null</c>.</returns>
 
         // TODO: Overloading factory method to send License ID directly for renwal
-        public static clsLicense GetNewLicenseObj(int ApplicationID, int PersonID, int LicenseClassID, int CreatedByUserID, int LocalDrivingLicenseApplicationID = -1)
+        public static clsLicense GetNewLicenseObj(int ApplicationID, int PersonID, int LicenseClassID,
+            int CreatedByUserID, int LocalDrivingLicenseApplicationID = -1)
         {
             if (clsApplication.GetApplicationStatus(ApplicationID) != clsApplication.enApplicationStatus.New)
             {
@@ -486,7 +501,8 @@ namespace DVLD_Business
             //throw new NotImplementedException("Most prevent international license to throw here");
             //throw new NotImplementedException("Most declare issue reason");
 
-            clsLicense Newlicense = _PrepareObj(ApplicationType, ApplicationID, PersonID, LicenseClassID, CreatedByUserID, LocalDrivingLicenseApplicationID);
+            clsLicense Newlicense = _PrepareObj(ApplicationType, PersonID, LicenseClassID,
+                CreatedByUserID, LocalDrivingLicenseApplicationID);
 
             if (Newlicense == null)
             {

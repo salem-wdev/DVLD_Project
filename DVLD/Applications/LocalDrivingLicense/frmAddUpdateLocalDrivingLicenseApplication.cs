@@ -46,7 +46,7 @@ namespace DVLD.Applications.Local_Driving_License
         /// Logic Methods
         /// </summary>
 
-        private void _ResetDefaultValues(bool ResetPersonInfo)
+        private void _ResetDefaultValues()
         {
             if (_Mode == enMode.AddNew)
             {
@@ -57,9 +57,6 @@ namespace DVLD.Applications.Local_Driving_License
                 cbLicenseClass.SelectedIndex = 0;
                 lblFees.Text = clsApplicationType.Find((int)clsApplication.enApplicationType.NewDrivingLicense)?.ApplicationTypeFees.ToString() ?? "0.00";
                 lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
-                
-                if(ResetPersonInfo)
-                    ctrlPersonCardWithFilter1.ctrlPersonCard1.ResetPersonInfo();
                 
                 tpApplicationInfo.Enabled = false;
                 btnApplicationInfoNext.Enabled = false;
@@ -154,7 +151,7 @@ namespace DVLD.Applications.Local_Driving_License
                 _Mode = enMode.AddNew;
             }
 
-            _ResetDefaultValues(true);
+            _ResetDefaultValues();
 
         }
 
@@ -164,7 +161,7 @@ namespace DVLD.Applications.Local_Driving_License
             {
                 _Mode = enMode.AddNew;
 
-                _ResetDefaultValues(false);
+                _ResetDefaultValues();
             }
 
             if (obj != -1)
@@ -217,12 +214,18 @@ namespace DVLD.Applications.Local_Driving_License
                 lblTitle.Text = "Update Local Driving License Application";
                 this.Text = "Update Local Driving License Application";
                 MessageBox.Show("Application saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ctrlPersonCardWithFilter1.FilterEnabled = false;
             }
             else
             {
                 MessageBox.Show("Error saving application.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
+        }
+
+        private void frmAddUpdateLocalDrivingLicenseApplication_Activated(object sender, EventArgs e)
+        {
+            ctrlPersonCardWithFilter1.FilterFocus();
         }
 
         ///////////////////////////////////////////////////////////////////

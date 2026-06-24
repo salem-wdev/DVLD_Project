@@ -24,7 +24,7 @@ namespace DVLD_Business
         {
             get
             {
-                if (_TestAppointmentInfo != null && TestAppointmentID != -1)
+                if (_TestAppointmentInfo == null && TestAppointmentID != -1)
                 {
                     _TestAppointmentInfo = clsTestAppointment.Find(TestAppointmentID);
                 }
@@ -45,11 +45,10 @@ namespace DVLD_Business
 
         }
 
+        // To Get new constructor internaly
         private clsTest( int TestAppointmentID,
             bool TestResult, string Notes, int CreatedByUserID)
-
         {
-            this.TestID = TestID;
             this.TestAppointmentID = TestAppointmentID;
             this.TestResult = TestResult;
             this.Notes = Notes;
@@ -79,7 +78,14 @@ namespace DVLD_Business
                 this.TestResult, this.Notes, this.CreatedByUserID);
 
 
-            return (this.TestID != -1);
+            if (this.TestID == -1) return false;
+
+            if (TestAppointmentInfo.RetakeTestAppInfo != null && TestResult == true)
+            {
+                TestAppointmentInfo.RetakeTestAppInfo.SetComplete();
+            }
+
+            return true;
         }
 
         private bool _UpdateTest()

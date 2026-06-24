@@ -432,13 +432,13 @@
             // 
             // dtpTestDate
             // 
-            this.dtpTestDate.CustomFormat = "dd/M/yyyy";
+            this.dtpTestDate.CustomFormat = "yyyy/MM/dd   hh:mm tt";
             this.dtpTestDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dtpTestDate.Location = new System.Drawing.Point(175, 451);
             this.dtpTestDate.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dtpTestDate.MinDate = new System.DateTime(1900, 1, 1, 0, 0, 0, 0);
             this.dtpTestDate.Name = "dtpTestDate";
-            this.dtpTestDate.Size = new System.Drawing.Size(163, 20);
+            this.dtpTestDate.Size = new System.Drawing.Size(151, 20);
             this.dtpTestDate.TabIndex = 155;
             this.dtpTestDate.Value = new System.DateTime(2000, 12, 31, 0, 0, 0, 0);
             // 

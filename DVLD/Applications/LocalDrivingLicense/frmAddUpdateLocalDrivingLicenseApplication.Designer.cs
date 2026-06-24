@@ -357,6 +357,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmAddUpdateLocalDrivingLicenseApplication";
             this.Text = "Add Local Driving Licesnse Application";
+            this.Activated += new System.EventHandler(this.frmAddUpdateLocalDrivingLicenseApplication_Activated);
             this.Load += new System.EventHandler(this.frmAddUpdateLocalDrivingLicesnseApplication_Load);
             this.tcApplicationInfo.ResumeLayout(false);
             this.tpPersonalInfo.ResumeLayout(false);
