@@ -46,7 +46,7 @@ namespace DVLD.Applications.Local_Driving_License
         /// Logic Methods
         /// </summary>
 
-        private void _ResetDefaultValues(bool ResetPersonInfo)
+        private void _ResetDefaultValues()
         {
             if (_Mode == enMode.AddNew)
             {
@@ -57,9 +57,6 @@ namespace DVLD.Applications.Local_Driving_License
                 cbLicenseClass.SelectedIndex = 0;
                 lblFees.Text = clsApplicationType.Find((int)clsApplication.enApplicationType.NewDrivingLicense)?.ApplicationTypeFees.ToString() ?? "0.00";
                 lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
-                
-                if(ResetPersonInfo)
-                    ctrlPersonCardWithFilter1.ctrlPersonCard1.ResetPersonInfo();
                 
                 tpApplicationInfo.Enabled = false;
                 btnApplicationInfoNext.Enabled = false;
@@ -154,7 +151,7 @@ namespace DVLD.Applications.Local_Driving_License
                 _Mode = enMode.AddNew;
             }
 
-            _ResetDefaultValues(true);
+            _ResetDefaultValues();
 
         }
 
@@ -164,7 +161,7 @@ namespace DVLD.Applications.Local_Driving_License
             {
                 _Mode = enMode.AddNew;
 
-                _ResetDefaultValues(false);
+                _ResetDefaultValues();
             }
 
             if (obj != -1)
