@@ -1,5 +1,6 @@
 ﻿using DVLD.Global_Classes;
 using DVLD_Business;
+using DVLD_Business.Global_Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
