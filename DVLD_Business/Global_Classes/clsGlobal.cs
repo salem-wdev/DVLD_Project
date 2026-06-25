@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DVLD_Business.Global_Classes
 {
-    internal static class clsGlobal
+    public static class clsGlobal
     {
         public static clsUser CurrentUser;
 
