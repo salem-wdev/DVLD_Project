@@ -1,30 +1,36 @@
-﻿using DVLD_Business;
-using System;
+﻿using System;
 using System.IO;
 
-namespace DVLD.Global_Classes
+namespace DVLD_Business.Global_Classes
 {
     public static class clsGlobal
     {
         public static clsUser CurrentUser;
 
+        private static readonly string _filePath 
+            = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+                , "DVLD_Project\\data.txt");
+
         public static bool RememberUsernameAndPassword(string Username, string Password)
         {
             try
             {
-                string currentDirectory = System.IO.Directory.GetCurrentDirectory();
+                string folderPath = Path.GetDirectoryName(_filePath);
 
-                string filePath = currentDirectory + "\\data.txt";
-
-                if (Username == "" && File.Exists(filePath))
+                if (!Directory.Exists(folderPath))
                 {
-                    File.Delete(filePath);
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                if (Username == "" && File.Exists(_filePath))
+                {
+                    File.Delete(_filePath);
                     return false;
                 }
 
                 string DataToSave = Username + "#//#" + Password;
 
-                using (StreamWriter writer = new StreamWriter(filePath))
+                using (StreamWriter writer = new StreamWriter(_filePath))
                 {
                     writer.WriteLine(DataToSave);
                     return true;
@@ -43,13 +49,11 @@ namespace DVLD.Global_Classes
             try
             {
 
-                string currentDirectory = System.IO.Directory.GetCurrentDirectory();
 
-                string filePath = currentDirectory + "\\data.txt";
 
-                if (File.Exists(filePath))
+                if (File.Exists(_filePath))
                 {
-                    using (StreamReader reader = new StreamReader(filePath))
+                    using (StreamReader reader = new StreamReader(_filePath))
                     {
                         string line;
                         while ((line = reader.ReadLine()) != null)
