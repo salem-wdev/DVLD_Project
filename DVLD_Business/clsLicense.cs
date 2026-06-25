@@ -292,6 +292,11 @@ namespace DVLD_Business
             return clsLicenseData.GetActiveLicenseIDByDriverID(DriverID, LicenseClassID);
         }
 
+        public static int GetLicenseIDByApplicationID(int ApplicationID)
+        {
+            return clsLicenseData.GetLicenseIDByApplicationID(ApplicationID);
+        }
+
         private static float _CalculatePaidFees(clsApplication.enApplicationType ApplicationType, int LicenseClassID)
         { 
             if(ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense
