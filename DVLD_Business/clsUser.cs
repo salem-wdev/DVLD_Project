@@ -1,4 +1,5 @@
-﻿using DVLD_DataAccess;
+﻿using DVLD_Business.Global_Classes;
+using DVLD_DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -153,7 +154,7 @@ namespace DVLD_Business
             }
         }
 
-        public static clsUser FindByUsernameAndPassword(string UserName, string Password)
+        protected static clsUser FindByUsernameAndPassword(string UserName, string Password)
         {
             int UserID = -1;
             int PersonID = -1;
@@ -275,6 +276,38 @@ namespace DVLD_Business
             }
 
             return new clsUser(PersonID, UserName, Password);
+        }
+
+        public static clsUser Login(string UserName, string Password, bool IsRememberd)
+        {
+            clsUser user = clsUser.FindByUsernameAndPassword(UserName, Password);
+
+            if (user != null)
+            {
+                if (IsRememberd)
+                {
+                    //store username and password
+                    clsGlobal.RememberUsernameAndPassword(UserName.Trim(), Password.Trim());
+
+                }
+                else
+                {
+                    //store empty username and password
+                    clsGlobal.RememberUsernameAndPassword("", "");
+
+                }
+
+                //incase the user is not active
+                if (!user.IsActive)
+                {
+                    return null;
+                }
+                return user;
+            }
+            else
+            {
+                return null;
+            }
         }
 
     }

@@ -22,34 +22,10 @@ namespace DVLD
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-
-            clsUser user = clsUser.FindByUsernameAndPassword(txtUserName.Text.Trim(), txtPassword.Text.Trim());
-
-            if (user != null)
+            if ((clsGlobal.CurrentUser =
+                clsUser.Login(txtUserName.Text.Trim(), txtPassword.Text.Trim(),
+                chkRememberMe.Checked))!= null)
             {
-                if (chkRememberMe.Checked)
-                {
-                    //store username and password
-                    clsGlobal.RememberUsernameAndPassword(txtUserName.Text.Trim(), txtPassword.Text.Trim());
-
-                }
-                else
-                {
-                    //store empty username and password
-                    clsGlobal.RememberUsernameAndPassword("", "");
-
-                }
-
-                //incase the user is not active
-                if (!user.IsActive)
-                {
-
-                    txtUserName.Focus();
-                    MessageBox.Show("Your accound is not Active, Contact Admin.", "In Active Account", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                clsGlobal.CurrentUser = user;
                 frmMain frm = new frmMain(this);
                 frm.Show();
                 this.Hide();
@@ -57,8 +33,8 @@ namespace DVLD
             else
             {
                 MessageBox.Show("Invalid username or password.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtUserName.Focus();
             }
+
         }
 
         private void btnClose_Click(object sender, EventArgs e)
