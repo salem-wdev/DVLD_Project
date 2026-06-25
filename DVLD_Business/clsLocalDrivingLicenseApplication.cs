@@ -241,6 +241,23 @@ namespace DVLD_Business
             return clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID);
         }
 
+        /// <summary>
+        /// Retrieves the license ID associated with the current application.
+        /// </summary>
+        /// <remarks>
+        /// <para>⚠️ **TECHNICAL DEBT / UNSTABLE METHOD:**</para>
+        /// <para>This method is currently marked as unstable or contains an architectural flaw that requires attention.</para>
+        /// <para>**TODO:** Refactor this method to address logic/performance issues before moving to production.</para>
+        /// </remarks>
+        /// <exception cref="NotImplementedException">Thrown because the method is unstable and pending refactoring.</exception>
+        public int GetApplicationLicenseID()
+        {
+            throw new NotImplementedException("This method is unstable and pending refactoring.");
+
+            // This will get the license id that belongs to this application
+            return clsLicense.GetLicenseIDByApplicationID(this.ApplicationID);
+        }
+
         public byte TotalTrialsPerTest(clsTestType.enTestType TestTypeID)
         {
             return clsLocalDrivingLicenseApplicationData.TotalTrialsPerTest(this.LocalDrivingLicenseApplicationID, (int)TestTypeID);
