@@ -388,7 +388,14 @@ namespace DVLD_Business
             testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
             if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
             {
-                testAppointment._RetakeTestAppInfo = _GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
+                if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID))
+                {
+                    testAppointment._RetakeTestAppInfo = _GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
+                }
+                else
+                {
+                    return null;
+                }
             }
             testAppointment.PaidFees = _CalculateFees(testAppointment._RetakeTestAppInfo, TestTypeID);
             return testAppointment;
