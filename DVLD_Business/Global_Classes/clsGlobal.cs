@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace DVLD_Business.Global_Classes
 {
@@ -45,7 +44,6 @@ namespace DVLD_Business.Global_Classes
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error occurred while saving credentials: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return false;
