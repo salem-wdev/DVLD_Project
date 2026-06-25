@@ -1,15 +1,10 @@
 ﻿using DVLD_Business;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace DVLD.Global_Classes
 {
-    internal static class clsGlobal
+    public static class clsGlobal
     {
         public static clsUser CurrentUser;
 
@@ -38,7 +33,6 @@ namespace DVLD.Global_Classes
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error occurred while saving credentials: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return false;
