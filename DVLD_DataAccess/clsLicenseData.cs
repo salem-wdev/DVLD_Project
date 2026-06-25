@@ -372,6 +372,47 @@ namespace DVLD_DataAccess
             return LicenseID;
         }
 
+        public static int GetLicenseIDByApplicationID(int ApplicationID)
+        {
+            int LicenseID = -1;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"SELECT [LicenseID]
+                             FROM [dbo].[Licenses]
+                             WHERE ApplicationID= @ApplicationID";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
+            try
+            {
+                connection.Open();
+
+                object result = command.ExecuteScalar();
+
+                if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                {
+                    LicenseID = insertedID;
+                }
+            }
+
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+
+            return LicenseID;
+        }
+
+
         public static int GetActiveLicenseIDByDriverID(int DriverID, int LicenseClassID)
         {
             int LicenseID = -1;
