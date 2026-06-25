@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DVLD_Business.Global_Classes;
 using DVLD_DataAccess;
 
 namespace DVLD_Business
@@ -39,14 +40,33 @@ namespace DVLD_Business
         {
             get
             {
-                if (_Country != null && NationalityCountryID != -1)
+                if (_Country == null && NationalityCountryID != -1)
                 {
                     _Country = clsCountry.Find(NationalityCountryID);
                 }
                 return _Country;
             }
         }
-        public string ImagePath { get; set; }
+        private bool _IsImagePathChanged = false;
+
+        private string _OldImagePath = "";
+        private string _ImagePath = "";
+        public string ImagePath
+        {
+            get
+            {
+                return _ImagePath;
+            }
+            set
+            {
+                if (value != _ImagePath)
+                {
+                    _IsImagePathChanged = true;
+                    _OldImagePath = _ImagePath;
+                    _ImagePath = value;
+                }
+            }
+        }
 
         public clsPerson()
         {
@@ -87,13 +107,23 @@ namespace DVLD_Business
             this.Phone = Phone;
             this.Email = Email;
             this.NationalityCountryID = NationalityCountryID;
-            this.ImagePath = ImagePath;
+            this._ImagePath = ImagePath;
 
             Mode = enMode.Update;
         }
 
         private bool _AddNewPerson()
         {
+            if (!string.IsNullOrWhiteSpace(this._ImagePath))
+            {
+                string sourceFilePath = this.ImagePath;
+                if (!clsFileStorage.CopyImageToProjectImagesFolder(ref sourceFilePath, @"C:\DVLD-People-Images\"))
+                {
+                    return false;
+                }
+                this.ImagePath = sourceFilePath;
+            }
+            
             this.PersonID = clsPersonData.AddNewPerson(this.FirstName,  this.SecondName,  this.ThirdName
                 , this.LastName,  this.NationalNo,  this.DateOfBirth,  (short)this.Gender,  this.Address,  this.Phone,  this.Email
                 , this.NationalityCountryID,  this.ImagePath);
@@ -103,13 +133,42 @@ namespace DVLD_Business
 
         private bool _UpdatePerson()
         {
-            return clsPersonData.UpdatePerson(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
-                , DateOfBirth, (short)Gender, Address, Phone, Email, NationalityCountryID, ImagePath);
+            if (this._IsImagePathChanged && !string.IsNullOrWhiteSpace(this.ImagePath))
+            {
+                string sourceFilePath = this.ImagePath;
+                if (!clsFileStorage.CopyImageToProjectImagesFolder(ref sourceFilePath, @"C:\DVLD-People-Images\"))
+                {
+                    return false;
+                }
+                this.ImagePath = sourceFilePath;
+            }
+
+            if( clsPersonData.UpdatePerson(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
+                , DateOfBirth, (short)Gender, Address, Phone, Email, NationalityCountryID, ImagePath))
+            {
+                if(clsFileStorage.DeleteFile(_OldImagePath))
+                {
+                    _IsImagePathChanged = false;
+                    _OldImagePath = "";
+                }
+                return true;
+            }
+            return false;
         }
 
         public static bool Delete(int PersonID)
         {
-            return clsPersonData.DeletePerson(PersonID);
+            string ImagePath = "";
+            ImagePath = Find(PersonID)?.ImagePath;
+            if ( clsPersonData.DeletePerson(PersonID))
+            {
+                if (!string.IsNullOrWhiteSpace(ImagePath))
+                {
+                    clsFileStorage.DeleteFile(ImagePath);
+                }
+                return true;
+            }
+            return false;
         }
 
         public static clsPerson Find(int PersonID)
