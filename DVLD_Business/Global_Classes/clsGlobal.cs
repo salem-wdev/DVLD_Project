@@ -16,7 +16,7 @@ namespace DVLD_Business.Global_Classes
             = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
                 , "DVLD_Project\\data.txt");
 
-        public static bool RememberUsernameAndPassword(string Username, string Password)
+        internal static bool RememberUsernameAndPassword(string Username, string Password)
         {
             try
             {
