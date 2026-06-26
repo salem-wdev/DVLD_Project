@@ -310,5 +310,10 @@ namespace DVLD_Business
             }
         }
 
+        public static bool HasUsers()
+        {
+            return clsUserData.HasUsers();
+        }
+
     }
 }
