@@ -273,5 +273,10 @@ namespace DVLD_Business
             }
         }
 
+        public static bool HasPeople()
+        {
+            return clsPersonData.HasPeople();
+        }
+
     }
 }
