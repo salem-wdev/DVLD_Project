@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
@@ -114,7 +110,7 @@ namespace DVLD_DataAccess
             Command.Parameters.AddWithValue("@ApplicationFees", ApplicationFees);
             Command.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
 
-            
+
             try
             {
                 connection.Open();
@@ -163,5 +159,5 @@ namespace DVLD_DataAccess
 
     }
 
-    
+
 }
