@@ -34,53 +34,7 @@ namespace DVLD
             }
             else
             {
-                bool isInitializationMode = false;
-
-                while (!clsUser.HasUsers())
-                {
-                    this.Hide();
-                    isInitializationMode = true;
-
-                    while (!clsPerson.HasPeople())
-                    {
-
-                        if (MessageBox.Show("Ther is no People in the system.\nDo you want to add person?"
-                            , "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
-                            , MessageBoxDefaultButton.Button1) == DialogResult.Yes)
-                        {
-                            frmAddUpdatePerson frm = new frmAddUpdatePerson();
-                            frm.ShowDialog();
-                        }
-                        else
-                        {
-                            Application.Exit();
-                            return;
-                        }
-                    }
-
-                    if (MessageBox.Show("Ther is no Users in the system.\nDo you want to add User?"
-                            , "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
-                            , MessageBoxDefaultButton.Button1) == DialogResult.Yes)
-                    {
-                        frmAddUpdateUser frm = new frmAddUpdateUser();
-                        frm.ShowDialog();
-                    }
-                    else
-                    {
-                        Application.Exit();
-                        return;
-                    }
-
-                }
-
-                if (isInitializationMode)
-                {
-                    this.Show();
-                    txtUserName.Clear();
-                    txtPassword.Clear();
-                    txtUserName.Focus();
-                    return;
-                }
+                
 
                 MessageBox.Show("Invalid username or password.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
