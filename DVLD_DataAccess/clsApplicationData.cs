@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DVLD_DataAccess
 {
     public class clsApplicationData
     {
         public static bool GetApplicationInfoByApplicationID
-            (int ApplicationID, ref int ApplicantPersonID, 
+            (int ApplicationID, ref int ApplicantPersonID,
             ref DateTime ApplicationDate, ref int ApplicationTypeID,
             ref byte ApplicationStatus, ref DateTime LastStatusDate,
             ref decimal PaidFees, ref int CreatedByUserID)
@@ -29,7 +23,7 @@ namespace DVLD_DataAccess
                             ",[LastStatusDate]" +
                             ",[PaidFees]" +
                             ",[CreatedByUserID]" +
-                           " FROM [dbo].[Applications]" +
+                           " FROM [Applications]" +
                            " WHERE [ApplicationID] = @ApplicationID";
 
             SqlCommand command = new SqlCommand(Query, connection);
@@ -61,7 +55,7 @@ namespace DVLD_DataAccess
             catch (Exception ex)
             {
                 // Log the exception (ex) as needed
-                
+
             }
             finally
             {
@@ -81,7 +75,7 @@ namespace DVLD_DataAccess
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string Query = "INSERT INTO [dbo].[Applications] " +
+            string Query = "INSERT INTO [Applications] " +
                 "([ApplicantPersonID], [ApplicationDate], [ApplicationTypeID], [ApplicationStatus], [LastStatusDate], [PaidFees], [CreatedByUserID]) " +
                 "OUTPUT INSERTED.ApplicationID, INSERTED.ApplicationDate, INSERTED.LastStatusDate, INSERTED.ApplicationStatus " +
                 "VALUES " +
@@ -127,7 +121,7 @@ namespace DVLD_DataAccess
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string Query = "UPDATE [dbo].[Applications] " +
+            string Query = "UPDATE [Applications] " +
                 "SET[PaidFees] = @PaidFees, " +
                 "[CreatedByUserID] = @CreatedByUserID " +
                 "WHERE[ApplicationID] = @ApplicationID";
@@ -138,7 +132,7 @@ namespace DVLD_DataAccess
             command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
             command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
-            
+
             try
             {
                 connection.Open();
@@ -166,7 +160,7 @@ namespace DVLD_DataAccess
                             ",[LastStatusDate]" +
                             ",[PaidFees]" +
                             ",[CreatedByUserID]" +
-                           " FROM [dbo].[Applications]" +
+                           " FROM [Applications]" +
                            " WHERE [ApplicantPersonID] = @ApplicantPersonID";
 
             SqlCommand command = new SqlCommand(Query, connection);
@@ -176,7 +170,7 @@ namespace DVLD_DataAccess
             {
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
-                
+
                 dt.Load(reader);
                 reader.Close();
             }
@@ -206,7 +200,7 @@ namespace DVLD_DataAccess
                             ",[ApplicationStatus]" +
                             ",[LastStatusDate]" +
                             ",[PaidFees]" +
-                           " FROM [dbo].[Applications]" +
+                           " FROM [Applications]" +
                            " WHERE [CreatedByUserID] = @CreatedByUserID";
 
             SqlCommand command = new SqlCommand(Query, connection);
@@ -240,7 +234,7 @@ namespace DVLD_DataAccess
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string Query = "SELECT TOP 1 1 FROM Applications "+
+            string Query = "SELECT TOP 1 1 FROM Applications " +
                              "WHERE ApplicationID = @ApplicationID";
 
             SqlCommand command = new SqlCommand(Query, connection);
@@ -251,7 +245,7 @@ namespace DVLD_DataAccess
                 connection.Open();
                 object Scalar = command.ExecuteScalar();
                 IsFound = (Scalar != null);
-                
+
 
             }
             catch (Exception ex)
@@ -411,7 +405,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateStatus(int ApplicationID, short NewStatus,DateTime LastStatusDate)
+        public static bool UpdateStatus(int ApplicationID, short NewStatus, DateTime LastStatusDate)
         {
 
             int rowsAffected = 0;
@@ -428,7 +422,7 @@ namespace DVLD_DataAccess
             command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
             command.Parameters.AddWithValue("@NewStatus", NewStatus);
             command.Parameters.AddWithValue("@LastStatusDate", LastStatusDate);
-            
+
 
             try
             {
