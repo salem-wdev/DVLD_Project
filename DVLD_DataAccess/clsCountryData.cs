@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
@@ -13,7 +8,7 @@ namespace DVLD_DataAccess
 
         public static bool GetCountryByID(int CountryID, ref string CountryName)
         {
-           bool IsFound = false;
+            bool IsFound = false;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string Query = "SELECT * FROM Countries WHERE CountryID = @CountryID";
             SqlCommand Command = new SqlCommand(Query, connection);
@@ -39,7 +34,7 @@ namespace DVLD_DataAccess
 
         public static bool GetCountryByCountryName(string CountryName, ref int CountryID)
         {
-           bool IsFound = false;
+            bool IsFound = false;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string Query = "SELECT * FROM Countries WHERE CountryName = @CountryName";
             SqlCommand Command = new SqlCommand(Query, connection);
