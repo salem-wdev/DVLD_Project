@@ -16,6 +16,17 @@ namespace DVLD.Tests.Controls
 {
     public partial class ctrlScheduleTest : UserControl
     {
+
+        // ===================================================================================================
+        // TODO: UI REFACTOR & TECH DEBT CLEANUP (Execute after project completion)
+        // ===================================================================================================
+        // 1. Remove dead/legacy business variables (e.g., _IsPassedCurrentTest, IsPassedPreviosTest).
+        // 2. Delete '_HandelBusinessRolls()' method completely; UI should not enforce business rules.
+        // 3. Simplify 'LoadData()' to rely strictly on the object returned from BLL (if null -> block save).
+        // 4. Implement 'out string errorMessage' in BLL to pass exact rejection reasons to 'lblUserMessage'.
+        // 5. Move any remaining fee arithmetic or financial calculations from '_DisplayData' to the BLL.
+        // ===================================================================================================
+
         public enum enMode { AddNew = 0, Update = 1 };
         private enMode _Mode = enMode.AddNew;
         public enum enCreationMode { FirstTimeSchedule = 0, RetakeTestSchedule = 1 };
