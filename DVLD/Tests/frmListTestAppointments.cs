@@ -126,7 +126,7 @@ namespace DVLD.Tests
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            frmScheduleTest frm = new frmScheduleTest(_LocalDrivingLicenseApplicationID, _TestTypeID, Convert.ToInt32(dgvLicenseTestAppointments.SelectedRows[0].Cells["TestAppointmentID"].Value));
+            frmScheduleTest frm = new frmScheduleTest(Convert.ToInt32(dgvLicenseTestAppointments.SelectedRows[0].Cells["TestAppointmentID"].Value));
             frm.ShowDialog();
             _RefreshData();
         }

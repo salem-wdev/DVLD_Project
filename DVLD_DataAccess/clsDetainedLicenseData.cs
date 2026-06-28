@@ -1,11 +1,7 @@
 ﻿using DVLD_DataAccess;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DVLD_Business
 {
@@ -214,7 +210,7 @@ namespace DVLD_Business
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = @"INSERT INTO dbo.DetainedLicenses
+            string query = @"INSERT INTO DetainedLicenses
                                (LicenseID,
                                DetainDate,
                                FineFees,
@@ -274,7 +270,7 @@ namespace DVLD_Business
             int rowsAffected = 0;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = @"UPDATE dbo.DetainedLicenses
+            string query = @"UPDATE DetainedLicenses
                               SET LicenseID = @LicenseID, 
                               DetainDate = @DetainDate, 
                               FineFees = @FineFees,
@@ -318,7 +314,7 @@ namespace DVLD_Business
             int rowsAffected = 0;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = @"UPDATE dbo.DetainedLicenses
+            string query = @"UPDATE DetainedLicenses
                               SET IsReleased = 1, 
                               ReleaseDate = @ReleaseDate, 
                               ReleaseApplicationID = @ReleaseApplicationID   

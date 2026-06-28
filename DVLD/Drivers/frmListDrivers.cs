@@ -157,5 +157,15 @@ namespace DVLD.Drivers
         {
             clsUtil.ConfigureDataGridViewContextMenu(e, dgvDrivers);
         }
+
+        private void txtFilterValue_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            string SelectedString = _GetSelectedString();
+
+            if (SelectedString == "DriverID" || SelectedString == "PersonID")
+            {
+                e.Handled = !clsValidation.IsValidCharForID(e.KeyChar);
+            }
+        }
     }
 }

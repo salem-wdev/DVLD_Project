@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
     public class clsUserData
     {
-        public static bool GetUserInfoByUserID(int UserID, ref int PersonID, ref string UserName, 
+        public static bool GetUserInfoByUserID(int UserID, ref int PersonID, ref string UserName,
             ref string Password, ref bool IsActive)
         {
             bool IsFound = false;
@@ -59,7 +55,7 @@ namespace DVLD_DataAccess
         }
 
         public static bool GetUserInfoByUserName(string UserName,
-           ref int UserID, ref int PersonID,  
+           ref int UserID, ref int PersonID,
             ref string Password, ref bool IsActive)
         {
             bool IsFound = false;
@@ -108,7 +104,7 @@ namespace DVLD_DataAccess
         }
 
         public static bool GetUserInfoByPersonID(int PersonID,
-            ref int UserID, ref string UserName, 
+            ref int UserID, ref string UserName,
             ref string Password, ref bool IsActive)
         {
             bool IsFound = false;
@@ -221,7 +217,7 @@ namespace DVLD_DataAccess
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string Query = "INSERT INTO [dbo].[Users] ([PersonID], [UserName], [Password], [IsActive])" +
+            string Query = "INSERT INTO [Users] ([PersonID], [UserName], [Password], [IsActive])" +
                 " VALUES (@PersonID, @UserName, @Password, @IsActive);" +
                 "SELECT SCOPE_IDENTITY();";
 
@@ -564,7 +560,7 @@ namespace DVLD_DataAccess
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string Query = @"UPDATE [dbo].[Users]
+            string Query = @"UPDATE [Users]
                                SET 
                                   [IsActive] = @IsActive
                              WHERE UserID = @UserID";

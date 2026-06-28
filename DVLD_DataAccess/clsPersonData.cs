@@ -1,14 +1,6 @@
-﻿using DVLD_DataAccess;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Net;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
@@ -27,7 +19,7 @@ namespace DVLD_DataAccess
 
             SqlCommand command = new SqlCommand(Query, connection);
             command.Parameters.AddWithValue("@PersonID", PersonID);
-            
+
             try
             {
                 connection.Open();
@@ -40,7 +32,7 @@ namespace DVLD_DataAccess
                     SecondName = reader["SecondName"].ToString();
 
                     //ThirdName: allows null, we should handle null value
-                    if(reader["ThirdName"] == DBNull.Value)
+                    if (reader["ThirdName"] == DBNull.Value)
                     {
                         ThirdName = string.Empty;
                     }
@@ -175,10 +167,10 @@ namespace DVLD_DataAccess
             return IsFound;
         }
 
-        public static int AddNewPerson( string FirstName,  string SecondName,
-             string ThirdName,  string LastName,  string NationalNo,  DateTime DateOfBirth,
-             short Gender,  string Address,  string Phone,  string Email,
-             int NationalityCountryID,  string ImagePath)
+        public static int AddNewPerson(string FirstName, string SecondName,
+             string ThirdName, string LastName, string NationalNo, DateTime DateOfBirth,
+             short Gender, string Address, string Phone, string Email,
+             int NationalityCountryID, string ImagePath)
         {
 
             int PersonID = -1;
@@ -200,7 +192,7 @@ namespace DVLD_DataAccess
             {
                 command.Parameters.AddWithValue("@ThirdName", DBNull.Value);
             }
-             else
+            else
             {
                 command.Parameters.AddWithValue("@ThirdName", ThirdName);
             }
@@ -211,7 +203,7 @@ namespace DVLD_DataAccess
             command.Parameters.AddWithValue("@Address", Address);
             command.Parameters.AddWithValue("@Phone", Phone);
 
-            if (Email == string.Empty && Email == null) 
+            if (Email == string.Empty && Email == null)
             {
                 command.Parameters.AddWithValue("@Email", DBNull.Value);
             }
@@ -237,7 +229,7 @@ namespace DVLD_DataAccess
                 object newPersonID = command.ExecuteScalar();
                 if (int.TryParse(newPersonID.ToString(), out int NewID))
                 {
-                   PersonID = NewID;
+                    PersonID = NewID;
                 }
                 else
                 {
@@ -276,7 +268,7 @@ namespace DVLD_DataAccess
             Command.Parameters.AddWithValue("@FirstName", FirstName);
             Command.Parameters.AddWithValue("@SecondName", SecondName);
 
-            if(string.IsNullOrEmpty(ThirdName))
+            if (string.IsNullOrEmpty(ThirdName))
             {
                 Command.Parameters.AddWithValue("@ThirdName", DBNull.Value);
             }
@@ -354,7 +346,7 @@ namespace DVLD_DataAccess
                 }
             }
             catch { }
-            finally 
+            finally
             {
                 connection.Close();
             }
@@ -417,9 +409,9 @@ namespace DVLD_DataAccess
                 NumberOfEffectedRows = Command.ExecuteNonQuery();
             }
             catch { }
-            finally 
+            finally
             {
-                connection.Close(); 
+                connection.Close();
             }
 
             return NumberOfEffectedRows > 0;

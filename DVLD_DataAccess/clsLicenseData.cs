@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
@@ -49,7 +44,7 @@ namespace DVLD_DataAccess
                     PaidFees = Convert.ToSingle(reader["PaidFees"]);
                     IsActive = (bool)reader["IsActive"];
                     IssueReason = (byte)reader["IssueReason"];
-                    CreatedByUserID = (int)reader["DriverID"];
+                    CreatedByUserID = (int)reader["CreatedByUserID"];
 
 
                 }
@@ -166,7 +161,7 @@ namespace DVLD_DataAccess
         }
 
         public static int AddNewLicense(int ApplicationID, int DriverID, int LicenseClass,
-            ref DateTime IssueDate,ref DateTime ExpirationDate, string Notes,
+            ref DateTime IssueDate, ref DateTime ExpirationDate, string Notes,
              float PaidFees, bool IsActive, byte IssueReason, int CreatedByUserID)
         {
             int LicenseID = -1;
@@ -294,7 +289,7 @@ namespace DVLD_DataAccess
             command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
             command.Parameters.AddWithValue("@DriverID", DriverID);
             command.Parameters.AddWithValue("@LicenseClass", LicenseClass);
-            
+
             if (Notes == "")
                 command.Parameters.AddWithValue("@Notes", DBNull.Value);
             else
@@ -534,7 +529,7 @@ namespace DVLD_DataAccess
 
                 effectedRows = command.ExecuteNonQuery();
 
-                
+
             }
 
             catch (Exception ex)

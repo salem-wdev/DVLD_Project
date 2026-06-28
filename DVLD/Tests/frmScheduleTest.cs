@@ -25,13 +25,19 @@ namespace DVLD.Tests
         }
         private clsTestType.enTestType _TestType;
 
-        public frmScheduleTest(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestType,int TestAppointmentID = -1)
+        public frmScheduleTest(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestType)
+        {
+            InitializeComponent();
+            _LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
+            _TestType = TestType;
+        }
+        public frmScheduleTest(int TestAppointmentID = -1)
         {
             InitializeComponent();
             _LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
             _TestAppointmentID = TestAppointmentID;
-            _TestType = TestType;
         }
+
 
 
         private void frmScheduleTest_Load(object sender, EventArgs e)
@@ -42,7 +48,7 @@ namespace DVLD.Tests
             }
             else
             {
-                ctrlScheduleTest1.LoadData(_LocalDrivingLicenseApplicationID, _TestType, _TestAppointmentID);
+                ctrlScheduleTest1.LoadData(_TestAppointmentID);
 
             }
 
