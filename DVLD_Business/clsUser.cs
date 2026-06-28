@@ -275,6 +275,11 @@ namespace DVLD_Business
                 return null;
             }
 
+            if(IsUserExistsForPersonID(PersonID))
+            {
+                return null;
+            }
+
             return new clsUser(PersonID, UserName, Password);
         }
 
