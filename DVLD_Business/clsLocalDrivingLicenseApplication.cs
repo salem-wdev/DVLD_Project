@@ -348,5 +348,15 @@ namespace DVLD_Business
             return clsLocalDrivingLicenseApplicationData.GetIsLocalDrivingLicenseApplicationHasLicense(LocalDrivingLicenseApplicationID, LicenseClassID);
         }
 
+        public static bool HasActiveTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        {
+            return clsLocalDrivingLicenseApplicationData.IsLocalDrivingLicenseApplicationHasActiveTestAppointment(LocalDrivingLicenseApplicationID, (int)TestTypeID);
+        }
+
+        public bool HasActiveTestAppointment(clsTestType.enTestType TestTypeID)
+        {
+            return HasActiveTestAppointment(this.LocalDrivingLicenseApplicationID, TestTypeID);
+        }
+
     }
 }
