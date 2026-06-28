@@ -288,6 +288,7 @@ namespace DVLD.Tests.Controls
                 return false;
             }
 
+            dtpTestDate.MinDate = _TestAppointment.AppointmentDate;
             _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(_TestAppointment.LocalDrivingLicenseApplicationID);
             _LocalDrivingLicenseApplicationID = _TestAppointment.LocalDrivingLicenseApplicationID;
 
