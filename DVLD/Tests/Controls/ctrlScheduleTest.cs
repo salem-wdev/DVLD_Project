@@ -178,7 +178,6 @@ namespace DVLD.Tests.Controls
 
                 _DisplayAppointmentData();
 
-                lblUserMessage.Visible = false;
             }
             else
             {
@@ -222,6 +221,7 @@ namespace DVLD.Tests.Controls
             this.TestTypeID = TestTypeID;
             _LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
             _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(_LocalDrivingLicenseApplicationID);
+            _Mode = enMode.AddNew;
 
             if (_LocalDrivingLicenseApplication == null)
             {
@@ -268,6 +268,7 @@ namespace DVLD.Tests.Controls
 
             _TestAppointment = clsTestAppointment.Find(TestAppointmentID);
             this.TestTypeID = _TestAppointment.TestTypeID;
+            _Mode = enMode.Update;
             if (_TestAppointment != null)
             {
                 if (_TestAppointment.RetakeTestAppInfo != null)
@@ -282,10 +283,18 @@ namespace DVLD.Tests.Controls
             }
             else
             {
-                lblUserMessage.Text = "TestAppointment Can not load Test Appointment data";
+                lblUserMessage.Text = "Test Appointment Can not load Test Appointment data";
                 lblUserMessage.Visible = true;
                 btnSave.Enabled = false;
                 return false;
+            }
+
+            if( _TestAppointment.IsLocked)
+            {
+                lblUserMessage.Text = "TestAppointment is locked can not be edited";
+                lblUserMessage.Visible = true;
+                dtpTestDate.Enabled = false;
+                btnSave.Enabled = false;
             }
 
             dtpTestDate.MinDate = _TestAppointment.AppointmentDate;
