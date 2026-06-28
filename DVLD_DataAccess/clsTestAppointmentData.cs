@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace DVLD_DataAccess
@@ -457,7 +453,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool DoesHaveAnActiveAppointment(int TestTypeID, 
+        public static bool DoesHaveAnActiveAppointment(int TestTypeID,
             int LocalDrivingLicenseApplicationID)
         {
 
@@ -479,7 +475,7 @@ namespace DVLD_DataAccess
             {
                 connection.Open();
                 object scalar = command.ExecuteScalar();
-                if(scalar == null)
+                if (scalar == null)
                 {
                     IsFound = false;
                 }
@@ -528,7 +524,7 @@ namespace DVLD_DataAccess
                 {
                     IsLocked = (bool)scalar;
                 }
-                
+
             }
             catch (Exception ex)
             {
