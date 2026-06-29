@@ -49,7 +49,7 @@ namespace DVLD.Licenses.Local_Licenses
 
             if (_License != null)
             {
-                MessageBox.Show("License issued successfully.");
+                MessageBox.Show("License issued successfully.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 btnIssueLicense.Enabled = false;
                 _LicenseID = _License.LicenseID;
                 _DriverID = _License.DriverID;
@@ -57,7 +57,7 @@ namespace DVLD.Licenses.Local_Licenses
             }
             else
             {
-                MessageBox.Show("Error saving license information.");
+                MessageBox.Show("Error saving license information.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 btnIssueLicense.Enabled = false;
             }
         }
