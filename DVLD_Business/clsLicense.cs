@@ -351,69 +351,57 @@ namespace DVLD_Business
             }
         }
 
-        private static clsLicense _PrepareNewLicense(clsApplication.enApplicationType ApplicationType,
-             int PersonID, int LicenseClassID, int CreatedByUserID,
-            int LocalDrivingLicenseApplicationID)
+        private static clsLicense _PrepareNewLicense(int LocalDrivingLicenseApplicationID, int CreatedByUserID, string Notes)
         {
-            clsLicense NewLicense = null;
-
-            if (ApplicationType == clsApplication.enApplicationType.NewDrivingLicense)
-            {
-                if (LocalDrivingLicenseApplicationID < 0)
-                {
-                    return null;
-                }
-
-                if (!IsValidAge(PersonID, LicenseClassID))
-                {
-                    return null;
-                }
-
-                if (clsLocalDrivingLicenseApplication.IsLocalDrivingLicenseApplicationHasLicense(LocalDrivingLicenseApplicationID, LicenseClassID))
-                {
-                    return null;
-                }
-
-                if (clsLicense.GetActiveLicenseIDByPersonID(PersonID, LicenseClassID) != -1)
-                {
-                    return null;
-                }
-
-                if (!clsLocalDrivingLicenseApplication.DoesPassAllTests(LocalDrivingLicenseApplicationID))
-                {
-                    return null;
-                }
-                else
-                {
-                    NewLicense = new clsLicense
-                        (_CreateNewApplicationID(CreatedByUserID, PersonID, ApplicationType)
-                        , LicenseClassID, CreatedByUserID);
-                    NewLicense.IssueReason = enIssueReason.FirstTime;
-                    if ((NewLicense._DriverInfo = clsDriver.FindByPersonID(PersonID)) == null)
-                    {
-                        NewLicense._DriverInfo = clsDriver.CreateNewDriver(PersonID, CreatedByUserID);
-                    }
-
-                    NewLicense.PaidFees = _CalculatePaidFees(ApplicationType, LicenseClassID);
-
-
-                    NewLicense.IsActive = true;
-                    if (NewLicense._DriverInfo != null)
-                    {
-                        return NewLicense;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-            }
-            else
+            if (LocalDrivingLicenseApplicationID < 0)
             {
                 return null;
             }
-        }
 
+            clsLicense NewLicense = null;
+            clsLocalDrivingLicenseApplication localDrivingLicenseApplication
+                = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
+
+            if (localDrivingLicenseApplication == null)
+            {
+                return null;
+            }
+
+            if (!IsValidAge(localDrivingLicenseApplication.ApplicantPersonID, localDrivingLicenseApplication.LicenseClassID))
+            {
+                return null;
+            }
+
+            if (localDrivingLicenseApplication.HasLicense())
+            {
+                return null;
+            }
+
+            if (clsLicense.GetActiveLicenseIDByPersonID(localDrivingLicenseApplication.ApplicantPersonID, localDrivingLicenseApplication.LicenseClassID) != -1)
+            {
+                return null;
+            }
+
+            if (!localDrivingLicenseApplication.DoesPassAllTests())
+            {
+                return null;
+            }
+
+
+            float PaidFees = _CalculatePaidFees(clsApplication.enApplicationType.NewDrivingLicense, localDrivingLicenseApplication.LicenseClassID);
+            NewLicense = new clsLicense(localDrivingLicenseApplication.ApplicationID, localDrivingLicenseApplication.LicenseClassID,
+                CreatedByUserID, Notes, PaidFees, enIssueReason.FirstTime);
+
+            if ((NewLicense._DriverInfo = clsDriver.FindByPersonID(localDrivingLicenseApplication.ApplicantPersonID)) == null)
+            {
+                NewLicense._DriverInfo = clsDriver.CreateNewDriver(localDrivingLicenseApplication.ApplicantPersonID, CreatedByUserID);
+            }
+
+            NewLicense.IsActive = true;
+
+            return (NewLicense._DriverInfo != null) ? NewLicense : null;
+        }
+       
         private static clsLicense _PrepareRenewLicense(int LicenseID, int CreatedByUserID)
         {
             clsLicense OldLicense = Find(LicenseID);
@@ -500,10 +488,8 @@ namespace DVLD_Business
                 case clsApplication.enApplicationType.ReleaseDetainedDrivingLicense:
                 case clsApplication.enApplicationType.NewInternationalLicense:
                 case clsApplication.enApplicationType.RenewDrivingLicense:
-                    return null;
                 case clsApplication.enApplicationType.NewDrivingLicense:
-                    return _PrepareNewLicense(ApplicationType, PersonID, LicenseClassID, CreatedByUserID,
-                    LocalDrivingLicenseApplicationID);
+                    return null;
                 case clsApplication.enApplicationType.ReplaceDamagedDrivingLicense:
                 case clsApplication.enApplicationType.ReplaceLostDrivingLicense:
                     return _PrepareReplacementLicense(ApplicationType, PersonID, LicenseClassID);
@@ -578,6 +564,21 @@ namespace DVLD_Business
         public static clsLicense RenewLicense(int LicenseID, int CreatedByUserID)
         {
             clsLicense license = _PrepareRenewLicense(LicenseID, CreatedByUserID);
+
+            if (license != null)
+            {
+                if (license.Save())
+                {
+                    return license;
+                }
+                return null;
+            }
+            return null;
+        }
+
+        internal static clsLicense IssueFirstTimeLocalLicense(int LocalDrivingLicenseApplicationID, int CreatedByUserID, string Notes)
+        {
+            clsLicense license = _PrepareNewLicense(LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
 
             if (license != null)
             {
