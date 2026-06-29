@@ -297,6 +297,11 @@ namespace DVLD_Business
             return clsLicenseData.GetLicenseIDByApplicationID(ApplicationID);
         }
 
+        public Boolean IsLicensExpired()
+        {
+            return this.ExpirationDate < clsUtilData.GetServerDate();
+        }
+
         private static float _CalculatePaidFees(clsApplication.enApplicationType ApplicationType, int LicenseClassID)
         { 
             if(ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense
