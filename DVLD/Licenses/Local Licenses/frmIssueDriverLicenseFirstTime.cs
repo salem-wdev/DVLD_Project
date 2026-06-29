@@ -21,23 +21,6 @@ namespace DVLD.Licenses.Local_Licenses
             _LocalDriverLicenseAppID = LocalDriverLicenseAppID;
         }
 
-
-        private void _FillLicenseObj()
-        {
-            _License = clsLicense.GetNewLicenseObj(_LocalDrivingLicenseApplication.ApplicationID,
-                _LocalDrivingLicenseApplication.ApplicantPersonID, _LocalDrivingLicenseApplication.LicenseClassID, clsGlobal.CurrentUser.UserID, _LocalDriverLicenseAppID);
-            if (_License != null)
-            {
-
-                
-                _License.Notes = txtNotes.Text;
-            }
-            else
-            {
-                MessageBox.Show("Error preparing license information.");
-            }
-        }
-
         private void frmIssueDriverLicenseFirstTime_Load(object sender, EventArgs e)
         {
             ctrlDrivingLicenseApplicationInfo1.LoadData(_LocalDriverLicenseAppID);
@@ -62,11 +45,9 @@ namespace DVLD.Licenses.Local_Licenses
 
         private void btnIssueLicense_Click(object sender, EventArgs e)
         {
-            
+            _License = _LocalDrivingLicenseApplication.IssueFirstTimeLocalLicense(clsGlobal.CurrentUser.UserID, txtNotes.Text);
 
-            _FillLicenseObj();
-
-            if (_License != null && _License.Save())
+            if (_License != null)
             {
                 MessageBox.Show("License issued successfully.");
                 btnIssueLicense.Enabled = false;
