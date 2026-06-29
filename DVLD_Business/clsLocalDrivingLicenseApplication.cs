@@ -368,5 +368,16 @@ namespace DVLD_Business
             return HasActiveTestAppointment(this.LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
+        public clsLicense IssueFirstTimeLocalLicense(int CreatedByUserID, string Notes)
+        {
+            clsLicense license = clsLicense.IssueFirstTimeLocalLicense(this.LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
+            if (license != null)
+            {
+                this.SetComplete();
+                return license;
+            }
+            return null;
+        }
+
     }
 }
