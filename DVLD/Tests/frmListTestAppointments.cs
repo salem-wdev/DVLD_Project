@@ -114,6 +114,15 @@ namespace DVLD.Tests
 
         private void btnAddNewAppointment_Click(object sender, EventArgs e)
         {
+            if(clsLocalDrivingLicenseApplication.HasActiveTestAppointment(_LocalDrivingLicenseApplicationID,_TestTypeID))
+            {
+                MessageBox.Show("Person cannot book a new appointment because they already have an active appointment for this test.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
             frmScheduleTest frm = new frmScheduleTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
             frm.ShowDialog();
             _RefreshData();

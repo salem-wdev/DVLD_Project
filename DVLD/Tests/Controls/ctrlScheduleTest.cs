@@ -160,6 +160,7 @@ namespace DVLD.Tests.Controls
             if(_TestAppointment != null)
             {
                 btnSave.Enabled = true;
+                lblUserMessage.Visible = false;
                 lblFees.Text = $"${_TestAppointment.PaidFees}";
 
                 _DisplayRetakeTestData();

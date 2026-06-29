@@ -320,6 +320,31 @@ namespace DVLD_Business
             return -1;
         }
 
+        private static bool _IsValidAge(int PersonID, int LicenseClassID)
+        {
+            clsPerson person = clsPerson.Find(PersonID);
+
+            DateTime DateOfBirth = DateTime.Today;
+            DateTime today = clsBusinessSettings.GetServerDateTime();
+
+            int years = 0;
+
+            if (person != null)
+            {
+                DateOfBirth = person.DateOfBirth;
+                years = today.Year - DateOfBirth.Year;
+                if (years < clsLicenseClass.Find(LicenseClassID)?.MinimumAllowedAge)
+                {
+                    return false;
+                }
+                return true;
+}
+            else
+            {
+                return false;
+            }
+        }
+
         private static clsLicense _PrepareNewLicense(clsApplication.enApplicationType ApplicationType,
              int PersonID, int LicenseClassID, int CreatedByUserID,
             int LocalDrivingLicenseApplicationID)

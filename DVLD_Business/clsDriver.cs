@@ -144,6 +144,11 @@ namespace DVLD_Business
                 return null;
             }
 
+            if (FindByPersonID(PersonID) != null)
+            {
+                return null;
+            }
+
             return new clsDriver(PersonID, CreatedByUserID);
 
         }
