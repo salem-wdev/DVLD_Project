@@ -225,7 +225,7 @@ namespace DVLD_Business
 
         }
 
-        public bool Save()
+        private bool Save()
         {
 
             switch (Mode)
