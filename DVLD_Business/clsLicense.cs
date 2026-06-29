@@ -83,7 +83,8 @@ namespace DVLD_Business
             }
         }
 
-        private clsLicense(int ApplicationID, int LicenseClassID, int CreatedByUserID)
+        private clsLicense(int ApplicationID, int LicenseClassID, int CreatedByUserID,
+            string Notes, float PaidFees, enIssueReason IssueReason)
 
         {
             this.LicenseID = -1;
@@ -92,10 +93,10 @@ namespace DVLD_Business
             this.LicenseClassID = LicenseClassID;
             this._IssueDate = DateTime.Now;
             this._ExpirationDate = DateTime.Now;
-            this.Notes = "";
-            this.PaidFees = 0;
+            this.Notes = Notes;
+            this.PaidFees = PaidFees;
             this.IsActive = true;
-            this.IssueReason = enIssueReason.FirstTime;
+            this.IssueReason = IssueReason;
             this.CreatedByUserID = CreatedByUserID;
 
             Mode = enMode.AddNew;
