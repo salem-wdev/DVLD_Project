@@ -363,6 +363,11 @@ namespace DVLD_Business
                     return null;
                 }
 
+                if (!_IsValidAge(PersonID, LicenseClassID))
+                {
+                    return null;
+                }
+
                 if (clsLocalDrivingLicenseApplication.IsLocalDrivingLicenseApplicationHasLicense(LocalDrivingLicenseApplicationID, LicenseClassID))
                 {
                     return null;
