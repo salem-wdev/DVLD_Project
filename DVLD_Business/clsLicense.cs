@@ -413,38 +413,38 @@ namespace DVLD_Business
             }
         }
 
-        private static clsLicense _PrepareRenewLicense
-            (clsApplication.enApplicationType ApplicationType,
-             int PersonID, int LicenseClassID)
+        private static clsLicense _PrepareRenewLicense(int LicenseID, int CreatedByUserID)
         {
-            clsLicense OldLicense = null;
+            clsLicense OldLicense = Find(LicenseID);
             clsLicense NewLicense = null;
-            if (ApplicationType == clsApplication.enApplicationType.RenewDrivingLicense)
+
+            // TODO: Get License ID if it's active or not for renewal
+            if (OldLicense != null)
             {
-                // TODO: Get License ID if it's active or not for renewal
-                OldLicense = clsLicense.Find(GetActiveLicenseIDByPersonID(PersonID, LicenseClassID));
-                if (OldLicense != null)
+
+                if (clsUtilData.GetServerDate() < OldLicense.ExpirationDate.AddMonths(-3) || clsUtilData.GetServerDate() > OldLicense.ExpirationDate.AddMonths(3))
                 {
-                    if (!IsLicenseActive(OldLicense.LicenseID))
-                    {
-                        return null;
-                    }
-
-                    if (OldLicense.ExpirationDate > clsUtilData.GetServerDate().AddMonths(1))
-                    {
-                        return null;
-                    }
-                    else
-                    {
-
-                        NewLicense = new clsLicense(OldLicense);
-                        NewLicense.IssueReason = enIssueReason.Renew;
-                        NewLicense.PaidFees = _CalculatePaidFees(ApplicationType, LicenseClassID);
-                        OldLicense.IsActive = false;
-
-                    }
+                    return null;
                 }
 
+                if (!IsLicenseActive(OldLicense.LicenseID) && clsUtilData.GetServerDate() < OldLicense.ExpirationDate)
+                {
+                    return null;
+                }
+
+                if (clsDetainedLicense.IsLicenseDetained(LicenseID))
+                {
+                    return null;
+                }
+
+                NewLicense = new clsLicense(OldLicense);
+                NewLicense.IssueReason = enIssueReason.Renew;
+                NewLicense.ApplicationID = _CreateNewApplicationID(CreatedByUserID,
+                    NewLicense.DriverInfo.PersonID, clsApplication.enApplicationType.RenewDrivingLicense);
+
+                NewLicense.PaidFees = _CalculatePaidFees(clsApplication.enApplicationType.RenewDrivingLicense
+                    , NewLicense.LicenseClassID);
+                OldLicense.IsActive = false;
             }
             return NewLicense;
         }
@@ -498,9 +498,8 @@ namespace DVLD_Business
                 case clsApplication.enApplicationType.RetakeTest:
                 case clsApplication.enApplicationType.ReleaseDetainedDrivingLicense:
                 case clsApplication.enApplicationType.NewInternationalLicense:
-                    return null;
                 case clsApplication.enApplicationType.RenewDrivingLicense:
-                    return _PrepareRenewLicense(ApplicationType, PersonID, LicenseClassID);
+                    return null;
                 case clsApplication.enApplicationType.NewDrivingLicense:
                     return _PrepareNewLicense(ApplicationType, PersonID, LicenseClassID, CreatedByUserID,
                     LocalDrivingLicenseApplicationID);
@@ -573,6 +572,11 @@ namespace DVLD_Business
         public static bool DeactivateExpiredLicenses()
         {
             return clsLicenseData.DeactivateExpiredLicenses();
+        }
+
+        public static clsLicense RenewLicense(int LicenseID,int CreatedByUserID)
+        {
+            return _PrepareRenewLicense(LicenseID, CreatedByUserID);
         }
 
     }
