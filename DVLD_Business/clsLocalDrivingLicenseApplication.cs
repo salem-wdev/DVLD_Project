@@ -307,6 +307,11 @@ namespace DVLD_Business
             return clsLocalDrivingLicenseApplicationData.DoesPassAllTests(LocalDrivingLicenseApplicationID);
         }
 
+        public bool DoesPassAllTests()
+        {
+            return DoesPassAllTests(this.LocalDrivingLicenseApplicationID);
+        }
+
         public static clsLocalDrivingLicenseApplication GetNewLocalDrivingLicenseApp(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
             // if the application type is not new driving license
