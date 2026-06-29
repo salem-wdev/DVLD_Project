@@ -402,7 +402,7 @@ namespace DVLD_Business
             return (NewLicense._DriverInfo != null) ? NewLicense : null;
         }
        
-        private static clsLicense _PrepareRenewLicense(int LicenseID, int CreatedByUserID)
+        private static clsLicense _PrepareRenewLicense(int LicenseID, string Notes, int CreatedByUserID)
         {
             clsLicense OldLicense = Find(LicenseID);
             clsLicense NewLicense = null;
@@ -430,7 +430,8 @@ namespace DVLD_Business
                 NewLicense.IssueReason = enIssueReason.Renew;
                 NewLicense.ApplicationID = _CreateNewApplicationID(CreatedByUserID,
                     NewLicense.DriverInfo.PersonID, clsApplication.enApplicationType.RenewDrivingLicense);
-
+                NewLicense.CreatedByUserID = CreatedByUserID;
+                NewLicense.Notes = Notes;
                 NewLicense.PaidFees = _CalculatePaidFees(clsApplication.enApplicationType.RenewDrivingLicense
                     , NewLicense.LicenseClassID);
                 OldLicense.IsActive = false;
@@ -561,9 +562,9 @@ namespace DVLD_Business
             return clsLicenseData.DeactivateExpiredLicenses();
         }
 
-        public static clsLicense RenewLicense(int LicenseID, int CreatedByUserID)
+        public static clsLicense RenewLicense(int LicenseID, string Notes, int CreatedByUserID)
         {
-            clsLicense license = _PrepareRenewLicense(LicenseID, CreatedByUserID);
+            clsLicense license = _PrepareRenewLicense(LicenseID, Notes, CreatedByUserID);
 
             if (license != null)
             {
