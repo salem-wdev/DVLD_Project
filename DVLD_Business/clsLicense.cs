@@ -325,7 +325,7 @@ namespace DVLD_Business
             return -1;
         }
 
-        private static bool _IsValidAge(int PersonID, int LicenseClassID)
+        public static bool IsValidAge(int PersonID, int LicenseClassID)
         {
             clsPerson person = clsPerson.Find(PersonID);
 
@@ -363,7 +363,7 @@ namespace DVLD_Business
                     return null;
                 }
 
-                if (!_IsValidAge(PersonID, LicenseClassID))
+                if (!IsValidAge(PersonID, LicenseClassID))
                 {
                     return null;
                 }
