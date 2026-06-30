@@ -154,16 +154,7 @@ namespace DVLD_Business
 
             //call DataAccess Layer 
 
-            if (this.IssueReason == enIssueReason.FirstTime)
-            {
-                if (!_DriverInfo.Save())
-                {
-                    return false;
-                }
-
-                this.DriverID = _DriverInfo.DriverID;
-            }
-            else
+            if (this.IssueReason != enIssueReason.FirstTime)
             {
                 OldLicenseID = this.LicenseID;
             }
@@ -397,6 +388,7 @@ namespace DVLD_Business
                 NewLicense._DriverInfo = clsDriver.CreateNewDriver(localDrivingLicenseApplication.ApplicantPersonID, CreatedByUserID);
             }
 
+            NewLicense.DriverID = NewLicense._DriverInfo.DriverID;
             NewLicense.IsActive = true;
 
             return (NewLicense._DriverInfo != null) ? NewLicense : null;
