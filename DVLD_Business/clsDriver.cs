@@ -137,9 +137,9 @@ namespace DVLD_Business
             return false;
         }
 
-        internal static clsDriver CreateNewDriver(int PersonID, int CreatedByUserID)
+        private static clsDriver _PrepareDriver(int PersonID, int CreatedByUserID)
         {
-            if (!clsPerson.IsPersonExists(PersonID)||!clsUser.IsUserExists(CreatedByUserID))
+            if (!clsPerson.IsPersonExists(PersonID) || !clsUser.IsUserExists(CreatedByUserID))
             {
                 return null;
             }
@@ -150,7 +150,20 @@ namespace DVLD_Business
             }
 
             return new clsDriver(PersonID, CreatedByUserID);
+        }
 
+        internal static clsDriver CreateNewDriver(int PersonID, int CreatedByUserID)
+        {
+            clsDriver driver = _PrepareDriver(PersonID, CreatedByUserID);
+
+            if(driver != null)
+            {
+                if(driver.Save())
+                {
+                    return driver;
+                }
+            }
+            return null;
         }
     }
 }
