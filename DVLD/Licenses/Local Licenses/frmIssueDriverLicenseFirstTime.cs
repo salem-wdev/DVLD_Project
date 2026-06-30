@@ -49,7 +49,7 @@ namespace DVLD.Licenses.Local_Licenses
 
             if (_License != null)
             {
-                MessageBox.Show("License issued successfully.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"License issued successfully.\nLicense ID = {_License.LicenseID}", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 btnIssueLicense.Enabled = false;
                 _LicenseID = _License.LicenseID;
                 _DriverID = _License.DriverID;
