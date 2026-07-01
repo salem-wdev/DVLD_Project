@@ -52,6 +52,11 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             }
         }
 
+        public IButtonControl AcceptButton
+        {
+            get { return btnFind; }
+        }
+
         public ctrlDriverLicenseInfoWithFilter()
         {
             InitializeComponent();
