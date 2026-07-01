@@ -42,14 +42,6 @@ namespace DVLD.Licenses.Local_Licenses.Controls
         public int SelectedLicenseID
         {
             get { return _LicenseID; }
-            set
-            {
-                if (_LicenseID != value)
-                {
-                    _LicenseID = value;
-                    LicenseSelected(_LicenseID); // Raise the event when the property changes
-                }
-            }
         }
 
         public ctrlDriverLicenseInfoWithFilter()
