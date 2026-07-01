@@ -272,16 +272,18 @@ namespace DVLD.Applications.LocalDrivingLicense
             int LocalDrivingLicenseApplicationID = (int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value;
             clsLocalDrivingLicenseApplication localDrivingLicenseApplication
                  = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
+            clsLicense license = clsLicense.FindByApplicationID
+                (localDrivingLicenseApplication.ApplicationID);
 
             bool DosHasLicenses = false;
-            DosHasLicenses = clsLicense.GetActiveLicenseIDByPersonID(localDrivingLicenseApplication.ApplicantPersonID,
-                localDrivingLicenseApplication.LicenseClassID) != -1;
 
             clsTestType.enTestType NumberOfPssedTests = (clsTestType.enTestType)dgvLocalDrivingLicenseApplications.CurrentRow.Cells["PassedTestCount"].Value;
 
+            DosHasLicenses = license != null;
             bool issueDrivingLicenseFirstTime = false;
             bool showLicense = false;
-            bool showPersonLicenseHistory = false;
+            bool showPersonLicenseHistory = clsLicense.GetActiveLicenseIDByPersonID(localDrivingLicenseApplication.ApplicantPersonID,
+                localDrivingLicenseApplication.LicenseClassID) != -1;
 
             if (NumberOfPssedTests == clsTestType.enTestType.StreetTest && !DosHasLicenses)
             {
@@ -292,7 +294,6 @@ namespace DVLD.Applications.LocalDrivingLicense
             if (DosHasLicenses)
             {
                 showLicense = true;
-                showPersonLicenseHistory = true;
             }
 
             issueDrivingLicenseFirstTimeToolStripMenuItem.Enabled = issueDrivingLicenseFirstTime;
@@ -365,8 +366,6 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         }
 
-
-
         private void scheduleVisionTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _ScheduleTest(clsTestType.enTestType.VisionTest);
@@ -396,7 +395,7 @@ namespace DVLD.Applications.LocalDrivingLicense
         private void showLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             clsLocalDrivingLicenseApplication LocalDriving = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
-            frmShowLicenseInfo frm = new frmShowLicenseInfo(LocalDriving.GetActiveLicenseID());
+            frmShowLicenseInfo frm = new frmShowLicenseInfo(clsLicense.FindByApplicationID(LocalDriving.ApplicationID).LicenseID);
             frm.ShowDialog();
         }
 
