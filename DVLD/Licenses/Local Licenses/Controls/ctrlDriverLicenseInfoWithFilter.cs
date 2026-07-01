@@ -25,6 +25,18 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             }
         }
 
+        private bool _FilterEnabled = true; // Variable to store the filter state
+
+        public bool FilterEnabled
+        {
+            get { return _FilterEnabled; }
+            set
+            {
+                _FilterEnabled = value;
+                gbFilters.Enabled = _FilterEnabled;
+            }
+        }
+
         private int _LicenseID = -1; // Variable to store the selected DriverID
 
         public int SelectedLicenseID
