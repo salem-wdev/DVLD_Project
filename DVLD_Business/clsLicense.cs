@@ -441,7 +441,7 @@ namespace DVLD_Business
                     return null;
                 }
 
-                if(IsLicenseActive(LicenseID) == false)
+                if(clsDriver.GetLastLicenseID(OldLicense.DriverID, OldLicense.LicenseClassID) != LicenseID)
                 {
                     return null;
                 }
