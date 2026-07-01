@@ -140,10 +140,10 @@
     <Compile Include="Licenses\Local Licenses\frmShowLicenseInfo.Designer.cs">
       <DependentUpon>frmShowLicenseInfo.cs</DependentUpon>
     </Compile>
-    <Compile Include="Licenses\Local Licenses\frmShowPersonLicenseHistory.cs">
+    <Compile Include="Licenses\frmShowPersonLicenseHistory.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Licenses\Local Licenses\frmShowPersonLicenseHistory.Designer.cs">
+    <Compile Include="Licenses\frmShowPersonLicenseHistory.Designer.cs">
       <DependentUpon>frmShowPersonLicenseHistory.cs</DependentUpon>
     </Compile>
     <Compile Include="Login\frmLogin.cs">
@@ -312,7 +312,7 @@
     <EmbeddedResource Include="Licenses\Local Licenses\frmShowLicenseInfo.resx">
       <DependentUpon>frmShowLicenseInfo.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Licenses\Local Licenses\frmShowPersonLicenseHistory.resx">
+    <EmbeddedResource Include="Licenses\frmShowPersonLicenseHistory.resx">
       <DependentUpon>frmShowPersonLicenseHistory.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Login\frmLogin.resx">
