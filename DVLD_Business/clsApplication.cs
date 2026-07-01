@@ -275,9 +275,6 @@ namespace DVLD_Business
 
         internal bool SetComplete()
         {
-            if (!CanBeEdited())
-                return false;
-
             if (SetComplete(ApplicationID))
             {
                 this._ApplicationStatus = enApplicationStatus.Completed;

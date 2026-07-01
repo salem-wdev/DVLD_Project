@@ -25,19 +25,36 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             }
         }
 
+        private bool _FilterEnabled = true; // Variable to store the filter state
+
+        public bool FilterEnabled
+        {
+            get { return _FilterEnabled; }
+            set
+            {
+                _FilterEnabled = value;
+                gbFilters.Enabled = _FilterEnabled;
+            }
+        }
+
         private int _LicenseID = -1; // Variable to store the selected DriverID
 
         public int SelectedLicenseID
         {
             get { return _LicenseID; }
-            set
+        }
+
+        public clsLicense SelectedLicenseInfo
+        {
+            get
             {
-                if (_LicenseID != value)
-                {
-                    _LicenseID = value;
-                    LicenseSelected(_LicenseID); // Raise the event when the property changes
-                }
+                return ctrlDriverLicenseInfo1.SelectedLicenseInfo;
             }
+        }
+
+        public IButtonControl AcceptButton
+        {
+            get { return btnFind; }
         }
 
         public ctrlDriverLicenseInfoWithFilter()
@@ -61,6 +78,13 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             }
         }
 
+        public void LoadLicense(int LicenseID)
+        {
+            txtLicenseID.Text = LicenseID.ToString();
+            FilterEnabled = false; // Disable the filter controls when loading a specific license.
+            _Find();
+        }
+
         private void btnFind_Click(object sender, EventArgs e)
         {
             if(string.IsNullOrWhiteSpace(txtLicenseID.Text))
@@ -70,6 +94,11 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             }
 
             _Find();
+        }
+
+        public void txtLicenseIDFocus()
+        {
+            txtLicenseID.Focus();
         }
 
         private void txtLicenseID_KeyPress(object sender, KeyPressEventArgs e)
