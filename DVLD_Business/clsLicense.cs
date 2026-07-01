@@ -316,6 +316,11 @@ namespace DVLD_Business
             return clsLicenseData.GetActiveLicenseIDByDriverID(DriverID, LicenseClassID);
         }
 
+        public static bool GetIsActiveLicense(int LicenseID)
+        {
+            return clsLicenseData.GetIsActiveLicense(LicenseID);
+        }
+
         public static int GetLicenseIDByApplicationID(int ApplicationID)
         {
             return clsLicenseData.GetLicenseIDByApplicationID(ApplicationID);
