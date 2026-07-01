@@ -386,45 +386,6 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
-        public static bool GetIsActiveLicense(int LicenseID)
-        {
-            bool IsFound = false;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = @"SELECT TOP (1) 1
-                              FROM Licenses
-                              WHERE LicenseID = @LicenseID AND IsActive = 1;";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@LicenseID", LicenseID);
-
-            try
-            {
-                connection.Open();
-
-                object result = command.ExecuteScalar();
-
-                IsFound = result != null;
-            }
-
-            catch (Exception ex)
-            {
-                //Console.WriteLine("Error: " + ex.Message);
-
-            }
-
-            finally
-            {
-                connection.Close();
-            }
-
-
-            return IsFound;
-        }
-
-
         public static int GetActiveLicenseIDByPersonID(int PersonID, int LicenseClassID)
         {
             int LicenseID = -1;
