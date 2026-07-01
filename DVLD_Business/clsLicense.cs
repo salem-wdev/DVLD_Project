@@ -166,7 +166,10 @@ namespace DVLD_Business
 
             if (this.LicenseID != -1 && clsApplication.SetComplete(this.ApplicationID))
             {
+                if (OldLicenseID > 0)
+                {
                 clsLicense.DeactivateLicense(OldLicenseID);
+                }
                 return true;
             }
 
