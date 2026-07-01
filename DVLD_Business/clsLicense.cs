@@ -168,7 +168,7 @@ namespace DVLD_Business
             {
                 if (OldLicenseID > 0)
                 {
-                clsLicense.DeactivateLicense(OldLicenseID);
+                    clsLicense.DeactivateLicense(OldLicenseID);
                 }
                 return true;
             }
@@ -441,6 +441,10 @@ namespace DVLD_Business
                     return null;
                 }
 
+                if(IsLicenseActive(LicenseID) == false)
+                {
+                    return null;
+                }
 
                 if (!IsLicenseActive(OldLicense.LicenseID) && ServerDate < OldLicense.ExpirationDate)
                 {
