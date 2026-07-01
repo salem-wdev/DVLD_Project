@@ -473,6 +473,43 @@ namespace DVLD_DataAccess
             return LicenseID;
         }
 
+        public static int GetLastLicenseIDByDriverID(int DriverID, int LicenseClassID)
+        {
+            int lastLicenseID = -1;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"SELECT TOP (1) LicenseID
+                              FROM Licenses
+                              WHERE DriverID = @DriverID AND LicenseClass = @LicenseClassID
+                              ORDER BY LicenseID DESC;";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@DriverID", DriverID);
+            command.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
+            try
+            {
+                connection.Open();
+                object scalar = command.ExecuteScalar();
+
+                if (scalar != null && int.TryParse(scalar.ToString(), out int parsedID))
+                {
+
+                    lastLicenseID = parsedID;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return lastLicenseID;
+        }
 
         public static int GetActiveLicenseIDByDriverID(int DriverID, int LicenseClassID)
         {
