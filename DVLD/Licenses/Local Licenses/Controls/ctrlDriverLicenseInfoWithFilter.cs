@@ -90,6 +90,12 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             _Find();
         }
 
+        public void txtLicenseIDFocus()
+        {
+            txtLicenseID.Focus();
+        }
+
+
         private void txtLicenseID_KeyPress(object sender, KeyPressEventArgs e)
         {
             e.Handled = !clsValidation.IsValidCharForID(e.KeyChar);
