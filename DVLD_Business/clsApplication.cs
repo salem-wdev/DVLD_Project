@@ -273,7 +273,7 @@ namespace DVLD_Business
             return false;
         }
 
-        public bool SetComplete()
+        internal bool SetComplete()
         {
             if (!CanBeEdited())
                 return false;
@@ -286,7 +286,7 @@ namespace DVLD_Business
             return false;
         }
 
-        public static bool SetComplete(int ApplicationID)
+        internal static bool SetComplete(int ApplicationID)
         {
             if (!CanBeEdited(ApplicationID))
                 return false;

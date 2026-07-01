@@ -307,6 +307,11 @@ namespace DVLD_Business
             return clsLocalDrivingLicenseApplicationData.DoesPassAllTests(LocalDrivingLicenseApplicationID);
         }
 
+        public bool DoesPassAllTests()
+        {
+            return DoesPassAllTests(this.LocalDrivingLicenseApplicationID);
+        }
+
         public static clsLocalDrivingLicenseApplication GetNewLocalDrivingLicenseApp(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
             // if the application type is not new driving license
@@ -348,6 +353,11 @@ namespace DVLD_Business
             return clsLocalDrivingLicenseApplicationData.GetIsLocalDrivingLicenseApplicationHasLicense(LocalDrivingLicenseApplicationID, LicenseClassID);
         }
 
+        public bool HasLicense()
+        {
+            return IsLocalDrivingLicenseApplicationHasLicense(this.LocalDrivingLicenseApplicationID, this.LicenseClassID);
+        }
+
         public static bool HasActiveTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             return clsLocalDrivingLicenseApplicationData.IsLocalDrivingLicenseApplicationHasActiveTestAppointment(LocalDrivingLicenseApplicationID, (int)TestTypeID);
@@ -356,6 +366,17 @@ namespace DVLD_Business
         public bool HasActiveTestAppointment(clsTestType.enTestType TestTypeID)
         {
             return HasActiveTestAppointment(this.LocalDrivingLicenseApplicationID, TestTypeID);
+        }
+
+        public clsLicense IssueFirstTimeLocalLicense(int CreatedByUserID, string Notes)
+        {
+            clsLicense license = clsLicense.IssueFirstTimeLocalLicense(this.LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
+            if (license != null)
+            {
+                this.SetComplete();
+                return license;
+            }
+            return null;
         }
 
     }
