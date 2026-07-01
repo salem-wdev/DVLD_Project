@@ -73,6 +73,12 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             }
         }
 
+        public void LoadLicense(int LicenseID)
+        {
+            txtLicenseID.Text = LicenseID.ToString();
+            _Find();
+        }
+
         private void btnFind_Click(object sender, EventArgs e)
         {
             if(string.IsNullOrWhiteSpace(txtLicenseID.Text))
