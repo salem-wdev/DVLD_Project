@@ -1,6 +1,7 @@
 ﻿using DVLD.Applications.Application_Types;
 using DVLD.Applications.Local_Driving_License;
 using DVLD.Applications.LocalDrivingLicense;
+using DVLD.Applications.Renew_Local_License;
 using DVLD.Drivers;
 using DVLD.Global_Classes;
 using DVLD.People.Forms;
@@ -123,7 +124,8 @@ namespace DVLD
 
         private void renewDrivingLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            frmRenewLocalDrivingLicenseApplication frm = new frmRenewLocalDrivingLicenseApplication();
+            frm.ShowDialog();
         }
 
         private void ReplacementLostOrDamagedDrivingLicenseToolStripMenuItem_Click(object sender, EventArgs e)
