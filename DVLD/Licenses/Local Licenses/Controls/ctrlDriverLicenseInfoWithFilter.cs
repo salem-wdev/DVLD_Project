@@ -44,6 +44,14 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             get { return _LicenseID; }
         }
 
+        public clsLicense SelectedLicenseInfo
+        {
+            get
+            {
+                return ctrlDriverLicenseInfo1.SelectedLicenseInfo;
+            }
+        }
+
         public ctrlDriverLicenseInfoWithFilter()
         {
             InitializeComponent();
