@@ -137,6 +137,11 @@ namespace DVLD_Business
             return false;
         }
 
+        public static int GetLastLicenseID(int DriverID, int LicenseClassID)
+        {
+            return clsLicenseData.GetLastLicenseIDByDriverID(DriverID,LicenseClassID);
+        }
+
         private static clsDriver _PrepareDriver(int PersonID, int CreatedByUserID)
         {
             if (!clsPerson.IsPersonExists(PersonID) || !clsUser.IsUserExists(CreatedByUserID))
