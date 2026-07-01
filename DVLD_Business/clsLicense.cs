@@ -439,13 +439,15 @@ namespace DVLD_Business
             // TODO: Get License ID if it's active or not for renewal
             if (OldLicense != null)
             {
+                DateTime ServerDate = clsUtilData.GetServerDate();
 
-                if (clsUtilData.GetServerDate() < OldLicense.ExpirationDate.AddMonths(-3) || clsUtilData.GetServerDate() > OldLicense.ExpirationDate.AddMonths(3))
+                if (ServerDate < OldLicense.ExpirationDate.AddMonths(-3) || ServerDate > OldLicense.ExpirationDate.AddMonths(3))
                 {
                     return null;
                 }
 
-                if (!IsLicenseActive(OldLicense.LicenseID) && clsUtilData.GetServerDate() < OldLicense.ExpirationDate)
+
+                if (!IsLicenseActive(OldLicense.LicenseID) && ServerDate < OldLicense.ExpirationDate)
                 {
                     return null;
                 }
