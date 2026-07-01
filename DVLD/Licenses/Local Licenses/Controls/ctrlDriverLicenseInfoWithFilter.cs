@@ -76,6 +76,7 @@ namespace DVLD.Licenses.Local_Licenses.Controls
         public void LoadLicense(int LicenseID)
         {
             txtLicenseID.Text = LicenseID.ToString();
+            FilterEnabled = false; // Disable the filter controls when loading a specific license.
             _Find();
         }
 
@@ -94,7 +95,6 @@ namespace DVLD.Licenses.Local_Licenses.Controls
         {
             txtLicenseID.Focus();
         }
-
 
         private void txtLicenseID_KeyPress(object sender, KeyPressEventArgs e)
         {
