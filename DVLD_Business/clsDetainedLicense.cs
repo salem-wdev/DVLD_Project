@@ -208,14 +208,32 @@ namespace DVLD_Business
                    ReleasedByUserID, ReleaseApplicationID);
         }
 
-        public static clsDetainedLicense CreateNewDetainedLicense(int LicenseID, int CreatedByUserID)
+        private static clsDetainedLicense _CreateNewDetainedLicense(int LicenseID, int CreatedByUserID)
         {
             if(!clsLicense.IsLicenseActive(LicenseID) || !clsUser.IsUserExists(CreatedByUserID))
             {
                 return null;
             }
 
+            if(IsLicenseDetained(LicenseID))
+            {
+                return null;
+            }
+
             return new clsDetainedLicense(LicenseID, CreatedByUserID);
+        }
+
+        public static clsDetainedLicense DetainedLicense(int LicenseID, int CreatedByUserID)
+        {
+            clsDetainedLicense license = _CreateNewDetainedLicense(LicenseID, CreatedByUserID);
+            if (license != null)
+            {
+                if(license.Save())
+                {
+                    return license;
+                }
+            }
+            return null;
         }
 
     }
