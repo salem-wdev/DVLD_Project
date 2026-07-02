@@ -464,6 +464,7 @@ namespace DVLD_Business
                 NewLicense.Notes = Notes;
                 NewLicense.PaidFees = _CalculatePaidFees(clsApplication.enApplicationType.RenewDrivingLicense
                     , NewLicense.LicenseClassID);
+                NewLicense.IsActive = true;
                 OldLicense.IsActive = false;
             }
             return NewLicense;
@@ -501,6 +502,7 @@ namespace DVLD_Business
                 NewLicense.DriverInfo.PersonID, applicationType);
             NewLicense.CreatedByUserID = CreatedByUserID;
             NewLicense.Notes = Notes;
+            NewLicense.IsActive = true;
 
             OldLicense.IsActive = false;
 
