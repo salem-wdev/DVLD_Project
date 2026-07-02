@@ -192,7 +192,7 @@ namespace DVLD_Business
 
         public bool ReleaseDetainedLicense(int ReleasedByUserID, int ReleaseApplicationID)
         {
-            if(IsLicenseDetained(this.LicenseID))
+            if(!IsLicenseDetained(this.LicenseID))
             {
                 return false;
             }
