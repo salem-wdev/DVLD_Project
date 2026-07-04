@@ -290,11 +290,10 @@ namespace DVLD_DataAccess
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = @"  
-                            SELECT Top 1 InternationalLicenseID
-                            FROM InternationalLicenses 
-                            where DriverID=@DriverID and GetDate() between IssueDate and ExpirationDate 
-                            order by ExpirationDate Desc;";
+            string query = @"SELECT TOP (1) InternationalLicenseID
+                                FROM [InternationalLicenses]
+                                WHERE DriverID = @DriverID AND IsActive = 1
+                                ORDER BY InternationalLicenseID DESC;";
 
             SqlCommand command = new SqlCommand(query, connection);
 
