@@ -2,21 +2,14 @@
 using DVLD.Applications.Local_Driving_License;
 using DVLD.Applications.LocalDrivingLicense;
 using DVLD.Applications.Renew_Local_License;
+using DVLD.Applications.ReplaceLostOrDamagedLicense;
 using DVLD.Drivers;
-using DVLD.Global_Classes;
 using DVLD.People.Forms;
 using DVLD.Tests.Test_Types;
 using DVLD.Users;
 using DVLD_Business;
 using DVLD_Business.Global_Classes;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DVLD
@@ -130,7 +123,9 @@ namespace DVLD
 
         private void ReplacementLostOrDamagedDrivingLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            frmReplaceLostOrDamagedLicenseApplication frm = new frmReplaceLostOrDamagedLicenseApplication();
+            frm.ShowDialog();
         }
 
         private void releaseDetainedDrivingLicenseToolStripMenuItem_Click(object sender, EventArgs e)

@@ -39,6 +39,15 @@ namespace DVLD.Applications.Renew_Local_License
         {
             if(obj > 0)
             {
+                DateTime ExpirationDate = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.ExpirationDate;
+                DateTime CurrentDate = clsBusinessSettings.GetServerDateTime();
+                if (CurrentDate > ExpirationDate.AddMonths(3) || CurrentDate < ExpirationDate.AddMonths(-3))
+                {
+                    MessageBox.Show("License is not eligible for renewal." +
+                        "\nLicense can only be renewed within 3 months before or after the expiration date.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 _NewLicenseID = -1;
                 _NewLicense = null;
                 llShowLicenseHistory.Enabled = true;

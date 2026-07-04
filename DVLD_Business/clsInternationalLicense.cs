@@ -37,7 +37,10 @@ namespace DVLD_Business
         public bool IsActive { get; internal set; }
        
 
-        private clsInternationalLicense()
+        private clsInternationalLicense(int DriverID, int IssuedUsingLocalLicenseID,
+            DateTime IssueDate, DateTime ExpirationDate, bool IsActive, 
+            clsApplication Application)
+            : base(Application)
 
         {
             //here we set the applicaiton type to New International License.
@@ -226,9 +229,9 @@ namespace DVLD_Business
             return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
         }
 
-        public static clsInternationalLicense GetNewInternationalLicense(int DriverID)
+        public static clsInternationalLicense GetNewInternationalLicense(int DriverID, int CreatedByUser)
         {
-            clsInternationalLicense InternationalLicense = new clsInternationalLicense();
+            clsInternationalLicense InternationalLicense = null;
             
             int LocalLicenseID;
 
@@ -237,9 +240,25 @@ namespace DVLD_Business
                 return null;
             }
 
-            InternationalLicense.DriverID = DriverID;
-            InternationalLicense.IssuedUsingLocalLicenseID = LocalLicenseID;
-            InternationalLicense.IsActive = true;
+            clsLicense LocalLicense = clsLicense.Find(LocalLicenseID);
+
+            if(LocalLicense == null)
+            {
+                return null;
+            }
+
+            DateTime IssueDate = clsBusinessSettings.GetServerDateTime();
+
+            clsApplication application = GetNewApplicationobject(CreatedByUser,
+                LocalLicense.DriverInfo.PersonID, enApplicationType.NewInternationalLicense);
+
+            if(application == null)
+            {
+                return null;
+            }
+
+            InternationalLicense = new clsInternationalLicense(DriverID, 
+                LocalLicenseID, IssueDate, IssueDate.AddYears(1), true, application);
 
             return InternationalLicense;
         }

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVLD_DataAccess", "..\DVLD_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVLD_Business", "..\DVLD_Business\DVLD_Business.csproj", "{45BFF457-AD05-4A4C-8155-00D5C523C0F1}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DVLD_Setup", "..\DVLD_Setup\DVLD_Setup.vdproj", "{F8D60F8E-74F6-E43E-5F78-3D36A93015B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,8 @@ Global
 		{45BFF457-AD05-4A4C-8155-00D5C523C0F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45BFF457-AD05-4A4C-8155-00D5C523C0F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45BFF457-AD05-4A4C-8155-00D5C523C0F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8D60F8E-74F6-E43E-5F78-3D36A93015B4}.Debug|Any CPU.ActiveCfg = Debug
+		{F8D60F8E-74F6-E43E-5F78-3D36A93015B4}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
