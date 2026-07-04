@@ -47,12 +47,12 @@ namespace DVLD_Business
             this.ApplicationTypeID = clsApplication.enApplicationType.NewInternationalLicense;
             
             this.InternationalLicenseID = -1;
-            this.DriverID = -1;
-            this.IssuedUsingLocalLicenseID = -1;
-            this.IssueDate = DateTime.Now;
-            this.ExpirationDate = DateTime.Now;
+            this.DriverID = DriverID;
+            this.IssuedUsingLocalLicenseID = IssuedUsingLocalLicenseID;
+            this.IssueDate = IssueDate;
+            this.ExpirationDate = ExpirationDate;
            
-            this.IsActive = true;
+            this.IsActive = IsActive;
             
 
             Mode = enMode.AddNew;
