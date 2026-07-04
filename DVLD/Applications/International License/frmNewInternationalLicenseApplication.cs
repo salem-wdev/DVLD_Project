@@ -42,11 +42,12 @@ namespace DVLD.Applications.International_License
         {
             if (obj > 0)
             {
-                //if (clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DriverID) > 0)
-                //{
-                //    MessageBox.Show("This Driver already has an Active International License.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //    return;
-                //}
+                int InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DriverID);
+                if (InternationalLicenseID > 0)
+                {
+                    MessageBox.Show("This Driver already has an Active International License with ID = " + InternationalLicenseID.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
                 _NewInternationalLicenseID = -1;
                 _NewInternationalLicense = null;
                 llShowLicenseHistory.Enabled = true;
