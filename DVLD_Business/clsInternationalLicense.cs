@@ -229,7 +229,7 @@ namespace DVLD_Business
             return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
         }
 
-        public static clsInternationalLicense GetNewInternationalLicense(int DriverID, int CreatedByUser)
+        private static clsInternationalLicense _GetNewInternationalLicense(int DriverID, int CreatedByUser)
         {
             clsInternationalLicense InternationalLicense = null;
             
@@ -266,6 +266,19 @@ namespace DVLD_Business
                 LocalLicenseID, IssueDate, IssueDate.AddYears(1), true, application);
 
             return InternationalLicense;
+        }
+
+        public static clsInternationalLicense IssueNewInternationalLicense(int DriverID, int CreatedByUser)
+        {
+            clsInternationalLicense InternationalLicense = _GetNewInternationalLicense(DriverID, CreatedByUser);
+            if (InternationalLicense != null)
+            {
+                if (InternationalLicense.Save())
+                {
+                    return InternationalLicense;
+                }
+            }
+            return null;
         }
 
         public static bool DeactvateExpiredLicenses()
