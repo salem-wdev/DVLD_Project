@@ -506,7 +506,7 @@ namespace DVLD_DataAccess
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
             string query = "SELECT TOP 1 IsLocked " +
-                "FROM[DVLD].[dbo].[TestAppointments] " +
+                "FROM [TestAppointments] " +
                 "WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID" +
                 " AND [TestTypeID] = @TestTypeID " +
                 "ORDER BY TestAppointmentID DESC";
