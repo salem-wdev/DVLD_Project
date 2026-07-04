@@ -257,6 +257,11 @@ namespace DVLD_Business
                 return null;
             }
 
+            if (!application.Save())
+            {
+                return null;
+            }
+
             InternationalLicense = new clsInternationalLicense(DriverID, 
                 LocalLicenseID, IssueDate, IssueDate.AddYears(1), true, application);
 
