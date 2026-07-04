@@ -47,12 +47,12 @@ namespace DVLD_Business
             this.ApplicationTypeID = clsApplication.enApplicationType.NewInternationalLicense;
             
             this.InternationalLicenseID = -1;
-            this.DriverID = -1;
-            this.IssuedUsingLocalLicenseID = -1;
-            this.IssueDate = DateTime.Now;
-            this.ExpirationDate = DateTime.Now;
+            this.DriverID = DriverID;
+            this.IssuedUsingLocalLicenseID = IssuedUsingLocalLicenseID;
+            this.IssueDate = IssueDate;
+            this.ExpirationDate = ExpirationDate;
            
-            this.IsActive = true;
+            this.IsActive = IsActive;
             
 
             Mode = enMode.AddNew;
@@ -229,7 +229,7 @@ namespace DVLD_Business
             return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
         }
 
-        public static clsInternationalLicense GetNewInternationalLicense(int DriverID, int CreatedByUser)
+        private static clsInternationalLicense _GetNewInternationalLicense(int DriverID, int CreatedByUser)
         {
             clsInternationalLicense InternationalLicense = null;
             
@@ -257,10 +257,28 @@ namespace DVLD_Business
                 return null;
             }
 
+            if (!application.Save())
+            {
+                return null;
+            }
+
             InternationalLicense = new clsInternationalLicense(DriverID, 
                 LocalLicenseID, IssueDate, IssueDate.AddYears(1), true, application);
 
             return InternationalLicense;
+        }
+
+        public static clsInternationalLicense IssueNewInternationalLicense(int DriverID, int CreatedByUser)
+        {
+            clsInternationalLicense InternationalLicense = _GetNewInternationalLicense(DriverID, CreatedByUser);
+            if (InternationalLicense != null)
+            {
+                if (InternationalLicense.Save())
+                {
+                    return InternationalLicense;
+                }
+            }
+            return null;
         }
 
         public static bool DeactvateExpiredLicenses()

@@ -1,4 +1,5 @@
 ﻿using DVLD.Applications.Application_Types;
+using DVLD.Applications.International_License;
 using DVLD.Applications.Local_Driving_License;
 using DVLD.Applications.LocalDrivingLicense;
 using DVLD.Applications.Renew_Local_License;
@@ -112,7 +113,9 @@ namespace DVLD
 
         private void internationalLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            frmNewInternationalLicenseApplication frm = new frmNewInternationalLicenseApplication();
+            frm.ShowDialog();
+            //MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void renewDrivingLicenseToolStripMenuItem_Click(object sender, EventArgs e)
@@ -150,7 +153,9 @@ namespace DVLD
 
         private void ManageInternationaDrivingLicenseToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        frmListInternationalLicesnseApplications frm = new frmListInternationalLicesnseApplications();
+            frm.ShowDialog();
         }
     }
 }
