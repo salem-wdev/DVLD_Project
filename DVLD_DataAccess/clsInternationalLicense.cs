@@ -332,12 +332,9 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = @"  UPDATE InternationalLicenses
-                             SET IsActive = 0
-                             FROM InternationalLicenses
-                             INNER JOIN Licenses ON InternationalLicenses.IssuedUsingLocalLicenseID = Licenses.LicenseID
-                             AND InternationalLicenses.IsActive = 1  
-                               AND (Licenses.ExpirationDate < GETDATE() OR Licenses.IsActive = 0); ";
+            string query = @"  UPDATE [InternationalLicenses]
+                                   SET [IsActive] = 0
+                                 WHERE ExpirationDate < GETDATE() AND IsActive = 1;";
 
             SqlCommand command = new SqlCommand(query, connection);
 
