@@ -72,6 +72,7 @@
             this.txtFineFees.Size = new System.Drawing.Size(102, 26);
             this.txtFineFees.TabIndex = 196;
             this.txtFineFees.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtFineFees_KeyPress);
+            this.txtFineFees.Validating += new System.ComponentModel.CancelEventHandler(this.txtFineFees_Validating);
             // 
             // pictureBox8
             // 
@@ -326,6 +327,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoValidate = System.Windows.Forms.AutoValidate.EnableAllowFocusChange;
             this.ClientSize = new System.Drawing.Size(869, 763);
             this.Controls.Add(this.ctrlDriverLicenseInfoWithFilter1);
             this.Controls.Add(this.gpDetain);

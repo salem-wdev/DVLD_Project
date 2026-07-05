@@ -64,6 +64,12 @@ namespace DVLD.Licenses.Detain_License
 
         private void btnDetain_Click(object sender, EventArgs e)
         {
+            if(!this.ValidateChildren())
+            {
+                MessageBox.Show("Please enter Fine Fees.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             _DetainedLicense = clsDetainedLicense.DetainedLicense(_SelectedLicenseID, float.Parse(txtFineFees.Text), clsGlobal.CurrentUser.UserID);
             if (_DetainedLicense == null)
             {
@@ -96,6 +102,20 @@ namespace DVLD.Licenses.Detain_License
         {
             frmShowLicenseInfo frm = new frmShowLicenseInfo(_SelectedLicenseID);
             frm.ShowDialog();
+        }
+
+        private void txtFineFees_Validating(object sender, CancelEventArgs e)
+        {
+            if(string.IsNullOrWhiteSpace(txtFineFees.Text))
+            {
+                errorProvider1.SetError(txtFineFees, "Fine Fees is required.");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider1.SetError(txtFineFees, "");
+                e.Cancel = false;
+            }
         }
     }
 }
