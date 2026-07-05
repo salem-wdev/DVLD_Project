@@ -208,7 +208,7 @@ namespace DVLD_Business
                    ReleasedByUserID, ReleaseApplicationID);
         }
 
-        private static clsDetainedLicense _CreateNewDetainedLicense(int LicenseID, int CreatedByUserID)
+        private static clsDetainedLicense _CreateNewDetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
         {
             if(!clsLicense.IsLicenseActive(LicenseID) || !clsUser.IsUserExists(CreatedByUserID))
             {
@@ -219,13 +219,18 @@ namespace DVLD_Business
             {
                 return null;
             }
+            DateTime CurrentDate = clsBusinessSettings.GetServerDateTime();
+            if(CurrentDate == DateTime.MinValue)
+            {
+                return null;
+            }
 
-            return new clsDetainedLicense(LicenseID, CreatedByUserID);
+            return new clsDetainedLicense(LicenseID, CurrentDate, FineFees, CreatedByUserID);
         }
 
-        public static clsDetainedLicense DetainedLicense(int LicenseID, int CreatedByUserID)
+        public static clsDetainedLicense DetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
         {
-            clsDetainedLicense license = _CreateNewDetainedLicense(LicenseID, CreatedByUserID);
+            clsDetainedLicense license = _CreateNewDetainedLicense(LicenseID, FineFees, CreatedByUserID);
             if (license != null)
             {
                 if(license.Save())
