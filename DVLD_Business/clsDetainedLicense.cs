@@ -52,13 +52,13 @@ namespace DVLD_Business
 
         public int ReleaseApplicationID { private set; get; }
 
-        private clsDetainedLicense(int LicenseID, int CreatedByUserID)
+        private clsDetainedLicense(int LicenseID, DateTime DetainDate, float FineFees, int CreatedByUserID)
 
         {
             this.DetainID = -1;
             this.LicenseID = LicenseID;
-            this.DetainDate = DateTime.Now;
-            this.FineFees = 0;
+            this.DetainDate = DetainDate;
+            this.FineFees = FineFees;
             this.CreatedByUserID = CreatedByUserID;
             this.IsReleased = false;
             this.ReleaseDate = DateTime.MaxValue;
