@@ -24,6 +24,13 @@ namespace DVLD.Applications.International_License
             InitializeComponent();
         }
 
+        private void _RefreshGrid()
+        {
+            _dtInternationalLicenseApplications = clsInternationalLicense.GetAllInternationalLicenses();
+            dgvInternationalLicenses.DataSource = _dtInternationalLicenseApplications;
+            lblInternationalLicensesRecords.Text = dgvInternationalLicenses.Rows.Count.ToString();
+        }
+
         private string _GetFilterColumn()
         {
             string FilterColumn = "";
@@ -62,12 +69,10 @@ namespace DVLD.Applications.International_License
 
         private void frmListInternationalLicesnseApplications_Load(object sender, EventArgs e)
         {
-            _dtInternationalLicenseApplications = clsInternationalLicense.GetAllInternationalLicenses();
+            _RefreshGrid();
             cbFilterBy.SelectedIndex = 0;
 
-            dgvInternationalLicenses.DataSource = _dtInternationalLicenseApplications;
-            lblInternationalLicensesRecords.Text = dgvInternationalLicenses.Rows.Count.ToString();
-
+            
             if (dgvInternationalLicenses.Rows.Count > 0)
             {
                 dgvInternationalLicenses.Columns[0].HeaderText = "Int.License ID";
@@ -205,6 +210,7 @@ namespace DVLD.Applications.International_License
         {
             frmNewInternationalLicenseApplication frm = new frmNewInternationalLicenseApplication();
             frm.ShowDialog();
+            _RefreshGrid();
         }
     }
 }
