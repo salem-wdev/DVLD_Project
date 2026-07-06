@@ -85,7 +85,7 @@ namespace DVLD_Business.Global_Classes
                 File.Delete(sourceFile);
                 return true;
             }
-            catch (IOException iox)
+            catch (Exception iox)
             {
                 return false;
             }
