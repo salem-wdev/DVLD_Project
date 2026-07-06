@@ -56,7 +56,7 @@ namespace DVLD_Business
         {
             get
             {
-                if (_ApplicationTypeInfo == null && (int)ApplicationTypeID>0 )
+                if (_ApplicationTypeInfo == null && (int)ApplicationTypeID > 0)
                 {
                     _ApplicationTypeInfo = clsApplicationType.Find((int)ApplicationTypeID);
                 }
@@ -124,7 +124,7 @@ namespace DVLD_Business
             this.PaidFees = 0;
             this.CreatedByUserID = -1;
 
-            
+
             Mode = enMode.AddNew;
         }
 
@@ -144,7 +144,7 @@ namespace DVLD_Business
             this.PaidFees = PaidFees;
             this.CreatedByUserID = CreatedByUserID;
 
-           
+
             Mode = enMode.Update;
         }
 
@@ -159,7 +159,7 @@ namespace DVLD_Business
             this.PaidFees = BaseApplication.PaidFees;
             this.CreatedByUserID = BaseApplication.CreatedByUserID;
 
-            
+
             Mode = enMode.Update;
         }
 
@@ -265,7 +265,7 @@ namespace DVLD_Business
             if (!CanBeEdited())
                 return false;
 
-            if(clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled, clsBusinessSettings.GetServerDateTime()))
+            if (clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled, clsBusinessSettings.GetServerDateTime()))
             {
                 this._ApplicationStatus = enApplicationStatus.Cancelled;
                 return true;
@@ -293,7 +293,7 @@ namespace DVLD_Business
 
         public virtual bool Save()
         {
-            
+
 
             switch (Mode)
             {
@@ -365,10 +365,28 @@ namespace DVLD_Business
             return (enApplicationStatus)clsApplicationData.GetApplicationStatus(ApplicationID);
         }
 
-        internal static clsApplication GetNewApplicationobject(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        protected static clsApplication GetNewApplicationobject(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
+            if (DoesPersonHaveActiveApplication(ApplicantPersonID, (int)ApplicationTypeID))
+            {
+                return null;
+            }
+
             clsApplication application = new clsApplication(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
             return application;
+        }
+
+        internal static clsApplication GetNewApplication(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        {
+            clsApplication application = GetNewApplicationobject(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
+            if (application.Save())
+            {
+                return application;
+            }
+            else
+            {
+                return null;
+            }
         }
 
     }
