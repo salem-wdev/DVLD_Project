@@ -140,7 +140,9 @@ namespace DVLD
 
         private void ManageDetainedLicensestoolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            frmListDetainedLicenses frm = new frmListDetainedLicenses();
+            frm.ShowDialog();
         }
 
         private void detainLicenseToolStripMenuItem_Click(object sender, EventArgs e)
