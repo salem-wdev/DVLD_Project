@@ -204,15 +204,11 @@ namespace DVLD_Business
         {
 
 
-            if (RetakeTestAppInfo != null)
+            if (RetakeTestAppInfo == null)
             {
-                if (!RetakeTestAppInfo.Save())
-                {
-                    return false;
-                }
-
-                RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
+                return false;
             }
+                RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
 
             switch (Mode)
             {
@@ -442,7 +438,7 @@ namespace DVLD_Business
 
         private static clsApplication _GetNewReTakeTestObj(int CreatedByUserID, int ApplicantPersonID)
         {
-            return clsApplication.GetNewApplicationobject(CreatedByUserID, ApplicantPersonID, clsApplication.enApplicationType.RetakeTest);
+            return clsApplication.GetNewApplication(CreatedByUserID, ApplicantPersonID, clsApplication.enApplicationType.RetakeTest);
         }
 
         public static bool LockExpiredTestAppointments()
