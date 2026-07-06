@@ -51,6 +51,18 @@ namespace DVLD_Business
         }
 
         public int ReleaseApplicationID { private set; get; }
+        private clsApplication _ReleaseApplicationInfo = null;
+        public clsApplication ReleaseApplicationInfo
+        {
+            get
+            {
+                if (_ReleaseApplicationInfo == null && ReleaseApplicationID != -1)
+                {
+                    _ReleaseApplicationInfo = clsApplication.Find(this.ReleaseApplicationID);
+                }
+                return _ReleaseApplicationInfo;
+            }
+        }
 
         private clsDetainedLicense(int LicenseID, DateTime DetainDate, float FineFees, int CreatedByUserID)
 
@@ -226,6 +238,7 @@ namespace DVLD_Business
                 this.ReleaseApplicationID = ReleaseApplication.ApplicationID;
                 this.ReleasedByUserID = ReleasedByUserID;
                 this.ReleaseDate = ReleaseDate;
+                this.ReleaseApplicationInfo.SetComplete();
                 return true;
             }
 
