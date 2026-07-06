@@ -190,22 +190,31 @@ namespace DVLD_Business
             return clsDetainedLicenseData.IsLicenseDetained(LicenseID);
         }
 
-        public bool ReleaseDetainedLicense(int ReleasedByUserID, int ReleaseApplicationID)
+        public bool ReleaseDetainedLicense(int ReleasedByUserID)
         {
-            if(!IsLicenseDetained(this.LicenseID))
+            if (!clsUser.IsUserExists(ReleasedByUserID)
+                || !IsLicenseDetained(this.LicenseID))
             {
                 return false;
             }
 
-            if (!clsUser.IsUserExists(ReleasedByUserID) || !clsApplication.IsApplicationExists(ReleaseApplicationID))
+            clsLicense license = clsLicense.Find(this.LicenseID);
+            if (license == null || license.DriverInfo == null)
             {
                 return false;
             }
 
+            clsApplication ReleaseApplication
+                = clsApplication.GetNewApplication(ReleasedByUserID,
+                license.DriverInfo.PersonID, clsApplication.enApplicationType.ReleaseDetainedDrivingLicense);
 
+            if (ReleaseApplication == null)
+            {
+                return false;
+            }
 
             return clsDetainedLicenseData.ReleaseDetainedLicense(this.DetainID,
-                   ReleasedByUserID, ReleaseApplicationID);
+                   ReleasedByUserID, ReleaseApplication.ApplicationID);
         }
 
         private static clsDetainedLicense _CreateNewDetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
