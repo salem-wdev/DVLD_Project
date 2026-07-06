@@ -4,7 +4,9 @@ using DVLD.Applications.Local_Driving_License;
 using DVLD.Applications.LocalDrivingLicense;
 using DVLD.Applications.Renew_Local_License;
 using DVLD.Applications.ReplaceLostOrDamagedLicense;
+using DVLD.Applications.Rlease_Detained_License;
 using DVLD.Drivers;
+using DVLD.Licenses.Detain_License;
 using DVLD.People.Forms;
 using DVLD.Tests.Test_Types;
 using DVLD.Users;
@@ -143,12 +145,16 @@ namespace DVLD
 
         private void detainLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            frmDetainLicenseApplication frm = new frmDetainLicenseApplication();
+            frm.ShowDialog();
         }
 
         private void releaseDetainedLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            frmReleaseDetainedLicenseApplication frm = new frmReleaseDetainedLicenseApplication();
+            frm.ShowDialog();
         }
 
         private void ManageInternationaDrivingLicenseToolStripMenuItem1_Click(object sender, EventArgs e)

@@ -51,14 +51,26 @@ namespace DVLD_Business
         }
 
         public int ReleaseApplicationID { private set; get; }
+        private clsApplication _ReleaseApplicationInfo = null;
+        public clsApplication ReleaseApplicationInfo
+        {
+            get
+            {
+                if (_ReleaseApplicationInfo == null && ReleaseApplicationID != -1)
+                {
+                    _ReleaseApplicationInfo = clsApplication.Find(this.ReleaseApplicationID);
+                }
+                return _ReleaseApplicationInfo;
+            }
+        }
 
-        private clsDetainedLicense(int LicenseID, int CreatedByUserID)
+        private clsDetainedLicense(int LicenseID, DateTime DetainDate, float FineFees, int CreatedByUserID)
 
         {
             this.DetainID = -1;
             this.LicenseID = LicenseID;
-            this.DetainDate = DateTime.Now;
-            this.FineFees = 0;
+            this.DetainDate = DetainDate;
+            this.FineFees = FineFees;
             this.CreatedByUserID = CreatedByUserID;
             this.IsReleased = false;
             this.ReleaseDate = DateTime.MaxValue;
@@ -190,25 +202,50 @@ namespace DVLD_Business
             return clsDetainedLicenseData.IsLicenseDetained(LicenseID);
         }
 
-        public bool ReleaseDetainedLicense(int ReleasedByUserID, int ReleaseApplicationID)
+        public bool ReleaseDetainedLicense(int ReleasedByUserID)
         {
-            if(!IsLicenseDetained(this.LicenseID))
+            if (!clsUser.IsUserExists(ReleasedByUserID)
+                || !IsLicenseDetained(this.LicenseID))
             {
                 return false;
             }
 
-            if (!clsUser.IsUserExists(ReleasedByUserID) || !clsApplication.IsApplicationExists(ReleaseApplicationID))
+            clsLicense license = clsLicense.Find(this.LicenseID);
+            if (license == null || license.DriverInfo == null)
             {
                 return false;
             }
 
+            clsApplication ReleaseApplication
+                = clsApplication.GetNewApplication(ReleasedByUserID,
+                license.DriverInfo.PersonID, clsApplication.enApplicationType.ReleaseDetainedDrivingLicense);
 
+            if (ReleaseApplication == null)
+            {
+                return false;
+            }
 
-            return clsDetainedLicenseData.ReleaseDetainedLicense(this.DetainID,
-                   ReleasedByUserID, ReleaseApplicationID);
+            DateTime ReleaseDate = clsBusinessSettings.GetServerDateTime();
+            if(ReleaseDate == DateTime.MinValue)
+            {
+                return false;
+            }
+
+            if ( clsDetainedLicenseData.ReleaseDetainedLicense(this.DetainID,
+                  ReleaseDate, ReleasedByUserID, ReleaseApplication.ApplicationID))
+            {
+                this.IsReleased = true;
+                this.ReleaseApplicationID = ReleaseApplication.ApplicationID;
+                this.ReleasedByUserID = ReleasedByUserID;
+                this.ReleaseDate = ReleaseDate;
+                this.ReleaseApplicationInfo.SetComplete();
+                return true;
+            }
+
+            return false;
         }
 
-        private static clsDetainedLicense _CreateNewDetainedLicense(int LicenseID, int CreatedByUserID)
+        private static clsDetainedLicense _CreateNewDetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
         {
             if(!clsLicense.IsLicenseActive(LicenseID) || !clsUser.IsUserExists(CreatedByUserID))
             {
@@ -219,13 +256,18 @@ namespace DVLD_Business
             {
                 return null;
             }
+            DateTime CurrentDate = clsBusinessSettings.GetServerDateTime();
+            if(CurrentDate == DateTime.MinValue)
+            {
+                return null;
+            }
 
-            return new clsDetainedLicense(LicenseID, CreatedByUserID);
+            return new clsDetainedLicense(LicenseID, CurrentDate, FineFees, CreatedByUserID);
         }
 
-        public static clsDetainedLicense DetainedLicense(int LicenseID, int CreatedByUserID)
+        public static clsDetainedLicense DetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
         {
-            clsDetainedLicense license = _CreateNewDetainedLicense(LicenseID, CreatedByUserID);
+            clsDetainedLicense license = _CreateNewDetainedLicense(LicenseID, FineFees, CreatedByUserID);
             if (license != null)
             {
                 if(license.Save())

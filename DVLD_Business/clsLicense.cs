@@ -338,13 +338,10 @@ namespace DVLD_Business
 
         private static int _CreateNewApplicationID(int CreatedByUserID, int PersonID, clsApplication.enApplicationType ApplicationType)
         {
-            clsApplication application = clsApplication.GetNewApplicationobject(CreatedByUserID, PersonID, ApplicationType);
+            clsApplication application = clsApplication.GetNewApplication(CreatedByUserID, PersonID, ApplicationType);
             if(application != null)
             {
-                if(application.Save())
-                {
-                    return application.ApplicationID;
-                }
+                return application.ApplicationID;
             }
             return -1;
         }

@@ -308,7 +308,7 @@ namespace DVLD_Business
 
 
         public static bool ReleaseDetainedLicense(int DetainID,
-                 int ReleasedByUserID, int ReleaseApplicationID)
+                 DateTime ReleaseDate, int ReleasedByUserID, int ReleaseApplicationID)
         {
 
             int rowsAffected = 0;
@@ -316,7 +316,8 @@ namespace DVLD_Business
 
             string query = @"UPDATE DetainedLicenses
                               SET IsReleased = 1, 
-                              ReleaseDate = @ReleaseDate, 
+                              ReleaseDate = @ReleaseDate,
+                              ReleasedByUserID = @ReleasedByUserID,
                               ReleaseApplicationID = @ReleaseApplicationID   
                               WHERE DetainID=@DetainID;";
 
@@ -325,7 +326,7 @@ namespace DVLD_Business
             command.Parameters.AddWithValue("@DetainID", DetainID);
             command.Parameters.AddWithValue("@ReleasedByUserID", ReleasedByUserID);
             command.Parameters.AddWithValue("@ReleaseApplicationID", ReleaseApplicationID);
-            command.Parameters.AddWithValue("@ReleaseDate", DateTime.Now);
+            command.Parameters.AddWithValue("@ReleaseDate", ReleaseDate);
             try
             {
                 connection.Open();
