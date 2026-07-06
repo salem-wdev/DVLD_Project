@@ -146,11 +146,12 @@ namespace DVLD_Business
             if( clsPersonData.UpdatePerson(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
                 , DateOfBirth, (short)Gender, Address, Phone, Email, NationalityCountryID, ImagePath))
             {
-                if(clsFileStorage.DeleteFile(_OldImagePath))
-                {
-                    _IsImagePathChanged = false;
-                    _OldImagePath = "";
-                }
+                if (!string.IsNullOrEmpty(_OldImagePath))
+                    if (clsFileStorage.DeleteFile(_OldImagePath))
+                    {
+                        _IsImagePathChanged = false;
+                        _OldImagePath = "";
+                    }
                 return true;
             }
             return false;
