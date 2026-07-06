@@ -213,8 +213,23 @@ namespace DVLD_Business
                 return false;
             }
 
-            return clsDetainedLicenseData.ReleaseDetainedLicense(this.DetainID,
-                   ReleasedByUserID, ReleaseApplication.ApplicationID);
+            DateTime ReleaseDate = clsBusinessSettings.GetServerDateTime();
+            if(ReleaseDate == DateTime.MinValue)
+            {
+                return false;
+            }
+
+            if ( clsDetainedLicenseData.ReleaseDetainedLicense(this.DetainID,
+                  ReleaseDate, ReleasedByUserID, ReleaseApplication.ApplicationID))
+            {
+                this.IsReleased = true;
+                this.ReleaseApplicationID = ReleaseApplication.ApplicationID;
+                this.ReleasedByUserID = ReleasedByUserID;
+                this.ReleaseDate = ReleaseDate;
+                return true;
+            }
+
+            return false;
         }
 
         private static clsDetainedLicense _CreateNewDetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
