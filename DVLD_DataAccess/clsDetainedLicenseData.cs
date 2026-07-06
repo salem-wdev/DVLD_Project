@@ -316,7 +316,8 @@ namespace DVLD_Business
 
             string query = @"UPDATE DetainedLicenses
                               SET IsReleased = 1, 
-                              ReleaseDate = @ReleaseDate, 
+                              ReleaseDate = @ReleaseDate,
+                              ReleasedByUserID = @ReleasedByUserID,
                               ReleaseApplicationID = @ReleaseApplicationID   
                               WHERE DetainID=@DetainID;";
 
