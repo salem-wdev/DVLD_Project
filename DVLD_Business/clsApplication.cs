@@ -379,14 +379,14 @@ namespace DVLD_Business
         internal static clsApplication GetNewApplication(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
             clsApplication application = GetNewApplicationobject(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
-            if (application.Save())
+            if (application != null)
             {
-                return application;
+                if (application.Save())
+                {
+                    return application;
+                }
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
     }
