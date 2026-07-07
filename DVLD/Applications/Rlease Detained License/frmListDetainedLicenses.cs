@@ -239,7 +239,7 @@ namespace DVLD.Applications.Rlease_Detained_License
 
         private void releaseDetainedLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            frmReleaseDetainedLicenseApplication frm = new frmReleaseDetainedLicenseApplication();
+            frmReleaseDetainedLicenseApplication frm = new frmReleaseDetainedLicenseApplication((int)dgvDetainedLicenses.CurrentRow.Cells["LicenseID"].Value);
             frm.ShowDialog();   
         }
 
