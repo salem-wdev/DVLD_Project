@@ -40,7 +40,7 @@ namespace DVLD_Business
         {
             get
             {
-                if( _LicenseClassInfo == null && LicenseClassID != -1)
+                if (_LicenseClassInfo == null && LicenseClassID != -1)
                 {
                     _LicenseClassInfo = clsLicenseClass.Find(LicenseClassID);
                 }
@@ -96,7 +96,7 @@ namespace DVLD_Business
         {
             this.LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID; ;
             this.LicenseClassID = LicenseClassID;
-            
+
             Mode = enMode.Update;
         }
 
@@ -265,7 +265,7 @@ namespace DVLD_Business
 
         public bool DosPassTest(clsTestType.enTestType TestTypeID)
         {
-            
+
 
             return clsLocalDrivingLicenseApplication.DosPassTest(this.LocalDrivingLicenseApplicationID, TestTypeID);
         }
@@ -277,7 +277,7 @@ namespace DVLD_Business
 
         public static bool DosPassPreviousTest(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            if(TestTypeID == clsTestType.enTestType.None)
+            if (TestTypeID == clsTestType.enTestType.None)
             {
                 return false;
             }
@@ -378,6 +378,27 @@ namespace DVLD_Business
             }
             return null;
         }
+
+        public static new enApplicationStatus GetApplicationStatus(int LocalDrivingLicenseApplicationID)
+        {
+            // Retrieve the integer status value from the Data Access Layer
+            int statusValue = clsLocalDrivingLicenseApplicationData.GetApplicationStatus(LocalDrivingLicenseApplicationID);
+
+            // Try to safely parse the integer value into the corresponding enum constant
+            if (Enum.TryParse(statusValue.ToString(), out enApplicationStatus status))
+            {
+                return status;
+            }
+
+            // Return the default fallback value if the parsing process fails
+            return enApplicationStatus.None;
+        }
+
+        public bool DoesAttendTestType(clsTestType.enTestType TestTypeID)
+        {
+            return clsLocalDrivingLicenseApplicationData.DoesAttendTestType(this.LocalDrivingLicenseApplicationID, (int)TestTypeID);
+        }
+
 
     }
 }

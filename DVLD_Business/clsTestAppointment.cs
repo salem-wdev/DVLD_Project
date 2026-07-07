@@ -204,11 +204,10 @@ namespace DVLD_Business
         {
 
 
-            if (RetakeTestAppInfo == null)
+            if (RetakeTestAppInfo != null)
             {
-                return false;
-            }
                 RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
+            }
 
             switch (Mode)
             {
@@ -397,7 +396,49 @@ namespace DVLD_Business
             return testAppointment;
         }
 
-        public static clsTestAppointment GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        private static bool _CanBookAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        {
+
+            if (clsLocalDrivingLicenseApplication.GetApplicationStatus(LocalDrivingLicenseApplicationID) != clsApplication.enApplicationStatus.New)
+            {
+                return false;
+            }
+
+            if (AppointmentDate < clsUtilData.GetServerDate())
+            {
+                return false;
+            }
+
+            if (TestTypeID == clsTestType.enTestType.None)
+            {
+                return false;
+            }
+
+            if (!_IsTestAppointmentInTheRightOrder(LocalDrivingLicenseApplicationID, TestTypeID))
+            {
+                return false;
+            }
+
+            if (TestTypeID == clsTestType.enTestType.VisionTest)
+            {
+                return true;
+            }
+
+            // check is passed preveous test.
+            if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID - 1))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool CanBookAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        {
+            return _CanBookAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+        }
+
+        private static clsTestAppointment _GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
             clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
             if(LocalDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
@@ -434,6 +475,20 @@ namespace DVLD_Business
 
 
             return _GetReadyObject(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+        }
+
+        public static clsTestAppointment CreateNewTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        {
+            clsTestAppointment appointment = _GetNewTestAppointmentObject(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+
+            if (appointment != null)
+            {
+                if(appointment.Save())
+                {
+                    return appointment;
+                }
+            }
+            return null;
         }
 
         private static clsApplication _GetNewReTakeTestObj(int CreatedByUserID, int ApplicantPersonID)

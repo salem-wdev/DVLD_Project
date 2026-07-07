@@ -13,8 +13,9 @@ namespace DVLD_Business
 
 
         public enum enMode { AddNew = 0, Update = 1 }
-        public enum enApplicationStatus : byte
+        public enum enApplicationStatus : sbyte
         {
+            None = -1,
             New = 1,
             Cancelled = 2,
             Completed = 3
