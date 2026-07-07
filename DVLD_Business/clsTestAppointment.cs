@@ -204,11 +204,10 @@ namespace DVLD_Business
         {
 
 
-            if (RetakeTestAppInfo == null)
+            if (RetakeTestAppInfo != null)
             {
-                return false;
-            }
                 RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
+            }
 
             switch (Mode)
             {
