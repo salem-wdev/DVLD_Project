@@ -239,8 +239,21 @@ namespace DVLD.Applications.Rlease_Detained_License
 
         private void releaseDetainedLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            frmReleaseDetainedLicenseApplication frm = new frmReleaseDetainedLicenseApplication();
+            frmReleaseDetainedLicenseApplication frm = new frmReleaseDetainedLicenseApplication((int)dgvDetainedLicenses.CurrentRow.Cells["LicenseID"].Value);
             frm.ShowDialog();   
+        }
+
+        private void cmsApplications_Opening(object sender, CancelEventArgs e)
+        {
+            bool IsReleased = (bool)dgvDetainedLicenses.SelectedRows[0].Cells["IsReleased"].Value;
+            if (IsReleased)
+            {
+                releaseDetainedLicenseToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                releaseDetainedLicenseToolStripMenuItem.Enabled = true;
+            }
         }
     }
 }

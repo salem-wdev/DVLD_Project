@@ -18,13 +18,20 @@ namespace DVLD.Applications.Rlease_Detained_License
         private int _SelectedLicenseID = -1;
         private int _DetainLicenseID = -1;
         private clsDetainedLicense _DetainedLicense = null;
+        private bool _IsLicenseSelected = false;
 
         public frmReleaseDetainedLicenseApplication()
         {
             InitializeComponent();
         }
 
-        
+        public frmReleaseDetainedLicenseApplication(int LicenseID)
+        {
+            InitializeComponent();
+            _SelectedLicenseID = LicenseID;
+            _IsLicenseSelected = true;
+        }
+
 
         private void CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected(int obj)
         {
@@ -61,6 +68,11 @@ namespace DVLD.Applications.Rlease_Detained_License
 
             lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
             AcceptButton = ctrlDriverLicenseInfoWithFilter1.AcceptButton;
+            if(_IsLicenseSelected)
+            {
+                ctrlDriverLicenseInfoWithFilter1.FilterEnabled = false;
+                ctrlDriverLicenseInfoWithFilter1.LoadLicense(_SelectedLicenseID);
+            }
         }
 
         private void llShowLicenseInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
