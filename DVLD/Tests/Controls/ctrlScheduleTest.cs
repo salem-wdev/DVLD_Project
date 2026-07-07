@@ -39,8 +39,7 @@ namespace DVLD.Tests.Controls
         private clsTestAppointment _TestAppointment;
         private int _TestAppointmentID = -1;
 
-        private bool _IsPassedCurrentTest = false;
-        private bool IsPassedPreviosTest = false;
+        private float TotalFees = 0.0f;
 
         // Using interface instead of solid class for more extensibility
         public IButtonControl SaveButtonAction => btnSave;
@@ -137,34 +136,36 @@ namespace DVLD.Tests.Controls
 
             if (_CreationMode == enCreationMode.RetakeTestSchedule)
             {
-                if (_TestAppointment.RetakeTestAppInfo != null)
+                if (_TestAppointment != null)
                 {
-                    int appID = _TestAppointment.RetakeTestAppInfo.ApplicationID;
-                    lblRetakeTestAppID.Text = appID > 0 ? appID.ToString() : "N/A";
-                    lblRetakeAppFees.Text = $"${_TestAppointment.RetakeTestAppInfo.PaidFees}";
-                    lblFees.Text = $"${_TestAppointment.PaidFees - (float)_TestAppointment.RetakeTestAppInfo.PaidFees}";                    
-
+                    if (_TestAppointment.RetakeTestAppInfo != null)
+                    {
+                        int appID = _TestAppointment.RetakeTestAppInfo.ApplicationID;
+                        lblRetakeTestAppID.Text = appID > 0 ? appID.ToString() : "N/A";
+                    }
                 }
+                float RetakeTestFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.RetakeTest).ApplicationTypeFees;
+                TotalFees += RetakeTestFees;
+                lblRetakeAppFees.Text = $"${RetakeTestFees}";
             }
             else
             {
                 lblRetakeTestAppID.Text = "N/A";
                 lblRetakeAppFees.Text = "N/A";
             }
-            lblTotalFees.Text = $"${_TestAppointment.PaidFees}";
+            lblTotalFees.Text = $"${TotalFees}";
             //lblFees.Text =
         }
 
         private void _DisplayAppointmentData()
         {
-            if(_TestAppointment != null)
-            {
-                btnSave.Enabled = true;
-                lblUserMessage.Visible = false;
-                lblFees.Text = $"${_TestAppointment.PaidFees}";
-
-                _DisplayRetakeTestData();
-            }
+            float fees = (float)clsTestType.Find(TestTypeID).TestTypeFees;
+            lblUserMessage.Visible = false;
+            lblFees.Text = $"${fees}";
+            TotalFees += fees;
+            lblTotalFees.Text = $"${TotalFees}";
+            _DisplayRetakeTestData();
+            
         }
 
         private void _DisplayData()
@@ -186,29 +187,16 @@ namespace DVLD.Tests.Controls
             }
         }
 
-        private void _FillTestAppointmentObj()
-        {
-            if (_TestAppointment == null)
-            {
-                _TestAppointment = clsTestAppointment.GetNewTestAppointmentObject(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value);
-            }
-            _TestAppointment.AppointmentDate = dtpTestDate.Value;
-        }
-
         private bool _SaveData()
         {
-            _FillTestAppointmentObj();
-
-            if (_TestAppointment.Save())
+            _TestAppointment = clsTestAppointment.CreateNewTestAppointment(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value);
+            if (_TestAppointment != null)
             {
-                _Mode = enMode.Update;
-
+                _TestAppointmentID = _TestAppointment.TestAppointmentID;
                 return true;
             }
             else
-            {
                 return false;
-            }
         }
 
         // Data
@@ -232,31 +220,20 @@ namespace DVLD.Tests.Controls
                 return false;
             }
 
-            _TestAppointment = clsTestAppointment.GetNewTestAppointmentObject(LocalDrivingLicenseApplicationID,
-                    TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value);
-            _Mode = enMode.AddNew;
-
-            if (_TestAppointment != null)
+            if (!clsTestAppointment.CanBookAppointment(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value))
             {
-                if (_TestAppointment.RetakeTestAppInfo != null)
-                {
-                    _CreationMode = enCreationMode.RetakeTestSchedule;
-                }
-                else
-                {
-                    _CreationMode = enCreationMode.FirstTimeSchedule;
-                }
-
-
-            }
-            else
-            {
-                lblUserMessage.Text = "TestAppointment Can not load Test Appointment data";
                 lblUserMessage.Visible = true;
                 btnSave.Enabled = false;
+                lblUserMessage.Text = "You cannot book a new appointment for this test type. Please check the application status or existing appointments.";
                 return false;
             }
 
+            _CreationMode = _LocalDrivingLicenseApplication.DoesAttendTestType(TestTypeID) 
+                ? enCreationMode.RetakeTestSchedule : enCreationMode.FirstTimeSchedule;
+
+            lblUserMessage.Visible = false;
+            btnSave.Enabled = true;
+            _Mode = enMode.AddNew;
             
             _DisplayData();
 
@@ -280,7 +257,7 @@ namespace DVLD.Tests.Controls
                 {
                     _CreationMode = enCreationMode.FirstTimeSchedule;
                 }
-
+                _TestAppointmentID = TestAppointmentID;
             }
             else
             {
@@ -298,6 +275,7 @@ namespace DVLD.Tests.Controls
                 btnSave.Enabled = false;
             }
 
+            _Mode = enMode.Update;
             dtpTestDate.MinDate = _TestAppointment.AppointmentDate;
             _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(_TestAppointment.LocalDrivingLicenseApplicationID);
             _LocalDrivingLicenseApplicationID = _TestAppointment.LocalDrivingLicenseApplicationID;
