@@ -516,6 +516,44 @@ namespace DVLD_DataAccess
             return HasActiveAppointment;
         }
 
+        public static int GetApplicationStatus(int LocalDrivingLicenseApplicationID)
+        {
+            int ApplicationStatus = -1;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = @"SELECT        TOP (1) Applications.ApplicationStatus
+                              FROM            Applications INNER JOIN
+                              LocalDrivingLicenseApplications ON Applications.ApplicationID = LocalDrivingLicenseApplications.ApplicationID 
+                              AND LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
+
+            try
+            {
+                connection.Open();
+                object result = command.ExecuteScalar();
+
+
+                if (result != null && int.TryParse(result.ToString(), out int AppID))
+                {
+                    ApplicationStatus = AppID;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return ApplicationStatus;
+        }
+
 
     }
 }
