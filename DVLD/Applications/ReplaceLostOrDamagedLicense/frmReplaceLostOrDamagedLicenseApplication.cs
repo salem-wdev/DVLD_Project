@@ -31,12 +31,15 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
             {
                 ReplaceReason = clsApplication.enApplicationType.ReplaceDamagedDrivingLicense;
                 _IssueReason = clsLicense.enIssueReason.DamagedReplacement;
-
+                lblTitle.Text = "Replacement for Damaged License";
+                this.Text = lblTitle.Text;
             }
             else
             {
                 ReplaceReason = clsApplication.enApplicationType.ReplaceLostDrivingLicense;
                 _IssueReason = clsLicense.enIssueReason.LostReplacement;
+                lblTitle.Text = "Replacement for Lost License";
+                this.Text = lblTitle.Text;
             }
 
             lblApplicationFees.Text = clsApplicationType.Find
