@@ -115,7 +115,7 @@ namespace DVLD.Licenses.Controls
             if (_Driver == null)
             {
                 MessageBox.Show("No driver information found for the provided DriverID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                
+
             }
             _RefreshDataGrids();
         }
@@ -124,15 +124,13 @@ namespace DVLD.Licenses.Controls
         {
 
             _Driver = clsDriver.FindByPersonID(PersonID);
-            if (_Driver != null)
-            {
-                _DriverID = clsDriver.FindByPersonID(PersonID).DriverID;
-            }
-            else
+            if (_Driver == null)
             {
                 MessageBox.Show("No driver information found for the provided PersonID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            _DriverID = _Driver.DriverID;
 
             _RefreshDataGrids();
         }
