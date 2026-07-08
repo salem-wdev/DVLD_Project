@@ -117,10 +117,8 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
 
         private void btnIssueReplacement_Click(object sender, EventArgs e)
         {
-            _ReplacedLicense = clsLicense.Replace
-                (ctrlDriverLicenseInfoWithFilter1.SelectedLicenseID, 
-                clsGlobal.CurrentUser.UserID,
-                ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Notes, _IssueReason);
+            _ReplacedLicense = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Replace
+                (clsGlobal.CurrentUser.UserID, _IssueReason);
 
             if( _ReplacedLicense == null)
             {
