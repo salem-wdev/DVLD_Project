@@ -381,7 +381,7 @@ namespace DVLD_Business
             clsTestAppointment testAppointment;
 
             testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
-            if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
+            if (clsLocalDrivingLicenseApplication.DoesAttendTestType(LocalDrivingLicenseApplicationID, TestTypeID))
             {
                 if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID))
                 {
