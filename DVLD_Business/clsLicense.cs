@@ -526,9 +526,9 @@ namespace DVLD_Business
             return clsLicenseData.DeactivateExpiredLicenses();
         }
 
-        public static clsLicense RenewLicense(int LicenseID, string Notes, int CreatedByUserID)
+        public clsLicense RenewLicense(string Notes, int CreatedByUserID)
         {
-            clsLicense license = _PrepareRenewLicense(LicenseID, Notes, CreatedByUserID);
+            clsLicense license = _PrepareRenewLicense(this.LicenseID, Notes, CreatedByUserID);
 
             if (license != null)
             {
