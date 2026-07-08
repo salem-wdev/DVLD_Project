@@ -394,9 +394,14 @@ namespace DVLD_Business
             return enApplicationStatus.None;
         }
 
+        public static bool DoesAttendTestType(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        {
+            return clsLocalDrivingLicenseApplicationData.DoesAttendTestType(LocalDrivingLicenseApplicationID, (int)TestTypeID);
+        }
+
         public bool DoesAttendTestType(clsTestType.enTestType TestTypeID)
         {
-            return clsLocalDrivingLicenseApplicationData.DoesAttendTestType(this.LocalDrivingLicenseApplicationID, (int)TestTypeID);
+            return DoesAttendTestType(this.LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
 
