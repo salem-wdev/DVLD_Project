@@ -556,9 +556,9 @@ namespace DVLD_Business
             return null;
         }
 
-        public static clsLicense Replace(int LicenseID, int CreatedByUserID, string Notes, enIssueReason IssueReason)
+        public clsLicense Replace(int CreatedByUserID, enIssueReason IssueReason)
         {
-            clsLicense license = _PrepareReplacementLicense(LicenseID, CreatedByUserID, Notes, IssueReason);
+            clsLicense license = _PrepareReplacementLicense(this.LicenseID, CreatedByUserID, Notes, IssueReason);
             if (license != null)
             {
                 if (license.Save())
