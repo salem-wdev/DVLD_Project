@@ -39,6 +39,26 @@ namespace DVLD.Licenses.Local_Licenses
                 ctrlPersonCardWithFilter1.FilterFocus();
             }
 
+            ctrlPersonCardWithFilter1.OnPersonSelected += CtrlPersonCardWithFilter1_OnPersonSelected;
+        }
+
+        private void CtrlPersonCardWithFilter1_OnPersonSelected(int obj)
+        {
+            _PersonID = obj;
+
+            if (_PersonID > 0)
+            {
+                ctrlPersonCardWithFilter1.FilterEnabled = false;
+                ctrlPersonCardWithFilter1.LoadPersonInfo(_PersonID);
+                ctrlDriverLicenses1.LoadInfoByPersonID(_PersonID);
+            }
+            else
+            {
+                MessageBox.Show("Could not Find selected person!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ctrlPersonCardWithFilter1.FilterEnabled = true;
+                ctrlPersonCardWithFilter1.FilterFocus();
+                return;
+            }
         }
     }
 }
