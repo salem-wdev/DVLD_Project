@@ -74,7 +74,7 @@ namespace DVLD.Licenses.Detain_License
                 return;
             }
 
-            _DetainedLicense = clsDetainedLicense.DetainedLicense(_SelectedLicenseID, float.Parse(txtFineFees.Text), clsGlobal.CurrentUser.UserID);
+            _DetainedLicense = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Detain(float.Parse(txtFineFees.Text), clsGlobal.CurrentUser.UserID);
             if (_DetainedLicense == null)
             {
                 llShowLicenseInfo.Enabled = false;
