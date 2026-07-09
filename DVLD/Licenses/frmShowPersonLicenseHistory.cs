@@ -14,6 +14,11 @@ namespace DVLD.Licenses.Local_Licenses
     {
         private int _PersonID;
 
+        public frmShowPersonLicenseHistory()
+        {
+            InitializeComponent();
+        }
+
         public frmShowPersonLicenseHistory(int personID)
         {
             InitializeComponent();
@@ -22,10 +27,18 @@ namespace DVLD.Licenses.Local_Licenses
 
         private void frmShowPersonLicenseHistory_Load(object sender, EventArgs e)
         {
-            ctrlPersonCardWithFilter1.gbFilters.Enabled = false;
-            ctrlPersonCardWithFilter1.LoadPersonInfo(_PersonID);
+            if (_PersonID > 0)
+            {
+                ctrlPersonCardWithFilter1.FilterEnabled = false;
+                ctrlPersonCardWithFilter1.LoadPersonInfo(_PersonID);
+                ctrlDriverLicenses1.LoadInfoByPersonID(_PersonID);
+            }
+            else
+            {
+                ctrlPersonCardWithFilter1.FilterEnabled = true;
+                ctrlPersonCardWithFilter1.FilterFocus();
+            }
 
-            ctrlDriverLicenses1.LoadInfoByPersonID(_PersonID);
         }
     }
 }
