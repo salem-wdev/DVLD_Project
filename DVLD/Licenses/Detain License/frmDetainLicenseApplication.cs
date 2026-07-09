@@ -32,6 +32,10 @@ namespace DVLD.Licenses.Detain_License
 
         private void CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected(int obj)
         {
+            llShowLicenseHistory.Enabled = false;
+            llShowLicenseInfo.Enabled = false;
+            btnDetain.Enabled = false;
+
             if (obj > 0)
             {
                 if(!ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.IsActive)
