@@ -38,6 +38,7 @@ namespace DVLD.Licenses.Local_Licenses
             {
                 ctrlPersonCardWithFilter1.FilterEnabled = true;
                 ctrlPersonCardWithFilter1.FilterFocus();
+                AcceptButton = ctrlPersonCardWithFilter1.AcceptButton;
             }
 
             ctrlPersonCardWithFilter1.OnPersonSelected += CtrlPersonCardWithFilter1_OnPersonSelected;

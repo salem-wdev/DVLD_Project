@@ -63,6 +63,11 @@ namespace DVLD.People.Controls
             get { return ctrlPersonCard1.PersonID; }
         }
 
+        public IButtonControl AcceptButton
+        {
+            get { return btnFind; }
+        }
+
         public clsPerson SelectedPerson
         {
             get { return ctrlPersonCard1.SelectedPerson; }
