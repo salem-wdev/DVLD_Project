@@ -45,6 +45,12 @@ namespace DVLD.Applications.International_License
             if (obj > 0)
             {
                 llShowLicenseHistory.Enabled = true;
+                if (clsLicense.Find(obj).LicenseClassID != 3)
+                {
+                    MessageBox.Show("License most be class (3)!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 int InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DriverID);
                 if (InternationalLicenseID > 0)
                 {
