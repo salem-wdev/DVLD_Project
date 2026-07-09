@@ -34,12 +34,12 @@ namespace DVLD.Licenses.Detain_License
         {
             if (obj > 0)
             {
-                if(!clsLicense.IsLicenseActive(obj))
+                if(!ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.IsActive)
                 {
                     MessageBox.Show("This License is not active", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                if (clsDetainedLicense.IsLicenseDetained(obj))
+                if (ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.IsDetained)
                 {
                     MessageBox.Show("This License is already Detained.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
