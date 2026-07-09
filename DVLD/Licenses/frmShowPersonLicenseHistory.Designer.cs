@@ -105,6 +105,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmShowPersonLicenseHistory";
             this.Text = "frmShowPersonLicenseHistory";
+            this.Activated += new System.EventHandler(this.frmShowPersonLicenseHistory_Activated);
             this.Load += new System.EventHandler(this.frmShowPersonLicenseHistory_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbPersonImage)).EndInit();
             this.ResumeLayout(false);

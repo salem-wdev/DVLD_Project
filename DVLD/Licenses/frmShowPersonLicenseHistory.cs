@@ -37,7 +37,6 @@ namespace DVLD.Licenses.Local_Licenses
             else
             {
                 ctrlPersonCardWithFilter1.FilterEnabled = true;
-                ctrlPersonCardWithFilter1.FilterFocus();
                 AcceptButton = ctrlPersonCardWithFilter1.AcceptButton;
             }
 
@@ -67,6 +66,11 @@ namespace DVLD.Licenses.Local_Licenses
                 ctrlPersonCardWithFilter1.FilterFocus();
                 return;
             }
+        }
+
+        private void frmShowPersonLicenseHistory_Activated(object sender, EventArgs e)
+        {
+            ctrlPersonCardWithFilter1.FilterFocus();
         }
     }
 }
