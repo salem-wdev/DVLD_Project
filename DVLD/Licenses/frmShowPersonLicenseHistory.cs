@@ -47,6 +47,7 @@ namespace DVLD.Licenses.Local_Licenses
         {
             _PersonID = obj;
             clsDriver driver = clsDriver.FindByPersonID(_PersonID);
+            ctrlDriverLicenses1.ResetData();
             if (driver == null)
             {
                 MessageBox.Show("Selected person is not a driver!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
