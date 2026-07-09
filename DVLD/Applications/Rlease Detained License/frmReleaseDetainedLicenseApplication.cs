@@ -17,7 +17,6 @@ namespace DVLD.Applications.Rlease_Detained_License
     {
         private int _SelectedLicenseID = -1;
         private int _DetainLicenseID = -1;
-        private clsDetainedLicense _DetainedLicense = null;
         private bool _IsLicenseSelected = false;
 
         public frmReleaseDetainedLicenseApplication()
@@ -38,21 +37,20 @@ namespace DVLD.Applications.Rlease_Detained_License
             if (obj > 0)
             {
                 _SelectedLicenseID = obj;
-                _DetainedLicense = clsDetainedLicense.FindByLicenseID(_SelectedLicenseID);
-                if (_DetainedLicense == null || _DetainedLicense.IsReleased)
+                if (ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo == null || ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.IsReleased)
                 {
                     MessageBox.Show("The selected license is not detained.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                _DetainLicenseID = _DetainedLicense.DetainID;
+                _DetainLicenseID = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.DetainID;
                 llShowLicenseHistory.Enabled = true;
                 btnRelease.Enabled = true;
                 llShowLicenseInfo.Enabled = true;
                 lblLicenseID.Text = _SelectedLicenseID.ToString();
                 lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
                 lblDetainID.Text = _DetainLicenseID.ToString();
-                lblDetainDate.Text = _DetainedLicense.DetainDate.ToString("dd/MM/yyyy");
-                float FineFees = _DetainedLicense.FineFees;
+                lblDetainDate.Text = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.DetainDate.ToString("dd/MM/yyyy");
+                float FineFees = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.FineFees;
                 float ApplicationFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReleaseDetainedDrivingLicense).ApplicationTypeFees;
                 lblFineFees.Text = FineFees.ToString();
                 lblApplicationFees.Text = ApplicationFees.ToString();
@@ -90,8 +88,10 @@ namespace DVLD.Applications.Rlease_Detained_License
                 return;
             }
 
-            lblApplicationID.Text = _DetainedLicense.ReleaseApplicationID.ToString();
-            MessageBox.Show("License Released Successfully with ID=" + _DetainedLicense.ReleaseApplicationID.ToString(), "License Issued", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            lblApplicationID.Text = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.ReleaseApplicationID.ToString();
+            MessageBox.Show("License Released Successfully with ID="
+                + ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.ReleaseApplicationID.ToString(),
+                "License Issued", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             btnRelease.Enabled = false;
             ctrlDriverLicenseInfoWithFilter1.FilterEnabled = false;
