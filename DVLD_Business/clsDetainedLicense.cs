@@ -202,18 +202,18 @@ namespace DVLD_Business
             return clsDetainedLicenseData.IsLicenseDetained(LicenseID);
         }
 
-        public bool ReleaseDetainedLicense(int ReleasedByUserID)
+        internal static clsDetainedLicense ReleaseDetainedLicense(int LicenseID, int ReleasedByUserID)
         {
             if (!clsUser.IsUserExists(ReleasedByUserID)
-                || !IsLicenseDetained(this.LicenseID))
+                || !IsLicenseDetained(LicenseID))
             {
-                return false;
+                return null;
             }
 
-            clsLicense license = clsLicense.Find(this.LicenseID);
+            clsLicense license = clsLicense.Find(LicenseID);
             if (license == null || license.DriverInfo == null)
             {
-                return false;
+                return null;
             }
 
             clsApplication ReleaseApplication
@@ -222,27 +222,33 @@ namespace DVLD_Business
 
             if (ReleaseApplication == null)
             {
-                return false;
+                return null;
             }
 
             DateTime ReleaseDate = clsBusinessSettings.GetServerDateTime();
             if(ReleaseDate == DateTime.MinValue)
             {
-                return false;
+                return null;
             }
 
-            if ( clsDetainedLicenseData.ReleaseDetainedLicense(this.DetainID,
+            clsDetainedLicense DetainedLicense = FindByLicenseID(LicenseID);
+            if(DetainedLicense == null )
+            {
+                return null;
+            }
+
+            if ( clsDetainedLicenseData.ReleaseDetainedLicense(DetainedLicense.DetainID,
                   ReleaseDate, ReleasedByUserID, ReleaseApplication.ApplicationID))
             {
-                this.IsReleased = true;
-                this.ReleaseApplicationID = ReleaseApplication.ApplicationID;
-                this.ReleasedByUserID = ReleasedByUserID;
-                this.ReleaseDate = ReleaseDate;
-                this.ReleaseApplicationInfo.SetComplete();
-                return true;
+                DetainedLicense.IsReleased = true;
+                DetainedLicense.ReleaseApplicationID = ReleaseApplication.ApplicationID;
+                DetainedLicense.ReleasedByUserID = ReleasedByUserID;
+                DetainedLicense.ReleaseDate = ReleaseDate;
+                DetainedLicense.ReleaseApplicationInfo.SetComplete();
+                return DetainedLicense;
             }
 
-            return false;
+            return null;
         }
 
         private static clsDetainedLicense _CreateNewDetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
@@ -265,7 +271,7 @@ namespace DVLD_Business
             return new clsDetainedLicense(LicenseID, CurrentDate, FineFees, CreatedByUserID);
         }
 
-        public static clsDetainedLicense DetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
+        internal static clsDetainedLicense DetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
         {
             clsDetainedLicense license = _CreateNewDetainedLicense(LicenseID, FineFees, CreatedByUserID);
             if (license != null)

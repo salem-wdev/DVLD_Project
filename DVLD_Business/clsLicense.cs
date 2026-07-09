@@ -569,6 +569,22 @@ namespace DVLD_Business
             return null;
         }
 
+        public clsDetainedLicense Detain(float FineFees, int CreatedByUserID)
+        {
+            return clsDetainedLicense.DetainedLicense(this.LicenseID, FineFees, CreatedByUserID);
+        }
+
+        public bool Release(int ReleasedByUserID)
+        {
+            clsDetainedLicense DetainedLicense = clsDetainedLicense.ReleaseDetainedLicense(this.LicenseID, ReleasedByUserID);
+            if(DetainedLicense != null)
+            {
+                this._DetainedInfo = DetainedLicense;
+                return true;
+            }
+            return false;
+        }
+
     }
 
 }

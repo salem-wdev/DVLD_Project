@@ -32,14 +32,18 @@ namespace DVLD.Licenses.Detain_License
 
         private void CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected(int obj)
         {
+            llShowLicenseHistory.Enabled = false;
+            llShowLicenseInfo.Enabled = false;
+            btnDetain.Enabled = false;
+
             if (obj > 0)
             {
-                if(!clsLicense.IsLicenseActive(obj))
+                if(!ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.IsActive)
                 {
                     MessageBox.Show("This License is not active", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                if (clsDetainedLicense.IsLicenseDetained(obj))
+                if (ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.IsDetained)
                 {
                     MessageBox.Show("This License is already Detained.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -70,7 +74,7 @@ namespace DVLD.Licenses.Detain_License
                 return;
             }
 
-            _DetainedLicense = clsDetainedLicense.DetainedLicense(_SelectedLicenseID, float.Parse(txtFineFees.Text), clsGlobal.CurrentUser.UserID);
+            _DetainedLicense = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Detain(float.Parse(txtFineFees.Text), clsGlobal.CurrentUser.UserID);
             if (_DetainedLicense == null)
             {
                 llShowLicenseInfo.Enabled = false;
