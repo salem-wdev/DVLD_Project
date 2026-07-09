@@ -84,7 +84,7 @@ namespace DVLD.Applications.Rlease_Detained_License
         private void btnRelease_Click(object sender, EventArgs e)
         {
 
-            if (!_DetainedLicense.ReleaseDetainedLicense(clsGlobal.CurrentUser.UserID))
+            if (!ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Release(clsGlobal.CurrentUser.UserID))
             {
                 MessageBox.Show("Failed to release license.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
