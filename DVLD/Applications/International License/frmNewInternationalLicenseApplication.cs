@@ -40,8 +40,11 @@ namespace DVLD.Applications.International_License
 
         private void CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected(int obj)
         {
+            llShowLicenseHistory.Enabled = false;
+            btnIssueLicense.Enabled = false;
             if (obj > 0)
             {
+                llShowLicenseHistory.Enabled = true;
                 int InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DriverID);
                 if (InternationalLicenseID > 0)
                 {
@@ -50,7 +53,6 @@ namespace DVLD.Applications.International_License
                 }
                 _NewInternationalLicenseID = -1;
                 _NewInternationalLicense = null;
-                llShowLicenseHistory.Enabled = true;
                 btnIssueLicense.Enabled = true;
                 lblLocalLicenseID.Text = obj.ToString();
             }
