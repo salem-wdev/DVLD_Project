@@ -18,7 +18,7 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
 
         int _ReplacedLicenseID = -1;
         clsLicense _ReplacedLicense = null;
-        clsApplication.enApplicationType ReplaceReason = clsApplication.enApplicationType.ReplaceLostDrivingLicense;
+        clsApplication.enApplicationType _ReplaceReason = clsApplication.enApplicationType.ReplaceLostDrivingLicense;
         clsLicense.enIssueReason _IssueReason = clsLicense.enIssueReason.LostReplacement;
         public frmReplaceLostOrDamagedLicenseApplication()
         {
@@ -29,18 +29,21 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
         {
             if (rbDamagedLicense.Checked)
             {
-                ReplaceReason = clsApplication.enApplicationType.ReplaceDamagedDrivingLicense;
+                _ReplaceReason = clsApplication.enApplicationType.ReplaceDamagedDrivingLicense;
                 _IssueReason = clsLicense.enIssueReason.DamagedReplacement;
-
+                lblTitle.Text = "Replacement for Damaged License";
+                this.Text = lblTitle.Text;
             }
             else
             {
-                ReplaceReason = clsApplication.enApplicationType.ReplaceLostDrivingLicense;
+                _ReplaceReason = clsApplication.enApplicationType.ReplaceLostDrivingLicense;
                 _IssueReason = clsLicense.enIssueReason.LostReplacement;
+                lblTitle.Text = "Replacement for Lost License";
+                this.Text = lblTitle.Text;
             }
 
             lblApplicationFees.Text = clsApplicationType.Find
-                    ((int)ReplaceReason).ApplicationTypeFees.ToString("0.##");
+                    ((int)_ReplaceReason).ApplicationTypeFees.ToString("0.##");
 
         }
 
@@ -117,10 +120,8 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
 
         private void btnIssueReplacement_Click(object sender, EventArgs e)
         {
-            _ReplacedLicense = clsLicense.Replace
-                (ctrlDriverLicenseInfoWithFilter1.SelectedLicenseID, 
-                clsGlobal.CurrentUser.UserID,
-                ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Notes, _IssueReason);
+            _ReplacedLicense = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Replace
+                (clsGlobal.CurrentUser.UserID, _IssueReason);
 
             if( _ReplacedLicense == null)
             {

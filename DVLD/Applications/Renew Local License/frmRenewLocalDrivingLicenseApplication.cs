@@ -77,7 +77,7 @@ namespace DVLD.Applications.Renew_Local_License
 
         private void btnRenewLicense_Click(object sender, EventArgs e)
         {
-            _NewLicense = clsLicense.RenewLicense(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseID, txtNotes.Text, clsGlobal.CurrentUser.UserID);
+            _NewLicense = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Renew(txtNotes.Text, clsGlobal.CurrentUser.UserID);
             if(_NewLicense == null)
             {
                 llShowLicenseInfo.Enabled = false;

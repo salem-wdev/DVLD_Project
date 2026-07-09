@@ -526,9 +526,9 @@ namespace DVLD_Business
             return clsLicenseData.DeactivateExpiredLicenses();
         }
 
-        public static clsLicense RenewLicense(int LicenseID, string Notes, int CreatedByUserID)
+        public clsLicense Renew(string Notes, int CreatedByUserID)
         {
-            clsLicense license = _PrepareRenewLicense(LicenseID, Notes, CreatedByUserID);
+            clsLicense license = _PrepareRenewLicense(this.LicenseID, Notes, CreatedByUserID);
 
             if (license != null)
             {
@@ -556,9 +556,9 @@ namespace DVLD_Business
             return null;
         }
 
-        public static clsLicense Replace(int LicenseID, int CreatedByUserID, string Notes, enIssueReason IssueReason)
+        public clsLicense Replace(int CreatedByUserID, enIssueReason IssueReason)
         {
-            clsLicense license = _PrepareReplacementLicense(LicenseID, CreatedByUserID, Notes, IssueReason);
+            clsLicense license = _PrepareReplacementLicense(this.LicenseID, CreatedByUserID, Notes, IssueReason);
             if (license != null)
             {
                 if (license.Save())
