@@ -98,8 +98,21 @@ namespace DVLD.Licenses.Controls
 
         private void _ResetData()
         {
-            _dtAllLocalDrivingLicenses.Clear();
-            _dtAllInternationalDrivingLicenses.Clear();
+            if (_dtAllLocalDrivingLicenses != null)
+            {
+                if (_dtAllLocalDrivingLicenses.Rows.Count > 0)
+                {
+                    _dtAllLocalDrivingLicenses.Clear();
+                }
+            }
+
+            if (_dtAllInternationalDrivingLicenses != null)
+            {
+                if (_dtAllInternationalDrivingLicenses.Rows.Count > 0)
+                {
+                    _dtAllInternationalDrivingLicenses.Clear();
+                }
+            }
         }
 
         public void ResetData()
