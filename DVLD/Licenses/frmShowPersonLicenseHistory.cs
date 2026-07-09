@@ -51,6 +51,7 @@ namespace DVLD.Licenses.Local_Licenses
             if (driver == null)
             {
                 MessageBox.Show("Selected person is not a driver!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ctrlPersonCardWithFilter1.FilterFocus();
                 return;
             }
 
