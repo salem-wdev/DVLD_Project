@@ -64,8 +64,12 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             lblDriverID.Text = _License.DriverID.ToString();
             lblIssueDate.Text = clsFormat.DateToShort(_License.IssueDate);
             lblExpirationDate.Text = clsFormat.DateToShort(_License.ExpirationDate);
-            lblIssueReason.Text = _License.IssueReasonText;
             lblNotes.Text = _License.Notes == "" ? "No Notes" : _License.Notes;
+            lblIssueReason.Text = _License.IssueReasonText;
+
+            // 
+            toolTip1.SetToolTip(lblNotes, lblNotes.Text);
+            toolTip1.SetToolTip(lblIssueReason, lblIssueReason.Text);
             _LoadPersonImage();
         }
 

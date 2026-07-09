@@ -28,7 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblIsDetained = new System.Windows.Forms.Label();
+            this.pictureBox12 = new System.Windows.Forms.PictureBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.lblIssueReason = new System.Windows.Forms.Label();
             this.pictureBox11 = new System.Windows.Forms.PictureBox();
             this.label9 = new System.Windows.Forms.Label();
@@ -66,10 +70,9 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.pbPersonImage = new System.Windows.Forms.PictureBox();
-            this.lblIsDetained = new System.Windows.Forms.Label();
-            this.pictureBox12 = new System.Windows.Forms.PictureBox();
-            this.label11 = new System.Windows.Forms.Label();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox12)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
@@ -83,7 +86,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPersonImage)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox12)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -138,9 +140,42 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Driver License Info";
             // 
+            // lblIsDetained
+            // 
+            this.lblIsDetained.AutoSize = true;
+            this.lblIsDetained.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblIsDetained.Location = new System.Drawing.Point(524, 252);
+            this.lblIsDetained.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblIsDetained.Name = "lblIsDetained";
+            this.lblIsDetained.Size = new System.Drawing.Size(53, 20);
+            this.lblIsDetained.TabIndex = 198;
+            this.lblIsDetained.Text = "[????]";
+            // 
+            // pictureBox12
+            // 
+            this.pictureBox12.Image = global::DVLD.Properties.Resources.Question_32;
+            this.pictureBox12.Location = new System.Drawing.Point(484, 252);
+            this.pictureBox12.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.pictureBox12.Name = "pictureBox12";
+            this.pictureBox12.Size = new System.Drawing.Size(31, 26);
+            this.pictureBox12.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox12.TabIndex = 197;
+            this.pictureBox12.TabStop = false;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(367, 252);
+            this.label11.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(112, 20);
+            this.label11.TabIndex = 196;
+            this.label11.Text = "Is Detained?";
+            // 
             // lblIssueReason
             // 
-            this.lblIssueReason.AutoSize = true;
+            this.lblIssueReason.AutoEllipsis = true;
             this.lblIssueReason.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblIssueReason.Location = new System.Drawing.Point(180, 250);
             this.lblIssueReason.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
@@ -339,7 +374,7 @@
             // 
             // lblNotes
             // 
-            this.lblNotes.AutoSize = true;
+            this.lblNotes.AutoEllipsis = true;
             this.lblNotes.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblNotes.Location = new System.Drawing.Point(180, 286);
             this.lblNotes.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
@@ -549,38 +584,11 @@
             this.pbPersonImage.TabIndex = 112;
             this.pbPersonImage.TabStop = false;
             // 
-            // lblIsDetained
+            // toolTip1
             // 
-            this.lblIsDetained.AutoSize = true;
-            this.lblIsDetained.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblIsDetained.Location = new System.Drawing.Point(524, 252);
-            this.lblIsDetained.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.lblIsDetained.Name = "lblIsDetained";
-            this.lblIsDetained.Size = new System.Drawing.Size(53, 20);
-            this.lblIsDetained.TabIndex = 198;
-            this.lblIsDetained.Text = "[????]";
-            // 
-            // pictureBox12
-            // 
-            this.pictureBox12.Image = global::DVLD.Properties.Resources.Question_32;
-            this.pictureBox12.Location = new System.Drawing.Point(484, 252);
-            this.pictureBox12.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.pictureBox12.Name = "pictureBox12";
-            this.pictureBox12.Size = new System.Drawing.Size(31, 26);
-            this.pictureBox12.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox12.TabIndex = 197;
-            this.pictureBox12.TabStop = false;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(367, 252);
-            this.label11.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(112, 20);
-            this.label11.TabIndex = 196;
-            this.label11.Text = "Is Detained?";
+            this.toolTip1.IsBalloon = true;
+            this.toolTip1.ShowAlways = true;
+            this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             // 
             // ctrlDriverLicenseInfo
             // 
@@ -593,6 +601,7 @@
             this.Size = new System.Drawing.Size(867, 339);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox12)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
@@ -606,7 +615,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPersonImage)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox12)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -654,5 +662,6 @@
         private System.Windows.Forms.Label lblIsDetained;
         private System.Windows.Forms.PictureBox pictureBox12;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
