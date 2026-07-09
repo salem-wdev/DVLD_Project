@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DVLD_Business;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -45,11 +46,15 @@ namespace DVLD.Licenses.Local_Licenses
         private void CtrlPersonCardWithFilter1_OnPersonSelected(int obj)
         {
             _PersonID = obj;
+            clsDriver driver = clsDriver.FindByPersonID(_PersonID);
+            if (driver == null)
+            {
+                MessageBox.Show("Selected person is not a driver!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             if (_PersonID > 0)
             {
-                ctrlPersonCardWithFilter1.FilterEnabled = false;
-                ctrlPersonCardWithFilter1.LoadPersonInfo(_PersonID);
                 ctrlDriverLicenses1.LoadInfoByPersonID(_PersonID);
             }
             else
