@@ -99,7 +99,7 @@
             this.toolStripMenuItem1,
             this.releaseDetainedLicenseToolStripMenuItem});
             this.cmsApplications.Name = "contextMenuStrip1";
-            this.cmsApplications.Size = new System.Drawing.Size(328, 184);
+            this.cmsApplications.Size = new System.Drawing.Size(328, 162);
             this.cmsApplications.Opening += new System.ComponentModel.CancelEventHandler(this.cmsApplications_Opening);
             // 
             // PesonDetailsToolStripMenuItem
@@ -291,6 +291,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.dgvDetainedLicenses);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmListDetainedLicenses";
             this.Text = "frmListDetainedLicenses";
             this.Load += new System.EventHandler(this.frmListDetainedLicenses_Load);
