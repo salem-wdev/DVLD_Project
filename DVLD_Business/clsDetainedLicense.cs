@@ -265,7 +265,7 @@ namespace DVLD_Business
             return new clsDetainedLicense(LicenseID, CurrentDate, FineFees, CreatedByUserID);
         }
 
-        public static clsDetainedLicense DetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
+        internal static clsDetainedLicense DetainedLicense(int LicenseID, float FineFees, int CreatedByUserID)
         {
             clsDetainedLicense license = _CreateNewDetainedLicense(LicenseID, FineFees, CreatedByUserID);
             if (license != null)
