@@ -63,6 +63,7 @@
             this.signOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainImageList = new System.Windows.Forms.ImageList(this.components);
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.licenseHistoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -78,13 +79,14 @@
             this.servicesToolStripMenuItem,
             this.peopleToolStripMenuItem,
             this.driversToolStripMenuItem,
+            this.licenseHistoryToolStripMenuItem,
             this.usersToolStripMenuItem,
             this.accountSettingsToolStripMenuItem});
             this.mainMenuStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.mainMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.mainMenuStrip.Name = "mainMenuStrip";
             this.mainMenuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.mainMenuStrip.Size = new System.Drawing.Size(1236, 80);
+            this.mainMenuStrip.Size = new System.Drawing.Size(1268, 80);
             this.mainMenuStrip.TabIndex = 0;
             this.mainMenuStrip.Text = "Main Menu";
             // 
@@ -377,16 +379,24 @@
             this.pictureBox1.Image = global::DVLD.Properties.Resources.DVLD_Logo;
             this.pictureBox1.Location = new System.Drawing.Point(0, 80);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1236, 612);
+            this.pictureBox1.Size = new System.Drawing.Size(1268, 612);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
+            // 
+            // licenseHistoryToolStripMenuItem
+            // 
+            this.licenseHistoryToolStripMenuItem.Image = global::DVLD.Properties.Resources.PersonLicenseHistory_512;
+            this.licenseHistoryToolStripMenuItem.Name = "licenseHistoryToolStripMenuItem";
+            this.licenseHistoryToolStripMenuItem.Size = new System.Drawing.Size(258, 76);
+            this.licenseHistoryToolStripMenuItem.Text = "License History";
+            this.licenseHistoryToolStripMenuItem.Click += new System.EventHandler(this.licenseHistoryToolStripMenuItem_Click);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1236, 692);
+            this.ClientSize = new System.Drawing.Size(1268, 692);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.mainMenuStrip);
             this.IsMdiContainer = true;
@@ -440,6 +450,7 @@
         private System.Windows.Forms.ToolStripMenuItem releaseDetainedLicenseToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem manageApplicationTypesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem manageTestTypesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem licenseHistoryToolStripMenuItem;
     }
 }
 

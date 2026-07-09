@@ -7,6 +7,7 @@ using DVLD.Applications.ReplaceLostOrDamagedLicense;
 using DVLD.Applications.Rlease_Detained_License;
 using DVLD.Drivers;
 using DVLD.Licenses.Detain_License;
+using DVLD.Licenses.Local_Licenses;
 using DVLD.People.Forms;
 using DVLD.Tests.Test_Types;
 using DVLD.Users;
@@ -165,6 +166,12 @@ namespace DVLD
         {
             //MessageBox.Show("This feature is not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         frmListInternationalLicesnseApplications frm = new frmListInternationalLicesnseApplications();
+            frm.ShowDialog();
+        }
+
+        private void licenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmShowPersonLicenseHistory frm = new frmShowPersonLicenseHistory();
             frm.ShowDialog();
         }
     }
