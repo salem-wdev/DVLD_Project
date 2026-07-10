@@ -58,14 +58,15 @@ namespace DVLD.Applications.International_License
                     return;
                 }
 
-                int InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID
-                    (ctrlDriverLicenseInfoWithFilter1?.SelectedLicenseInfo?.DriverID ?? -2);
-                if (InternationalLicenseID == -2)
+                int DriverID = ctrlDriverLicenseInfoWithFilter1?.SelectedLicenseInfo?.DriverID ?? -1;
+                if (DriverID == -1)
                 {
                     MessageBox.Show("Driver data is missing.\nPlease reload or re-select the license.", "Data Loading Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
+                int InternationalLicenseID = clsInternationalLicense
+                    .GetActiveInternationalLicenseIDByDriverID(DriverID);
                 if (InternationalLicenseID > 0)
                 {
                     MessageBox.Show("This Driver already has an Active International License with ID = " + InternationalLicenseID.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
