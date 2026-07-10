@@ -450,7 +450,7 @@
             this.Controls.Add(this.lblTitle);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmNewInternationalLicenseApplication";
-            this.Text = "frmNewInternationalLicenseApplication";
+            this.Text = "Issue new International License";
             this.Activated += new System.EventHandler(this.frmNewInternationalLicenseApplication_Activated);
             this.Load += new System.EventHandler(this.frmNewInternationalLicenseApplication_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
