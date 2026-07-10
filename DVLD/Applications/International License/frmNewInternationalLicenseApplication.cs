@@ -45,13 +45,16 @@ namespace DVLD.Applications.International_License
             if (obj > 0)
             {
                 llShowLicenseHistory.Enabled = true;
-                if (clsLicense.Find(obj).LicenseClassID != 3)
+                if ((clsLicense.Find(obj)?.LicenseClassID ?? -1) != 3)
                 {
                     MessageBox.Show("License most be class (3)!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                int InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DriverID);
+                int InternationalLicenseID = -1;
+                InternationalLicenseID
+                    = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID
+                    (ctrlDriverLicenseInfoWithFilter1?.SelectedLicenseInfo?.DriverID ?? -1);
                 if (InternationalLicenseID > 0)
                 {
                     MessageBox.Show("This Driver already has an Active International License with ID = " + InternationalLicenseID.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
