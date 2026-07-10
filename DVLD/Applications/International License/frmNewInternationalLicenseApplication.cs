@@ -45,7 +45,14 @@ namespace DVLD.Applications.International_License
             if (obj > 0)
             {
                 llShowLicenseHistory.Enabled = true;
-                if ((clsLicense.Find(obj)?.LicenseClassID ?? -1) != 3)
+                int LicenseClass = (clsLicense.Find(obj)?.LicenseClassID ?? -1);
+                if (LicenseClass < 1)
+                {
+                    MessageBox.Show("License not Existes!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (LicenseClass != 3)
                 {
                     MessageBox.Show("License most be class (3)!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
