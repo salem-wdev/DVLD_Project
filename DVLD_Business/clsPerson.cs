@@ -16,7 +16,23 @@ namespace DVLD_Business
         public enMode Mode { get; private set; }
 
         public int PersonID { get; private set; }
-        public string NationalNo { get; set; }
+        private bool _IsNationalNoChanged = false;
+        private string _NationalNo = "";
+
+        public string NationalNo {
+            get
+            {
+                return _NationalNo;
+            }
+            set
+            {
+                if (value != _NationalNo)
+                {
+                    _IsNationalNoChanged = true;
+                    _NationalNo = value;
+                }
+            }
+        }
         public string FirstName { get; set; }
         public string SecondName { get; set; } 
         public string ThirdName { get; set; }
@@ -96,7 +112,7 @@ namespace DVLD_Business
             this.SecondName = SecondName;
             this.ThirdName = ThirdName;
             this.LastName = LastName;
-            this.NationalNo = NationalNo;
+            this._NationalNo = NationalNo;
             this.DateOfBirth = DateOfBirth;
             this.Gender = Gender;
             this.Address = Address;
@@ -120,7 +136,7 @@ namespace DVLD_Business
             this.SecondName = SecondName;
             this.ThirdName = ThirdName;
             this.LastName = LastName;
-            this.NationalNo = NationalNo;
+            this._NationalNo = NationalNo;
             this.DateOfBirth = DateOfBirth;
             this.Gender = (enGenderType)Gender;
             this.Address = Address;
@@ -153,7 +169,12 @@ namespace DVLD_Business
 
         private bool _UpdatePerson()
         {
-            if (IsPersonExists(NationalNo))
+            if (string.IsNullOrWhiteSpace(_NationalNo))
+            {
+                return false;
+            }
+
+            if (_IsNationalNoChanged && IsPersonExists(NationalNo))
             {
                 return false;
             }
