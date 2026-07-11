@@ -85,7 +85,7 @@ namespace DVLD.People.Forms
             if (_Mode == enMode.AddNew)
             {
                 lblTitle.Text = "Add New Person";
-                _Person = new clsPerson();
+                _Person = null;
             }
             else
             {
@@ -122,25 +122,30 @@ namespace DVLD.People.Forms
 
         private bool _SavePerson()
         {
-            bool IsSaved = false;
 
-            switch (_Mode)
+            if (_Mode == enMode.AddNew)
             {
-                case enMode.AddNew:
-                    IsSaved = _Person.Save();
+                clsPerson.enGenderType Gender = rbMale.Checked ? clsPerson.enGenderType.Male
+                    : clsPerson.enGenderType.Female;
+
+                _Person = clsPerson.CreateNewPerson(txtNationalNo.Text, txtFirstName.Text, txtSecondName.Text,
+                    txtLastName.Text, dtpDateOfBirth.Value, Gender, txtAddress.Text, txtPhone.Text
+                    , (int)cmbNationality.SelectedValue, txtThirdName.Text, txtEmail.Text, pbPersonPhoto.ImageLocation);
+                if (_Person != null)
+                {
+
                     _Mode = enMode.Update;
                     lblTitle.Text = "Edit Person";
-                    break;
-                case enMode.Update:
-                    IsSaved = _Person.Save();
-                    break;
-                default:
-                    IsSaved = false;
-                    break;
+                    return true;
+            }
             }
 
-            return IsSaved;
+            if (_Mode == enMode.Update)
+            {
+                return _Person.Save();
+            }
 
+            return false;
         }
 
         private void _FillPersonWithData()
@@ -386,7 +391,7 @@ namespace DVLD.People.Forms
                 MessageBox.Show("Please correct the errors before saving.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-
+            if (_Mode == enMode.Update)
             _FillPersonWithData();
 
            
