@@ -390,6 +390,37 @@ namespace DVLD_DataAccess
 
         }
 
+        public static bool IsNationalNoUsed(int PersonID, string NationalNo)
+        {
+            bool IsUsed = false;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string Query = @"SELECT Found=1 FROM People
+                 WHERE NationalNo = @NationalNo AND PersonID != @PersonID;";
+
+            SqlCommand command = new SqlCommand(Query, connection);
+            command.Parameters.AddWithValue("@NationalNo", NationalNo);
+            command.Parameters.AddWithValue("@PersonID", PersonID);
+            try
+            {
+                connection.Open();
+                object scalar = command.ExecuteScalar();
+
+                IsUsed = (scalar != null);
+
+            }
+            catch { }
+            finally
+            {
+                connection.Close();
+            }
+
+            return IsUsed;
+
+        }
+
+
         public static bool DeletePerson(int PersonID)
         {
             int NumberOfEffectedRows = 0;

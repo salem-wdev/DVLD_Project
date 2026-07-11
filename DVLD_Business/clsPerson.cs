@@ -290,6 +290,11 @@ namespace DVLD_Business
             return clsPersonData.IsPersonExists(NationalNo);
         }
 
+        private static bool _IsNationalNoUsed(int PersonID, string NationalNo)
+        {
+            return clsPersonData.IsNationalNoUsed(PersonID, NationalNo);
+        }
+
         public static DataTable GetAllPeople()
         {
             return clsPersonData.GetAllPeople();
