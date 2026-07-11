@@ -102,6 +102,8 @@ namespace DVLD_Business
 
         public static clsInternationalLicense FindByInternationalLicenseID(int InternationalLicenseID)
         {
+            if (InternationalLicenseID <= 0) return null; // To prevent unnessasry database connection.
+
             int ApplicationID = -1;
             int DriverID = -1; int IssuedUsingLocalLicenseID = -1;
             DateTime IssueDate = DateTime.Now; DateTime ExpirationDate = DateTime.Now;
@@ -186,6 +188,7 @@ namespace DVLD_Business
 
         public static int GetActiveInternationalLicenseIDByDriverID(int DriverID)
         {
+            if (DriverID <= 0) return -1; // To prevent unnessasry database connection.
 
             return clsInternationalLicenseData.GetActiveInternationalLicenseIDByDriverID(DriverID);
 
@@ -193,11 +196,16 @@ namespace DVLD_Business
 
         public static DataTable GetDriverInternationalLicenses(int DriverID)
         {
+            if (DriverID <= 0) return null; // To prevent unnessasry database connection.
+
             return clsInternationalLicenseData.GetDriverInternationalLicenses(DriverID);
         }
 
         private static bool _IsDriverEligibleForInternationalLicense(int DriverID,out int LocalLicenseID)
         {
+            LocalLicenseID = -1;
+            if (DriverID <= 0) return false; // To prevent unnessasry database connection.
+
             LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
             if (LocalLicenseID == -1)
             {
@@ -220,20 +228,27 @@ namespace DVLD_Business
 
         public static bool IsDriverEligibleForInternationalLicense(int DriverID)
         {
+            if (DriverID <= 0) return false; // To prevent unnessasry database connection.
+
             int LocalLicenseID;
             return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
         }
 
         public static bool IsDriverEligibleForInternationalLicense(int DriverID, out int LocalLicenseID)
         {
+            LocalLicenseID = -1;
+            if (DriverID <= 0) return false; // To prevent unnessasry database connection.
+
             return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
         }
 
         private static clsInternationalLicense _GetNewInternationalLicense(int DriverID, int CreatedByUser)
         {
+
             clsInternationalLicense InternationalLicense = null;
-            
-            int LocalLicenseID;
+
+            int LocalLicenseID = -1;
+            if (DriverID <= 0) return null; // To prevent unnessasry database connection.
 
             if (!IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID))
             {
@@ -270,6 +285,8 @@ namespace DVLD_Business
 
         public static clsInternationalLicense IssueNewInternationalLicense(int DriverID, int CreatedByUser)
         {
+            if (DriverID <= 0) return null; // To prevent unnessasry database connection.
+
             clsInternationalLicense InternationalLicense = _GetNewInternationalLicense(DriverID, CreatedByUser);
             if (InternationalLicense != null)
             {

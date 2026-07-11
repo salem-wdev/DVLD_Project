@@ -68,7 +68,6 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             if (clsLicense.Find(_LicenseID) != null)
             {
                 ctrlDriverLicenseInfo1.LoadData(_LicenseID);
-                LicenseSelected(_LicenseID); // Raise the event when a driver is found
             }
             else
             {
@@ -76,6 +75,7 @@ namespace DVLD.Licenses.Local_Licenses.Controls
                 MessageBox.Show("License not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 ctrlDriverLicenseInfo1.ClearData();
             }
+            LicenseSelected(_LicenseID); // Raise the event
         }
 
         public void LoadLicense(int LicenseID)

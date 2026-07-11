@@ -40,9 +40,33 @@ namespace DVLD.Applications.International_License
 
         private void CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected(int obj)
         {
+            llShowLicenseHistory.Enabled = false;
+            btnIssueLicense.Enabled = false;
             if (obj > 0)
             {
-                int InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DriverID);
+                llShowLicenseHistory.Enabled = true;
+                int LicenseClass = (clsLicense.Find(obj)?.LicenseClassID ?? -1);
+                if (LicenseClass < 1)
+                {
+                    MessageBox.Show("License not Existes!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (LicenseClass != 3)
+                {
+                    MessageBox.Show("License most be class (3)!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                int DriverID = ctrlDriverLicenseInfoWithFilter1?.SelectedLicenseInfo?.DriverID ?? -1;
+                if (DriverID == -1)
+                {
+                    MessageBox.Show("Driver data is missing.\nPlease reload or re-select the license.", "Data Loading Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                int InternationalLicenseID = clsInternationalLicense
+                    .GetActiveInternationalLicenseIDByDriverID(DriverID);
                 if (InternationalLicenseID > 0)
                 {
                     MessageBox.Show("This Driver already has an Active International License with ID = " + InternationalLicenseID.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -50,7 +74,6 @@ namespace DVLD.Applications.International_License
                 }
                 _NewInternationalLicenseID = -1;
                 _NewInternationalLicense = null;
-                llShowLicenseHistory.Enabled = true;
                 btnIssueLicense.Enabled = true;
                 lblLocalLicenseID.Text = obj.ToString();
             }
