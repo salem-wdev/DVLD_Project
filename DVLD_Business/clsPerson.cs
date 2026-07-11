@@ -153,6 +153,11 @@ namespace DVLD_Business
 
         private bool _UpdatePerson()
         {
+            if (IsPersonExists(NationalNo))
+            {
+                return false;
+            }
+
             if (this._IsImagePathChanged && !string.IsNullOrWhiteSpace(this.ImagePath))
             {
                 string sourceFilePath = this.ImagePath;
@@ -163,7 +168,7 @@ namespace DVLD_Business
                 this.ImagePath = sourceFilePath;
             }
 
-            if( clsPersonData.UpdatePerson(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
+            if ( clsPersonData.UpdatePerson(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
                 , DateOfBirth, (short)Gender, Address, Phone, Email, NationalityCountryID, ImagePath))
             {
                 if (!string.IsNullOrEmpty(_OldImagePath))
