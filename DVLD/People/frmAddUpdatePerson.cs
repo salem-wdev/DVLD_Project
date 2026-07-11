@@ -137,7 +137,7 @@ namespace DVLD.People.Forms
                     _Mode = enMode.Update;
                     lblTitle.Text = "Edit Person";
                     return true;
-            }
+                }
             }
 
             if (_Mode == enMode.Update)
@@ -348,20 +348,23 @@ namespace DVLD.People.Forms
                 e.Cancel = true;
                 return;
             }
-            else
-            {
-                errorProvider1.SetError(txtNationalNo, string.Empty);
-            }
-
-            if (txtNationalNo.Text.Trim() != _Person.NationalNo && clsPerson.IsPersonExists(txtNationalNo.Text.Trim()))
+            
+            if (_Mode == enMode.Update && txtNationalNo.Text.Trim() != _Person.NationalNo && clsPerson.IsPersonExists(txtNationalNo.Text.Trim()))
             {
                 errorProvider1.SetError(txtNationalNo, "Invalid National No.");
                 e.Cancel = true;
+                return;
             }
-            else
+
+            if (_Mode == enMode.AddNew && clsPerson.IsPersonExists(txtNationalNo.Text.Trim()))
             {
-                errorProvider1.SetError(txtNationalNo, string.Empty);
+                errorProvider1.SetError(txtNationalNo, "Invalid National No.");
+                e.Cancel = true;
+                return;
             }
+
+            errorProvider1.SetError(txtNationalNo, string.Empty);
+            
         }
       
         private void txt_Validating(object sender, CancelEventArgs e)
@@ -392,18 +395,18 @@ namespace DVLD.People.Forms
                 return;
             }
             if (_Mode == enMode.Update)
-            _FillPersonWithData();
+                _FillPersonWithData();
 
-           
-                if (_SavePerson())
-                {
-                    MessageBox.Show("Saved Successfully", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
-                    lblPersonID.Text = _Person.PersonID.ToString();
-                }
-                else
-                {
-                    MessageBox.Show("Failed to save", "Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+
+            if (_SavePerson())
+            {
+                MessageBox.Show("Saved Successfully", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                lblPersonID.Text = _Person.PersonID.ToString();
+            }
+            else
+            {
+                MessageBox.Show("Failed to save", "Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnClose_Click(object sender, EventArgs e)
