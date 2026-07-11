@@ -68,7 +68,7 @@ namespace DVLD_Business
             }
         }
 
-        public clsPerson()
+        private clsPerson()
         {
             PersonID = -1;
             FirstName = string.Empty;
@@ -87,7 +87,27 @@ namespace DVLD_Business
             Mode = enMode.AddNew;
         }
 
-        
+        private clsPerson(string FirstName, string SecondName, string ThirdName
+           , string LastName, string NationalNo, DateTime DateOfBirth, enGenderType Gender
+           , string Address, string Phone, string Email, int NationalityCountryID
+           , string ImagePath)
+        {
+            this.FirstName = FirstName;
+            this.SecondName = SecondName;
+            this.ThirdName = ThirdName;
+            this.LastName = LastName;
+            this.NationalNo = NationalNo;
+            this.DateOfBirth = DateOfBirth;
+            this.Gender = Gender;
+            this.Address = Address;
+            this.Phone = Phone;
+            this.Email = Email;
+            this.NationalityCountryID = NationalityCountryID;
+            this._ImagePath = ImagePath;
+
+            Mode = enMode.AddNew;
+        }
+
 
         // New overload that sets PersonID so instances returned from Find have correct ID
         private clsPerson(int PersonID, string FirstName, string SecondName, string ThirdName
@@ -279,5 +299,68 @@ namespace DVLD_Business
             return clsPersonData.HasPeople();
         }
 
+        private static bool _IsValidInfo(string NationalNo, string FirstName, string SecondName,
+             string LastName, DateTime DateOfBirth,string Address,
+            string Phone, int NationalityCountryID, string Email = "")
+        {
+            string[] Array = new string[] { NationalNo, FirstName, SecondName, LastName, Address, Phone, };
+            if (Array.Any(string.IsNullOrWhiteSpace))
+            {
+                return false;
+            }
+
+            if (NationalityCountryID < 1 || NationalityCountryID > 191)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(Email) && !Email.Contains("@"))
+            {
+                return false;
+            }
+
+            if (DateOfBirth > clsBusinessSettings.GetServerDateTime().AddYears(-18))
+            {
+                return false;
+            }
+
+            if (IsPersonExists(NationalNo))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static clsPerson _GetReadyObj(string NationalNo, string FirstName, string SecondName,
+             string LastName, DateTime DateOfBirth, enGenderType Gender, string Address,
+            string Phone, int NationalityCountryID, string ThirdName = "", string Email = "", string ImagePath = "")
+        {
+
+            if (_IsValidInfo(NationalNo, FirstName, SecondName, LastName, DateOfBirth
+                , Address, Phone, NationalityCountryID, Email))
+            {
+                return null;
+            }
+
+            return new clsPerson(FirstName, SecondName, ThirdName, LastName, NationalNo, DateOfBirth
+                , Gender, Address, Phone, Email, NationalityCountryID, ImagePath);
+        }
+
+        public static clsPerson CreateNewPerson(string NationalNo, string FirstName, string SecondName,
+             string LastName, DateTime DateOfBirth, enGenderType Gender, string Address,
+            string Phone, int NationalityCountryID, string ThirdName = "", string Email = "", string ImagePath = "")
+        {
+            clsPerson NewPerson = _GetReadyObj(NationalNo, FirstName, SecondName, LastName, DateOfBirth, Gender
+                , Address, Phone, NationalityCountryID, ThirdName, Email, ImagePath);
+            if(NewPerson != null)
+            {
+                if(NewPerson.Save())
+                {
+                    return NewPerson;
+                }
+            }
+            return null;
+        }
     }
 }
