@@ -337,7 +337,7 @@ namespace DVLD_Business
             string Phone, int NationalityCountryID, string ThirdName = "", string Email = "", string ImagePath = "")
         {
 
-            if (_IsValidInfo(NationalNo, FirstName, SecondName, LastName, DateOfBirth
+            if (!_IsValidInfo(NationalNo, FirstName, SecondName, LastName, DateOfBirth
                 , Address, Phone, NationalityCountryID, Email))
             {
                 return null;
