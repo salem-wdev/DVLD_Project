@@ -174,7 +174,7 @@ namespace DVLD_Business
                 return false;
             }
 
-            if (_IsNationalNoChanged && IsPersonExists(NationalNo))
+            if (_IsNationalNoChanged && _IsNationalNoUsed(this.PersonID, NationalNo))
             {
                 return false;
             }
