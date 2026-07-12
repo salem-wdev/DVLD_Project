@@ -75,11 +75,14 @@ namespace DVLD_Business
             }
             set
             {
-                if (value != _ImagePath)
+                if (value != _OldImagePath)
                 {
                     _IsImagePathChanged = true;
-                    _OldImagePath = _ImagePath;
                     _ImagePath = value;
+                }
+                else
+                {
+                    _IsImagePathChanged = false;
                 }
             }
         }
@@ -144,6 +147,7 @@ namespace DVLD_Business
             this.Email = Email;
             this.NationalityCountryID = NationalityCountryID;
             this._ImagePath = ImagePath;
+            this._OldImagePath = ImagePath;
 
             Mode = enMode.Update;
         }
@@ -157,14 +161,29 @@ namespace DVLD_Business
                 {
                     return false;
                 }
-                this.ImagePath = sourceFilePath;
+                this._ImagePath = sourceFilePath;
             }
             
             this.PersonID = clsPersonData.AddNewPerson(this.FirstName,  this.SecondName,  this.ThirdName
                 , this.LastName,  this.NationalNo,  this.DateOfBirth,  (short)this.Gender,  this.Address,  this.Phone,  this.Email
                 , this.NationalityCountryID,  this.ImagePath);
 
-            return (PersonID != -1);
+            if (PersonID != -1)
+            {
+                this._OldImagePath = this._ImagePath;
+                this._IsImagePathChanged = false;
+                return true;
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(_ImagePath) && this._IsImagePathChanged)
+                {
+                    clsFileStorage.DeleteFile(_ImagePath);
+                    this._ImagePath = this._OldImagePath;
+                    this._IsImagePathChanged = false;
+                }
+            }
+            return false;
         }
 
         private bool _UpdatePerson()
@@ -186,21 +205,30 @@ namespace DVLD_Business
                 {
                     return false;
                 }
-                this.ImagePath = sourceFilePath;
+                this._ImagePath = sourceFilePath;
             }
 
             if ( clsPersonData.UpdatePerson(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
                 , DateOfBirth, (short)Gender, Address, Phone, Email, NationalityCountryID, ImagePath))
             {
-                if (!string.IsNullOrEmpty(_OldImagePath))
-                    if (clsFileStorage.DeleteFile(_OldImagePath))
-                    {
-                        _IsImagePathChanged = false;
-                        _OldImagePath = "";
-                    }
+                if (!string.IsNullOrEmpty(_OldImagePath) && this._IsImagePathChanged)
+                {
+                    clsFileStorage.DeleteFile(_OldImagePath);
+                }
+                _IsImagePathChanged = false;
+
+                _OldImagePath = _ImagePath;
                 return true;
             }
-            return false;
+            else if (!string.IsNullOrEmpty(_ImagePath) && this._IsImagePathChanged)
+            {
+                if(clsFileStorage.DeleteFile(_ImagePath))
+                {
+                    _ImagePath = _OldImagePath;
+                    _IsImagePathChanged = false;
+                }
+            }
+                return false;
         }
 
         public static bool Delete(int PersonID)
