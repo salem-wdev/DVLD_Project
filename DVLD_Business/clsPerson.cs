@@ -123,6 +123,7 @@ namespace DVLD_Business
             this.Email = Email;
             this.NationalityCountryID = NationalityCountryID;
             this._ImagePath = ImagePath;
+            this._OldImagePath = ImagePath;
 
             Mode = enMode.AddNew;
         }
