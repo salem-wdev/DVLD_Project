@@ -16,7 +16,23 @@ namespace DVLD_Business
         public enMode Mode { get; private set; }
 
         public int PersonID { get; private set; }
-        public string NationalNo { get; set; }
+        private bool _IsNationalNoChanged = false;
+        private string _NationalNo = "";
+
+        public string NationalNo {
+            get
+            {
+                return _NationalNo;
+            }
+            set
+            {
+                if (value != _NationalNo)
+                {
+                    _IsNationalNoChanged = true;
+                    _NationalNo = value;
+                }
+            }
+        }
         public string FirstName { get; set; }
         public string SecondName { get; set; } 
         public string ThirdName { get; set; }
@@ -59,16 +75,19 @@ namespace DVLD_Business
             }
             set
             {
-                if (value != _ImagePath)
+                if (value != _OldImagePath)
                 {
                     _IsImagePathChanged = true;
-                    _OldImagePath = _ImagePath;
                     _ImagePath = value;
+                }
+                else
+                {
+                    _IsImagePathChanged = false;
                 }
             }
         }
 
-        public clsPerson()
+        private clsPerson()
         {
             PersonID = -1;
             FirstName = string.Empty;
@@ -87,7 +106,27 @@ namespace DVLD_Business
             Mode = enMode.AddNew;
         }
 
-        
+        private clsPerson(string FirstName, string SecondName, string ThirdName
+           , string LastName, string NationalNo, DateTime DateOfBirth, enGenderType Gender
+           , string Address, string Phone, string Email, int NationalityCountryID
+           , string ImagePath)
+        {
+            this.FirstName = FirstName;
+            this.SecondName = SecondName;
+            this.ThirdName = ThirdName;
+            this.LastName = LastName;
+            this._NationalNo = NationalNo;
+            this.DateOfBirth = DateOfBirth;
+            this.Gender = Gender;
+            this.Address = Address;
+            this.Phone = Phone;
+            this.Email = Email;
+            this.NationalityCountryID = NationalityCountryID;
+            this._ImagePath = ImagePath;
+
+            Mode = enMode.AddNew;
+        }
+
 
         // New overload that sets PersonID so instances returned from Find have correct ID
         private clsPerson(int PersonID, string FirstName, string SecondName, string ThirdName
@@ -100,7 +139,7 @@ namespace DVLD_Business
             this.SecondName = SecondName;
             this.ThirdName = ThirdName;
             this.LastName = LastName;
-            this.NationalNo = NationalNo;
+            this._NationalNo = NationalNo;
             this.DateOfBirth = DateOfBirth;
             this.Gender = (enGenderType)Gender;
             this.Address = Address;
@@ -108,6 +147,7 @@ namespace DVLD_Business
             this.Email = Email;
             this.NationalityCountryID = NationalityCountryID;
             this._ImagePath = ImagePath;
+            this._OldImagePath = ImagePath;
 
             Mode = enMode.Update;
         }
@@ -121,18 +161,43 @@ namespace DVLD_Business
                 {
                     return false;
                 }
-                this.ImagePath = sourceFilePath;
+                this._ImagePath = sourceFilePath;
             }
             
             this.PersonID = clsPersonData.AddNewPerson(this.FirstName,  this.SecondName,  this.ThirdName
                 , this.LastName,  this.NationalNo,  this.DateOfBirth,  (short)this.Gender,  this.Address,  this.Phone,  this.Email
                 , this.NationalityCountryID,  this.ImagePath);
 
-            return (PersonID != -1);
+            if (PersonID != -1)
+            {
+                this._OldImagePath = this._ImagePath;
+                this._IsImagePathChanged = false;
+                return true;
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(_ImagePath) && this._IsImagePathChanged)
+                {
+                    clsFileStorage.DeleteFile(_ImagePath);
+                    this._ImagePath = this._OldImagePath;
+                    this._IsImagePathChanged = false;
+                }
+            }
+            return false;
         }
 
         private bool _UpdatePerson()
         {
+            if (string.IsNullOrWhiteSpace(_NationalNo))
+            {
+                return false;
+            }
+
+            if (_IsNationalNoChanged && _IsNationalNoUsed(this.PersonID, NationalNo))
+            {
+                return false;
+            }
+
             if (this._IsImagePathChanged && !string.IsNullOrWhiteSpace(this.ImagePath))
             {
                 string sourceFilePath = this.ImagePath;
@@ -140,21 +205,30 @@ namespace DVLD_Business
                 {
                     return false;
                 }
-                this.ImagePath = sourceFilePath;
+                this._ImagePath = sourceFilePath;
             }
 
-            if( clsPersonData.UpdatePerson(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
+            if ( clsPersonData.UpdatePerson(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
                 , DateOfBirth, (short)Gender, Address, Phone, Email, NationalityCountryID, ImagePath))
             {
-                if (!string.IsNullOrEmpty(_OldImagePath))
-                    if (clsFileStorage.DeleteFile(_OldImagePath))
-                    {
-                        _IsImagePathChanged = false;
-                        _OldImagePath = "";
-                    }
+                if (!string.IsNullOrEmpty(_OldImagePath) && this._IsImagePathChanged)
+                {
+                    clsFileStorage.DeleteFile(_OldImagePath);
+                }
+                _IsImagePathChanged = false;
+
+                _OldImagePath = _ImagePath;
                 return true;
             }
-            return false;
+            else if (!string.IsNullOrEmpty(_ImagePath) && this._IsImagePathChanged)
+            {
+                if(clsFileStorage.DeleteFile(_ImagePath))
+                {
+                    _ImagePath = _OldImagePath;
+                    _IsImagePathChanged = false;
+                }
+            }
+                return false;
         }
 
         public static bool Delete(int PersonID)
@@ -244,6 +318,11 @@ namespace DVLD_Business
             return clsPersonData.IsPersonExists(NationalNo);
         }
 
+        private static bool _IsNationalNoUsed(int PersonID, string NationalNo)
+        {
+            return clsPersonData.IsNationalNoUsed(PersonID, NationalNo);
+        }
+
         public static DataTable GetAllPeople()
         {
             return clsPersonData.GetAllPeople();
@@ -279,5 +358,68 @@ namespace DVLD_Business
             return clsPersonData.HasPeople();
         }
 
+        private static bool _IsValidInfo(string NationalNo, string FirstName, string SecondName,
+             string LastName, DateTime DateOfBirth,string Address,
+            string Phone, int NationalityCountryID, string Email = "")
+        {
+            string[] Array = new string[] { NationalNo, FirstName, SecondName, LastName, Address, Phone, };
+            if (Array.Any(string.IsNullOrWhiteSpace))
+            {
+                return false;
+            }
+
+            if (NationalityCountryID < 1 || NationalityCountryID > 191)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(Email) && !Email.Contains("@"))
+            {
+                return false;
+            }
+
+            if (DateOfBirth > clsBusinessSettings.GetServerDateTime().AddYears(-18))
+            {
+                return false;
+            }
+
+            if (IsPersonExists(NationalNo))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static clsPerson _GetReadyObj(string NationalNo, string FirstName, string SecondName,
+             string LastName, DateTime DateOfBirth, enGenderType Gender, string Address,
+            string Phone, int NationalityCountryID, string ThirdName = "", string Email = "", string ImagePath = "")
+        {
+
+            if (!_IsValidInfo(NationalNo, FirstName, SecondName, LastName, DateOfBirth
+                , Address, Phone, NationalityCountryID, Email))
+            {
+                return null;
+            }
+
+            return new clsPerson(FirstName, SecondName, ThirdName, LastName, NationalNo, DateOfBirth
+                , Gender, Address, Phone, Email, NationalityCountryID, ImagePath);
+        }
+
+        public static clsPerson CreateNewPerson(string NationalNo, string FirstName, string SecondName,
+             string LastName, DateTime DateOfBirth, enGenderType Gender, string Address,
+            string Phone, int NationalityCountryID, string ThirdName = "", string Email = "", string ImagePath = "")
+        {
+            clsPerson NewPerson = _GetReadyObj(NationalNo, FirstName, SecondName, LastName, DateOfBirth, Gender
+                , Address, Phone, NationalityCountryID, ThirdName, Email, ImagePath);
+            if(NewPerson != null)
+            {
+                if(NewPerson.Save())
+                {
+                    return NewPerson;
+                }
+            }
+            return null;
+        }
     }
 }
