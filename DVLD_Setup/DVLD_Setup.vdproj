@@ -15,32 +15,38 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_044A4384E1234709B1BBBC1D654A2ED1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_09AFF54F27300703E3974BE272D46889"
         "OwnerKey" = "8:_B0AE67510A2646A7A2207A3438BD7F58"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_96BCA5623887400A8199CAE14A7014D6"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A02351DBE2FB1F1C44020D79AE6E0BE1"
-        "OwnerKey" = "8:_D67A8CF6469A90C51981D7D1BF04B69C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A02351DBE2FB1F1C44020D79AE6E0BE1"
+        "MsmKey" = "8:_2C3CA9DD0A803E7EACB493F3D4A9975B"
         "OwnerKey" = "8:_B0AE67510A2646A7A2207A3438BD7F58"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_ACA8EE0F735E46A78FB3997BAA953D3B"
+        "MsmKey" = "8:_65C33EC1C7294A7D821D489B3C81CED6"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9FE055750426D0D1E448D50803F95585"
+        "OwnerKey" = "8:_2C3CA9DD0A803E7EACB493F3D4A9975B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9FE055750426D0D1E448D50803F95585"
+        "OwnerKey" = "8:_B0AE67510A2646A7A2207A3438BD7F58"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -51,13 +57,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D67A8CF6469A90C51981D7D1BF04B69C"
-        "OwnerKey" = "8:_B0AE67510A2646A7A2207A3438BD7F58"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F4D81DEDF7944DF39DC09392F8A6DBC1"
+        "MsmKey" = "8:_E8DC7C47DDF348F38D9BCC0EDAC8DB0B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -70,13 +70,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D67A8CF6469A90C51981D7D1BF04B69C"
+        "OwnerKey" = "8:_2C3CA9DD0A803E7EACB493F3D4A9975B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A02351DBE2FB1F1C44020D79AE6E0BE1"
+        "OwnerKey" = "8:_9FE055750426D0D1E448D50803F95585"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -112,10 +112,10 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.8"
                     {
-                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
-                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    "Name" = "8:Microsoft .NET Framework 4.8 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.8"
                     }
                 }
             }
@@ -180,6 +180,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_044A4384E1234709B1BBBC1D654A2ED1"
+            {
+            "SourcePath" = "8:D:\\Database\\DVLD_Database.mdf"
+            "TargetName" = "8:DVLD_Database.mdf"
+            "Tag" = "8:"
+            "Folder" = "8:_2D75AEED702D4C06981E8AA52B39C754"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_09AFF54F27300703E3974BE272D46889"
             {
             "AssemblyRegister" = "3:1"
@@ -211,85 +231,14 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_96BCA5623887400A8199CAE14A7014D6"
-            {
-            "SourcePath" = "8:..\\DVLD\\DVLD_Database.mdf"
-            "TargetName" = "8:DVLD_Database.mdf"
-            "Tag" = "8:"
-            "Folder" = "8:_2D75AEED702D4C06981E8AA52B39C754"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A02351DBE2FB1F1C44020D79AE6E0BE1"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:DVLD_DataAccess, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_A02351DBE2FB1F1C44020D79AE6E0BE1"
-                    {
-                    "Name" = "8:DVLD_DataAccess.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:DVLD_DataAccess.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_A221E014C01048D1815669FA1DA3AA66"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ACA8EE0F735E46A78FB3997BAA953D3B"
-            {
-            "SourcePath" = "8:..\\DVLD\\DVLD_Database_log.ldf"
-            "TargetName" = "8:DVLD_Database_log.ldf"
-            "Tag" = "8:"
-            "Folder" = "8:_2D75AEED702D4C06981E8AA52B39C754"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D67A8CF6469A90C51981D7D1BF04B69C"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_2C3CA9DD0A803E7EACB493F3D4A9975B"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:DVLD_Business, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D67A8CF6469A90C51981D7D1BF04B69C"
+                    "_2C3CA9DD0A803E7EACB493F3D4A9975B"
                     {
                     "Name" = "8:DVLD_Business.dll"
                     "Attributes" = "3:512"
@@ -313,9 +262,60 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F4D81DEDF7944DF39DC09392F8A6DBC1"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_65C33EC1C7294A7D821D489B3C81CED6"
             {
-            "SourcePath" = "8:..\\..\\..\\..\\Downloads\\en-US\\SqlLocalDB.msi"
+            "SourcePath" = "8:D:\\Database\\DVLD_Database_log.ldf"
+            "TargetName" = "8:DVLD_Database_log.ldf"
+            "Tag" = "8:"
+            "Folder" = "8:_2D75AEED702D4C06981E8AA52B39C754"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9FE055750426D0D1E448D50803F95585"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:DVLD_DataAccess, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_9FE055750426D0D1E448D50803F95585"
+                    {
+                    "Name" = "8:DVLD_DataAccess.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:DVLD_DataAccess.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A221E014C01048D1815669FA1DA3AA66"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E8DC7C47DDF348F38D9BCC0EDAC8DB0B"
+            {
+            "SourcePath" = "8:D:\\Database\\SqlLocalDB.msi"
             "TargetName" = "8:SqlLocalDB.msi"
             "Tag" = "8:"
             "Folder" = "8:_A221E014C01048D1815669FA1DA3AA66"
@@ -401,7 +401,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DVLD"
         "ProductCode" = "8:{1212FCC3-603C-4E63-AE08-2AD941D96C12}"
-        "PackageCode" = "8:{025C9BBA-EF60-4CFF-9C04-5004AE6422C2}"
+        "PackageCode" = "8:{0A9C9944-D886-4369-9681-E6C3F90EEE30}"
         "UpgradeCode" = "8:{BEA33995-53EE-485E-B967-70FFA9F9751E}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -922,7 +922,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B0AE67510A2646A7A2207A3438BD7F58"
             {
-            "SourcePath" = "8:..\\DVLD\\obj\\Release\\DVLD.exe"
+            "SourcePath" = "8:..\\DVLD\\obj\\Debug\\DVLD.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A221E014C01048D1815669FA1DA3AA66"

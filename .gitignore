@@ -48,3 +48,5 @@ $RECYCLE.BIN/
 *.tmp
 *DVLD/test.cs
 *DVLD/test.Designer.cs
+/DVLD_Setup/Release/DVLD_Setup.msi
+*.msi
