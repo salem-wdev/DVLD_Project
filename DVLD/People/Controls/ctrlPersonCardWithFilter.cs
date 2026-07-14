@@ -95,26 +95,6 @@ namespace DVLD.People.Controls
             InitializeComponent();
         }
 
-        private bool _IsValidInput()
-        {
-            if (string.IsNullOrWhiteSpace(txtFilterValue.Text))
-            {
-                MessageBox.Show("Please enter a value to filter by.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-            if (cbFilterBy.SelectedItem.ToString() == "ID" && !int.TryParse(txtFilterValue.Text, out _))
-            {
-                MessageBox.Show("Please enter a valid integer for ID.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-            if (cbFilterBy.SelectedItem.ToString() == "NationalNo" && txtFilterValue.Text.Length > 10)
-            {
-                MessageBox.Show("Please enter a valid 10-digit National Number.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-            return true;
-        }
-
         private void _FindNow()
         {
             switch (cbFilterBy.SelectedItem.ToString())
