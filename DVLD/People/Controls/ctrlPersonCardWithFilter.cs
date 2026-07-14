@@ -108,7 +108,7 @@ namespace DVLD.People.Controls
                     break;
 
                 default:
-                    MessageBox.Show($"No person found with the given {cbFilterBy.SelectedItem.ToString()}.", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"No person found with the given {cbFilterBy?.SelectedItem?.ToString() ?? "???"}.", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     break;
             }
 
@@ -187,7 +187,7 @@ namespace DVLD.People.Controls
         }
 
         private void txtFilterValue_KeyPress(object sender, KeyPressEventArgs e)
-        {
+        {            
             //this will allow only digits if person id is selected
             e.Handled = !clsValidation.IsValidCharForID(e.KeyChar);
         }
