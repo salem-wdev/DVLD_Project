@@ -16,17 +16,34 @@ namespace DVLD.People.Controls
     {
 
         // Define a custom event handler delegate with parameters
-        public event Action<int> OnPersonSelected;
-        // Create a protected method to raise the event with a parameter
-        protected virtual void PersonSelected(int PersonID)
+        //public event Action<int> OnPersonSelected;
+        //// Create a protected method to raise the event with a parameter
+        //protected virtual void PersonSelected(int PersonID)
+        //{
+        //    Action<int> handler = OnPersonSelected;
+        //    if (handler != null)
+        //    {
+        //        handler(PersonID); // Raise the event with the parameter
+        //    }
+        //}
+
+        public class PersonSelectedEventArgs:EventArgs
         {
-            Action<int> handler = OnPersonSelected;
-            if (handler != null)
+            public int PersonID { get; } = -1;
+            public string NationalNo { get; } = string.Empty;
+            public PersonSelectedEventArgs(int PersonID, string NationalNo)
             {
-                handler(PersonID); // Raise the event with the parameter
+                this.PersonID = PersonID;
+                this.NationalNo = NationalNo;
             }
         }
 
+        public event EventHandler<PersonSelectedEventArgs> PersonSelected;
+
+        protected void OnPersonSelected(PersonSelectedEventArgs e)
+        {
+            PersonSelected?.Invoke(this, e);
+        }
 
         private bool _ShowAddPerson = true;
         public bool ShowAddPerson
@@ -115,9 +132,11 @@ namespace DVLD.People.Controls
                     break;
             }
 
-            if (OnPersonSelected != null && FilterEnabled)
+            if (FilterEnabled)
                 // Raise the event with a parameter
-                OnPersonSelected(ctrlPersonCard1.PersonID);
+                OnPersonSelected
+                    (new PersonSelectedEventArgs(ctrlPersonCard1?.PersonID ?? -1
+                    , ctrlPersonCard1?.SelectedPerson?.NationalNo ?? string.Empty));
 
         }
 
