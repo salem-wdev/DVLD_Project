@@ -140,7 +140,6 @@ namespace DVLD.Applications.Local_Driving_License
         {
             _FillcbLicenseClassWithData();
 
-            ctrlPersonCardWithFilter1.OnPersonSelected += CtrlPersonCardWithFilter1_OnPersonSelected;
                 _LocalLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(_ApplicationID);
 
             if (_LocalLicenseApplication != null)
@@ -153,31 +152,6 @@ namespace DVLD.Applications.Local_Driving_License
             }
 
             _ResetDefaultValues();
-
-        }
-
-        private void CtrlPersonCardWithFilter1_OnPersonSelected(int obj)
-        {
-            if (_IsFormUpdated)
-            {
-                _Mode = enMode.AddNew;
-
-                _ResetDefaultValues();
-            }
-
-            if (obj != -1)
-            {
-                btnApplicationInfoNext.Enabled = true;
-                tpApplicationInfo.Enabled = true;
-                btnSave.Enabled = true;
-            }
-            else
-            {
-                btnApplicationInfoNext.Enabled = false;
-            }
-
-            _isDataLoaded = true;
-            _IsFormUpdated = true;
 
         }
 
@@ -227,6 +201,27 @@ namespace DVLD.Applications.Local_Driving_License
         private void frmAddUpdateLocalDrivingLicenseApplication_Activated(object sender, EventArgs e)
         {
             ctrlPersonCardWithFilter1.FilterFocus();
+        }
+
+        private void ctrlPersonCardWithFilter1_PersonSelected(object sender, People.Controls.ctrlPersonCardWithFilter.PersonSelectedEventArgs e)
+        {
+            if (_IsFormUpdated)
+            {
+                _Mode = enMode.AddNew;
+
+                _ResetDefaultValues();
+            }
+
+            bool isPersonFound = (e.PersonID != -1);
+
+            
+                btnApplicationInfoNext.Enabled = isPersonFound;
+                tpApplicationInfo.Enabled = isPersonFound;
+                btnSave.Enabled = isPersonFound;
+           
+
+            _isDataLoaded = true;
+            _IsFormUpdated = true;
         }
 
         ///////////////////////////////////////////////////////////////////

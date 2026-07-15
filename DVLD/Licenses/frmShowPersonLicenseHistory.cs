@@ -39,13 +39,22 @@ namespace DVLD.Licenses.Local_Licenses
                 ctrlPersonCardWithFilter1.FilterEnabled = true;
                 AcceptButton = ctrlPersonCardWithFilter1.AcceptButton;
             }
-
-            ctrlPersonCardWithFilter1.OnPersonSelected += CtrlPersonCardWithFilter1_OnPersonSelected;
         }
 
-        private void CtrlPersonCardWithFilter1_OnPersonSelected(int obj)
+        private void frmShowPersonLicenseHistory_Activated(object sender, EventArgs e)
         {
-            _PersonID = obj;
+            ctrlPersonCardWithFilter1.FilterFocus();
+        }
+
+        private void ctrlPersonCardWithFilter1_PersonSelected(object sender, People.Controls.ctrlPersonCardWithFilter.PersonSelectedEventArgs e)
+        {
+            _PersonID = e.PersonID;
+            if (_PersonID < 0)
+            {
+                ctrlDriverLicenses1.ResetData();
+                return;
+            }
+
             clsDriver driver = clsDriver.FindByPersonID(_PersonID);
             ctrlDriverLicenses1.ResetData();
             if (driver == null)
@@ -66,11 +75,6 @@ namespace DVLD.Licenses.Local_Licenses
                 ctrlPersonCardWithFilter1.FilterFocus();
                 return;
             }
-        }
-
-        private void frmShowPersonLicenseHistory_Activated(object sender, EventArgs e)
-        {
-            ctrlPersonCardWithFilter1.FilterFocus();
         }
     }
 }

@@ -16,17 +16,34 @@ namespace DVLD.People.Controls
     {
 
         // Define a custom event handler delegate with parameters
-        public event Action<int> OnPersonSelected;
-        // Create a protected method to raise the event with a parameter
-        protected virtual void PersonSelected(int PersonID)
+        //public event Action<int> OnPersonSelected;
+        //// Create a protected method to raise the event with a parameter
+        //protected virtual void PersonSelected(int PersonID)
+        //{
+        //    Action<int> handler = OnPersonSelected;
+        //    if (handler != null)
+        //    {
+        //        handler(PersonID); // Raise the event with the parameter
+        //    }
+        //}
+
+        public sealed class PersonSelectedEventArgs : EventArgs
         {
-            Action<int> handler = OnPersonSelected;
-            if (handler != null)
+            public int PersonID { get; }
+            public string NationalNo { get; }
+            public PersonSelectedEventArgs(int personID, string nationalNo)
             {
-                handler(PersonID); // Raise the event with the parameter
+                PersonID = personID;
+                NationalNo = nationalNo;
             }
         }
 
+        public event EventHandler<PersonSelectedEventArgs> PersonSelected;
+
+        protected virtual void OnPersonSelected(PersonSelectedEventArgs e)
+        {
+            PersonSelected?.Invoke(this, e);
+        }
 
         private bool _ShowAddPerson = true;
         public bool ShowAddPerson
@@ -78,26 +95,6 @@ namespace DVLD.People.Controls
             InitializeComponent();
         }
 
-        private bool _IsValidInput()
-        {
-            if (string.IsNullOrWhiteSpace(txtFilterValue.Text))
-            {
-                MessageBox.Show("Please enter a value to filter by.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-            if (cbFilterBy.SelectedItem.ToString() == "ID" && !int.TryParse(txtFilterValue.Text, out _))
-            {
-                MessageBox.Show("Please enter a valid integer for ID.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-            if (cbFilterBy.SelectedItem.ToString() == "NationalNo" && txtFilterValue.Text.Length > 10)
-            {
-                MessageBox.Show("Please enter a valid 10-digit National Number.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-            return true;
-        }
-
         private void _FindNow()
         {
             switch (cbFilterBy.SelectedItem.ToString())
@@ -111,13 +108,15 @@ namespace DVLD.People.Controls
                     break;
 
                 default:
-                    MessageBox.Show($"No person found with the given {cbFilterBy.SelectedItem.ToString()}.", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"No person found with the given {cbFilterBy?.SelectedItem?.ToString() ?? "???"}.", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     break;
             }
 
-            if (OnPersonSelected != null && FilterEnabled)
+            if (FilterEnabled)
                 // Raise the event with a parameter
-                OnPersonSelected(ctrlPersonCard1.PersonID);
+                OnPersonSelected
+                    (new PersonSelectedEventArgs(ctrlPersonCard1?.PersonID ?? -1
+                    , ctrlPersonCard1?.SelectedPerson?.NationalNo ?? string.Empty));
 
         }
 
@@ -189,17 +188,11 @@ namespace DVLD.People.Controls
 
         private void txtFilterValue_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Check if the pressed key is Enter (character code 13)
-            if (e.KeyChar == (char)13)
+            if (cbFilterBy.SelectedItem.ToString() == "Person ID")
             {
-
-                btnFind.PerformClick();
+                //this will allow only digits if person id is selected
+                e.Handled = !clsValidation.IsValidCharForID(e.KeyChar);
             }
-
-            //this will allow only digits if person id is selected
-            if (cbFilterBy.Text == "Person ID")
-                e.Handled = !char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar);
-
         }
     }
 }

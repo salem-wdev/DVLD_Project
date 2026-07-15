@@ -84,6 +84,7 @@
             this.ctrlPersonCardWithFilter1.ShowAddPerson = true;
             this.ctrlPersonCardWithFilter1.Size = new System.Drawing.Size(826, 379);
             this.ctrlPersonCardWithFilter1.TabIndex = 135;
+            this.ctrlPersonCardWithFilter1.PersonSelected += new System.EventHandler<DVLD.People.Controls.ctrlPersonCardWithFilter.PersonSelectedEventArgs>(this.ctrlPersonCardWithFilter1_PersonSelected);
             // 
             // ctrlDriverLicenses1
             // 
@@ -96,6 +97,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(1086, 829);
             this.Controls.Add(this.ctrlDriverLicenses1);
             this.Controls.Add(this.ctrlPersonCardWithFilter1);
