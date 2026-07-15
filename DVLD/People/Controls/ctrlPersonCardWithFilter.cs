@@ -187,9 +187,12 @@ namespace DVLD.People.Controls
         }
 
         private void txtFilterValue_KeyPress(object sender, KeyPressEventArgs e)
-        {            
-            //this will allow only digits if person id is selected
-            e.Handled = !clsValidation.IsValidCharForID(e.KeyChar);
+        {
+            if (cbFilterBy.SelectedItem.ToString() == "Person ID")
+            {
+                //this will allow only digits if person id is selected
+                e.Handled = !clsValidation.IsValidCharForID(e.KeyChar);
+            }
         }
     }
 }
