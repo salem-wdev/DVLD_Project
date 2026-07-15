@@ -13,16 +13,27 @@ namespace DVLD.Licenses.Local_Licenses.Controls
 {
     public partial class ctrlDriverLicenseInfoWithFilter : UserControl
     {
-        // Define a custom event handler delegate with parameters
-        public event Action<int> OnLicenseSelected;
-        // Create a protected method to raise the event with a parameter
-        protected virtual void LicenseSelected(int DriverID)
+
+        // TODO: 
+        // 1. Add DriverID and ApplicationID properties to this EventArgs class.
+        // 2. Update invocation points to pass the actual IDs when raising the event.
+        // 3. Update subscriber methods (Event Handlers) to consume and sync with these new IDs.
+
+        public sealed class LicenseSelectedEventArgs : EventArgs
         {
-            Action<int> handler = OnLicenseSelected;
-            if (handler != null)
+            public int LicenseID { get; }
+
+            public LicenseSelectedEventArgs(int licenseID)
             {
-                handler(DriverID); // Raise the event with the parameter
+                LicenseID = licenseID;
             }
+        }
+
+        public event EventHandler<LicenseSelectedEventArgs> LicenseSelected;
+
+        protected virtual void OnLicenseSelected(LicenseSelectedEventArgs e)
+        {
+            LicenseSelected?.Invoke(this, e);
         }
 
         private bool _FilterEnabled = true; // Variable to store the filter state
@@ -75,7 +86,7 @@ namespace DVLD.Licenses.Local_Licenses.Controls
                 MessageBox.Show("License not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 ctrlDriverLicenseInfo1.ClearData();
             }
-            LicenseSelected(_LicenseID); // Raise the event
+            OnLicenseSelected(new LicenseSelectedEventArgs(_LicenseID)); // Raise the event
         }
 
         public void LoadLicense(int LicenseID)

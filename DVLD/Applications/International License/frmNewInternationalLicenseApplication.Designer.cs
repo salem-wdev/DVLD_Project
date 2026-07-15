@@ -434,6 +434,7 @@
             this.ctrlDriverLicenseInfoWithFilter1.Name = "ctrlDriverLicenseInfoWithFilter1";
             this.ctrlDriverLicenseInfoWithFilter1.Size = new System.Drawing.Size(874, 413);
             this.ctrlDriverLicenseInfoWithFilter1.TabIndex = 184;
+            this.ctrlDriverLicenseInfoWithFilter1.LicenseSelected += new System.EventHandler<DVLD.Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs>(this.ctrlDriverLicenseInfoWithFilter1_LicenseSelected);
             // 
             // frmNewInternationalLicenseApplication
             // 

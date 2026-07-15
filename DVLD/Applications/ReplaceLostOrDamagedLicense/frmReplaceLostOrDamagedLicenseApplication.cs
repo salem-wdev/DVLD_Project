@@ -49,37 +49,11 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
 
         private void frmReplaceLostOrDamagedLicenseApplication_Load(object sender, EventArgs e)
         {
-            ctrlDriverLicenseInfoWithFilter1.OnLicenseSelected += CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected;
-
             lblApplicationDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
             lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
             SetReason();
 
             AcceptButton = ctrlDriverLicenseInfoWithFilter1.AcceptButton;
-        }
-
-        private void CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected(int obj)
-        {
-            if (obj > 0)
-            {
-                if(!clsLicense.IsLicenseActive(obj))
-                {
-                    MessageBox.Show("License not active!" +
-                        "\nSelect another one", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    btnIssueReplacement.Enabled = false;
-                    return;
-                }
-
-                SetReason();
-
-                _ReplacedLicenseID = -1;
-                _ReplacedLicense = null;
-                llShowLicenseHistory.Enabled = true;
-                btnIssueReplacement.Enabled = true;
-                lblOldLicenseID.Text = obj.ToString();
-                
-            }
-
         }
 
         private void frmReplaceLostOrDamagedLicenseApplication_Activated(object sender, EventArgs e)
@@ -138,6 +112,31 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
             btnIssueReplacement.Enabled = false;
             ctrlDriverLicenseInfoWithFilter1.FilterEnabled = false;
             llShowLicenseInfo.Enabled = true;
+
+        }
+
+        private void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
+        {
+            int licenseID = e.LicenseID;
+            if (licenseID > 0)
+            {
+                if (!clsLicense.IsLicenseActive(licenseID))
+                {
+                    MessageBox.Show("License not active!" +
+                        "\nSelect another one", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    btnIssueReplacement.Enabled = false;
+                    return;
+                }
+
+                SetReason();
+
+                _ReplacedLicenseID = -1;
+                _ReplacedLicense = null;
+                llShowLicenseHistory.Enabled = true;
+                btnIssueReplacement.Enabled = true;
+                lblOldLicenseID.Text = licenseID.ToString();
+
+            }
 
         }
     }

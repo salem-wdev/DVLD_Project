@@ -24,7 +24,6 @@ namespace DVLD.Applications.Renew_Local_License
 
         private void frmRenewLocalDrivingLicenseApplication_Load(object sender, EventArgs e)
         {
-            ctrlDriverLicenseInfoWithFilter1.OnLicenseSelected += CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected;
         
             lblApplicationDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
             lblIssueDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
@@ -33,31 +32,6 @@ namespace DVLD.Applications.Renew_Local_License
                 ((int)clsApplication.enApplicationType.RenewDrivingLicense)
                 .ApplicationTypeFees.ToString("0.##");
             AcceptButton = ctrlDriverLicenseInfoWithFilter1.AcceptButton;
-        }
-
-        private void CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected(int obj)
-        {
-            if(obj > 0)
-            {
-                DateTime ExpirationDate = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.ExpirationDate;
-                DateTime CurrentDate = clsBusinessSettings.GetServerDateTime();
-                if (CurrentDate > ExpirationDate.AddMonths(3) || CurrentDate < ExpirationDate.AddMonths(-3))
-                {
-                    MessageBox.Show("License is not eligible for renewal." +
-                        "\nLicense can only be renewed within 3 months before or after the expiration date.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                _NewLicenseID = -1;
-                _NewLicense = null;
-                llShowLicenseHistory.Enabled = true;
-                btnRenewLicense.Enabled = true;
-                lblOldLicenseID.Text = obj.ToString();
-                float ClassFees = clsLicenseClass.Find(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.LicenseClassID).ClassFees;
-                lblLicenseFees.Text = ClassFees.ToString();
-                lblTotalFees.Text = (ClassFees + (float)clsApplicationType.Find((int)clsApplication.enApplicationType.RenewDrivingLicense).ApplicationTypeFees).ToString();
-            }
-
         }
 
         private void llShowLicenseHistory_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -105,6 +79,32 @@ namespace DVLD.Applications.Renew_Local_License
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
+        {
+            int licensesID = e.LicenseID;
+            if (licensesID > 0)
+            {
+                DateTime ExpirationDate = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.ExpirationDate;
+                DateTime CurrentDate = clsBusinessSettings.GetServerDateTime();
+                if (CurrentDate > ExpirationDate.AddMonths(3) || CurrentDate < ExpirationDate.AddMonths(-3))
+                {
+                    MessageBox.Show("License is not eligible for renewal." +
+                        "\nLicense can only be renewed within 3 months before or after the expiration date.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                _NewLicenseID = -1;
+                _NewLicense = null;
+                llShowLicenseHistory.Enabled = true;
+                btnRenewLicense.Enabled = true;
+                lblOldLicenseID.Text = licensesID.ToString();
+                float ClassFees = clsLicenseClass.Find(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.LicenseClassID).ClassFees;
+                lblLicenseFees.Text = ClassFees.ToString();
+                lblTotalFees.Text = (ClassFees + (float)clsApplicationType.Find((int)clsApplication.enApplicationType.RenewDrivingLicense).ApplicationTypeFees).ToString();
+            }
+
         }
     }
 }
