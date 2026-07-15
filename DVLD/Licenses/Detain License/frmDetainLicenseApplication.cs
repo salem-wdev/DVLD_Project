@@ -26,38 +26,7 @@ namespace DVLD.Licenses.Detain_License
         private void frmDetainLicenseApplication_Load(object sender, EventArgs e)
         {
             AcceptButton = ctrlDriverLicenseInfoWithFilter1.AcceptButton;
-            ctrlDriverLicenseInfoWithFilter1.OnLicenseSelected += CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected;
             lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
-        }
-
-        private void CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected(int obj)
-        {
-            llShowLicenseHistory.Enabled = false;
-            llShowLicenseInfo.Enabled = false;
-            btnDetain.Enabled = false;
-
-            if (obj > 0)
-            {
-                if(!ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.IsActive)
-                {
-                    MessageBox.Show("This License is not active", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                if (ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.IsDetained)
-                {
-                    MessageBox.Show("This License is already Detained.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                _DetainID = -1;
-                _DetainedLicense = null;
-                _SelectedLicenseID = obj;
-                llShowLicenseHistory.Enabled = true;
-                llShowLicenseInfo.Enabled = true;
-                btnDetain.Enabled = true;
-                lblLicenseID.Text = obj.ToString();
-            }
-
-            //throw new NotImplementedException();
         }
 
         private void txtFineFees_KeyPress(object sender, KeyPressEventArgs e)
@@ -119,6 +88,36 @@ namespace DVLD.Licenses.Detain_License
             {
                 errorProvider1.SetError(txtFineFees, "");
                 e.Cancel = false;
+            }
+        }
+
+        private void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
+        {
+            int licenseID = e.LicenseID;
+
+            llShowLicenseHistory.Enabled = false;
+            llShowLicenseInfo.Enabled = false;
+            btnDetain.Enabled = false;
+
+            if (licenseID > 0)
+            {
+                if (!ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.IsActive)
+                {
+                    MessageBox.Show("This License is not active", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.IsDetained)
+                {
+                    MessageBox.Show("This License is already Detained.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                _DetainID = -1;
+                _DetainedLicense = null;
+                _SelectedLicenseID = licenseID;
+                llShowLicenseHistory.Enabled = true;
+                llShowLicenseInfo.Enabled = true;
+                btnDetain.Enabled = true;
+                lblLicenseID.Text = licenseID.ToString();
             }
         }
     }
