@@ -27,14 +27,14 @@ namespace DVLD.People.Controls
         //    }
         //}
 
-        public class PersonSelectedEventArgs:EventArgs
+        public sealed class PersonSelectedEventArgs : EventArgs
         {
-            public int PersonID { get; } = -1;
-            public string NationalNo { get; } = string.Empty;
-            public PersonSelectedEventArgs(int PersonID, string NationalNo)
+            public int PersonID { get; }
+            public string NationalNo { get; }
+            public PersonSelectedEventArgs(int personID, string nationalNo)
             {
-                this.PersonID = PersonID;
-                this.NationalNo = NationalNo;
+                PersonID = personID;
+                NationalNo = nationalNo;
             }
         }
 
