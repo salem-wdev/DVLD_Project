@@ -51,6 +51,7 @@ namespace DVLD.Licenses.Local_Licenses
             _PersonID = e.PersonID;
             if (_PersonID < 0)
             {
+                ctrlDriverLicenses1.ResetData();
                 return;
             }
 
