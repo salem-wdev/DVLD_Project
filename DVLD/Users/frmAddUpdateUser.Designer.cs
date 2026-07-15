@@ -338,6 +338,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmAddUpdateUser";
             this.Text = "Add/UpdateUser";
+            this.Activated += new System.EventHandler(this.frmAddUpdateUser_Activated);
             this.Load += new System.EventHandler(this.frmAddUpdateUser_Load);
             this.tcInfo.ResumeLayout(false);
             this.tpPesronInfo.ResumeLayout(false);

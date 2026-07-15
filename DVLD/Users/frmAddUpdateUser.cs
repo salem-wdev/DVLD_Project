@@ -68,7 +68,7 @@ namespace DVLD.Users
         private void _LoadData()
         {
             _User = clsUser.Find(_UserID);
-            ctrlPersonCardWithFilter1.gbFilters.Enabled = false;
+            ctrlPersonCardWithFilter1.FilterEnabled = false;
 
             if (_User == null)
             {
@@ -115,19 +115,22 @@ namespace DVLD.Users
             {
                 return false;
             }
-
+            AcceptButton = btnSave;
             return true;
         }
 
         private void frmAddUpdateUser_Load(object sender, EventArgs e)
         {
             _ResetValues();
+            AcceptButton = ctrlPersonCardWithFilter1.AcceptButton;
 
             if(_Mode == enMode.Update)
             {
                 _LoadData();
+                ctrlPersonCardWithFilter1.FilterEnabled = false;
+                AcceptButton = btnSave;
+                tcInfo.SelectedTab = tcInfo.TabPages["tpLoginInfo"];
             }
-
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -247,8 +250,8 @@ namespace DVLD.Users
             }
 
 
-            
 
+            ctrlPersonCardWithFilter1.FilterEnabled = false;
             txtPassword.Focus();
 
         }
@@ -294,6 +297,8 @@ namespace DVLD.Users
             if (_IsPersonUser())
             {
                 MessageBox.Show("Person already is a User", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                AcceptButton = ctrlPersonCardWithFilter1.AcceptButton;
+                ctrlPersonCardWithFilter1.FilterFocus();
                 return;
             }
 
@@ -303,7 +308,12 @@ namespace DVLD.Users
 
 
             btnSave.Enabled = _IsbtnSaveReadyToEnable();
+            AcceptButton = btnNext;
+        }
 
+        private void frmAddUpdateUser_Activated(object sender, EventArgs e)
+        {
+            ctrlPersonCardWithFilter1.FilterFocus();
         }
     }
 }
