@@ -128,7 +128,6 @@ namespace DVLD.Users
                 _LoadData();
             }
 
-            ctrlPersonCardWithFilter1.OnPersonSelected += CtrlPersonCardWithFilter1_OnPersonSelected;
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -137,24 +136,6 @@ namespace DVLD.Users
 
         }
 
-        private void CtrlPersonCardWithFilter1_OnPersonSelected(int PersonID)
-        {
-
-            if (_IsPersonUser())
-            {
-                MessageBox.Show("Person already is a User", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            tpLoginInfo.Enabled = true;
-            btnNext.Enabled = true;
-
-
-
-            btnSave.Enabled = _IsbtnSaveReadyToEnable();
-           
-
-        }
 
         private void btnNext_Click(object sender, EventArgs e)
         {
@@ -304,6 +285,25 @@ namespace DVLD.Users
             e.Cancel = false;
 
         }
-    
+
+        private void ctrlPersonCardWithFilter1_PersonSelected(object sender, People.Controls.ctrlPersonCardWithFilter.PersonSelectedEventArgs e)
+        {
+            tpLoginInfo.Enabled = false;
+            btnNext.Enabled = false;
+
+            if (_IsPersonUser())
+            {
+                MessageBox.Show("Person already is a User", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            tpLoginInfo.Enabled = true;
+            btnNext.Enabled = true;
+
+
+
+            btnSave.Enabled = _IsbtnSaveReadyToEnable();
+
+        }
     }
 }
