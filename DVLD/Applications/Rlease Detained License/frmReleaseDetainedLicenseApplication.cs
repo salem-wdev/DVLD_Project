@@ -31,39 +31,8 @@ namespace DVLD.Applications.Rlease_Detained_License
             _IsLicenseSelected = true;
         }
 
-
-        private void CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected(int obj)
-        {
-            if (obj > 0)
-            {
-                _SelectedLicenseID = obj;
-                if (ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo == null || ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.IsReleased)
-                {
-                    MessageBox.Show("The selected license is not detained.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                _DetainLicenseID = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.DetainID;
-                llShowLicenseHistory.Enabled = true;
-                btnRelease.Enabled = true;
-                llShowLicenseInfo.Enabled = true;
-                lblLicenseID.Text = _SelectedLicenseID.ToString();
-                lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
-                lblDetainID.Text = _DetainLicenseID.ToString();
-                lblDetainDate.Text = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.DetainDate.ToString("dd/MM/yyyy");
-                float FineFees = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.FineFees;
-                float ApplicationFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReleaseDetainedDrivingLicense).ApplicationTypeFees;
-                lblFineFees.Text = FineFees.ToString();
-                lblApplicationFees.Text = ApplicationFees.ToString();
-                lblTotalFees.Text = (FineFees + ApplicationFees).ToString();
-            }
-
-            //throw new NotImplementedException();
-        }
-
         private void frmReleaseDetainedLicenseApplication_Load(object sender, EventArgs e)
         {
-            ctrlDriverLicenseInfoWithFilter1.OnLicenseSelected += CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected;
-
             lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
             AcceptButton = ctrlDriverLicenseInfoWithFilter1.AcceptButton;
             if(_IsLicenseSelected)
@@ -106,6 +75,34 @@ namespace DVLD.Applications.Rlease_Detained_License
         private void frmReleaseDetainedLicenseApplication_Activated(object sender, EventArgs e)
         {
             ctrlDriverLicenseInfoWithFilter1.txtLicenseIDFocus();
+        }
+
+        private void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
+        {
+            int licenseID = e.LicenseID;
+            if (licenseID > 0)
+            {
+                _SelectedLicenseID = licenseID;
+                if (ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo == null || ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.IsReleased)
+                {
+                    MessageBox.Show("The selected license is not detained.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                _DetainLicenseID = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.DetainID;
+                llShowLicenseHistory.Enabled = true;
+                btnRelease.Enabled = true;
+                llShowLicenseInfo.Enabled = true;
+                lblLicenseID.Text = _SelectedLicenseID.ToString();
+                lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
+                lblDetainID.Text = _DetainLicenseID.ToString();
+                lblDetainDate.Text = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.DetainDate.ToString("dd/MM/yyyy");
+                float FineFees = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.FineFees;
+                float ApplicationFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReleaseDetainedDrivingLicense).ApplicationTypeFees;
+                lblFineFees.Text = FineFees.ToString();
+                lblApplicationFees.Text = ApplicationFees.ToString();
+                lblTotalFees.Text = (FineFees + ApplicationFees).ToString();
+            }
+
         }
     }
 }
