@@ -13,17 +13,11 @@ namespace DVLD.Licenses.Local_Licenses.Controls
 {
     public partial class ctrlDriverLicenseInfoWithFilter : UserControl
     {
-        // Define a custom event handler delegate with parameters
-        //public event Action<int> OnLicenseSelected;
-        // Create a protected method to raise the event with a parameter
-        //protected virtual void LicenseSelected(int DriverID)
-        //{
-        //    Action<int> handler = OnLicenseSelected;
-        //    if (handler != null)
-        //    {
-        //        handler(DriverID); // Raise the event with the parameter
-        //    }
-        //}
+
+        // TODO: 
+        // 1. Add DriverID and ApplicationID properties to this EventArgs class.
+        // 2. Update invocation points to pass the actual IDs when raising the event.
+        // 3. Update subscriber methods (Event Handlers) to consume and sync with these new IDs.
 
         public sealed class LicenseSelectedEventArgs : EventArgs
         {
