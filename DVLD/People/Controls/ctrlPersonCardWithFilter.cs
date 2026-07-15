@@ -40,7 +40,7 @@ namespace DVLD.People.Controls
 
         public event EventHandler<PersonSelectedEventArgs> PersonSelected;
 
-        protected void OnPersonSelected(PersonSelectedEventArgs e)
+        protected virtual void OnPersonSelected(PersonSelectedEventArgs e)
         {
             PersonSelected?.Invoke(this, e);
         }
