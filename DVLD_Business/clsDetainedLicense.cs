@@ -9,6 +9,52 @@ namespace DVLD_Business
 {
     public class clsDetainedLicense
     {
+        public sealed class LicenseDetainedEventArgs : EventArgs
+        {
+            public int DetainID { get; }
+            public int LicenseID { get; }
+            public DateTime DetainDate { get; }
+            public float FineFees { get; }
+            public int CreatedByUserID { get; }
+            public bool IsReleased { get; }
+
+            public LicenseDetainedEventArgs(int DetainID, int LicenseID, DateTime DetainDate,
+                float FineFees, int CreatedByUserID, bool IsReleased)
+            {
+                this.DetainID = DetainID;
+                this.LicenseID = LicenseID;
+                this.DetainDate = DetainDate;
+                this.FineFees = FineFees;
+                this.CreatedByUserID = CreatedByUserID;
+                this.IsReleased = IsReleased;
+            }
+        }
+
+        public static event EventHandler<LicenseDetainedEventArgs> LicenseDetained;
+
+        public sealed class LicenseReleasedEventArgs : EventArgs
+        {
+            public int DetainID { get; }
+            public int LicenseID { get; }
+            public DateTime ReleaseDate { get; }
+            public int ReleasedByUserID { get; }
+            public int ReleaseApplicationID { get; }
+            public bool IsReleased { get; }
+
+            public LicenseReleasedEventArgs(int DetainID, int LicenseID, DateTime ReleaseDate,
+            int ReleasedByUserID, int ReleaseApplicationID, bool IsReleased)
+            {
+                this.DetainID = DetainID;
+                this.LicenseID = LicenseID;
+                this.ReleaseDate = ReleaseDate;
+                this.ReleasedByUserID = ReleasedByUserID;
+                this.ReleaseApplicationID = ReleaseApplicationID;
+                this.IsReleased = IsReleased;
+            }
+        }
+
+        public static event EventHandler<LicenseReleasedEventArgs> LicenseReleased;
+
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode { private set; get; } = enMode.AddNew;
 
@@ -202,6 +248,16 @@ namespace DVLD_Business
             return clsDetainedLicenseData.IsLicenseDetained(LicenseID);
         }
 
+        protected void OnLicenseDetained(LicenseDetainedEventArgs e)
+        {
+            LicenseDetained?.Invoke(this, e);
+        }
+
+        protected void OnLicenseReleased(LicenseReleasedEventArgs e)
+        {
+            LicenseReleased?.Invoke(this, e);
+        }
+
         internal static clsDetainedLicense ReleaseDetainedLicense(int LicenseID, int ReleasedByUserID)
         {
             if (!clsUser.IsUserExists(ReleasedByUserID)
@@ -244,7 +300,11 @@ namespace DVLD_Business
                 DetainedLicense.ReleaseApplicationID = ReleaseApplication.ApplicationID;
                 DetainedLicense.ReleasedByUserID = ReleasedByUserID;
                 DetainedLicense.ReleaseDate = ReleaseDate;
-                DetainedLicense.ReleaseApplicationInfo.SetComplete();
+                DetainedLicense?.ReleaseApplicationInfo?.SetComplete();
+
+                DetainedLicense?.OnLicenseReleased(new LicenseReleasedEventArgs(DetainedLicense.DetainID, DetainedLicense.LicenseID,
+                    DetainedLicense.ReleaseDate, DetainedLicense.ReleasedByUserID, DetainedLicense.ReleaseApplicationID,
+                    DetainedLicense.IsReleased));
                 return DetainedLicense;
             }
 
@@ -278,6 +338,8 @@ namespace DVLD_Business
             {
                 if(license.Save())
                 {
+                    license?.OnLicenseDetained(new LicenseDetainedEventArgs(license.DetainID, license.LicenseID, license.DetainDate,
+                        license.FineFees, license.CreatedByUserID, license.IsReleased));
                     return license;
                 }
             }
