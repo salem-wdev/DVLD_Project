@@ -35,7 +35,7 @@ namespace DVLD_Business
 
 
         }
-        public static event EventHandler<LicenseUpdatedEventArgs> LicenseUpdated;
+        public event EventHandler<LicenseUpdatedEventArgs> LicenseUpdated;
 
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
