@@ -78,7 +78,8 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             _LicenseID = int.Parse(txtLicenseID.Text);
             if (clsLicense.Find(_LicenseID) != null)
             {
-                ctrlDriverLicenseInfo1.LoadData(_LicenseID);
+               if( ctrlDriverLicenseInfo1.LoadData(_LicenseID))
+                    ctrlDriverLicenseInfo1.SelectedLicenseInfo.LicenseUpdated += SelectedLicenseInfo_LicenseUpdated;
             }
             else
             {
@@ -87,6 +88,13 @@ namespace DVLD.Licenses.Local_Licenses.Controls
                 ctrlDriverLicenseInfo1.ClearData();
             }
             OnLicenseSelected(new LicenseSelectedEventArgs(_LicenseID)); // Raise the event
+        }
+
+        private void SelectedLicenseInfo_LicenseUpdated(object sender, clsLicense.LicenseUpdatedEventArgs e)
+        {
+            ctrlDriverLicenseInfo1.SelectedLicenseInfo.Dispose();
+            _Find();
+
         }
 
         public void LoadLicense(int LicenseID)

@@ -9,8 +9,34 @@ using System.Threading.Tasks;
 
 namespace DVLD_Business
 {
-    public class clsLicense
+    public class clsLicense : IDisposable
     {
+        public sealed class LicenseUpdatedEventArgs : EventArgs
+        {
+            public int LicenseID { get; }
+            public int DriverID { get; }
+            public DateTime ExpirationDate { get; }
+            public string Notes { get; }
+            public float PaidFees { get; }
+            public bool IsActive { get; }
+            public bool IsDetained { get; }
+            
+            public LicenseUpdatedEventArgs(int LicenseID, int DriverID, DateTime ExpirationDate, string Notes,
+                float PaidFees, bool IsActive, bool IsDetained)
+            {
+                this.LicenseID = LicenseID;
+                this.DriverID = DriverID;
+                this.ExpirationDate = ExpirationDate;
+                this.Notes = Notes;
+                this.PaidFees = PaidFees;
+                this.IsActive = IsActive;
+                this.IsDetained = IsDetained;
+            }
+
+
+        }
+        public event EventHandler<LicenseUpdatedEventArgs> LicenseUpdated;
+
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
 
@@ -82,7 +108,8 @@ namespace DVLD_Business
                 return _LicenseClassInfo;
             }
         }
-
+        private bool _isSubscribed = false;
+        private bool _disposed = false;
         private clsLicense(int ApplicationID, int LicenseClassID, int CreatedByUserID,
             string Notes, float PaidFees, enIssueReason IssueReason)
 
@@ -138,7 +165,33 @@ namespace DVLD_Business
             this.IssueReason = OldLicense.IssueReason;
             this.CreatedByUserID = OldLicense.CreatedByUserID;
 
+            clsDetainedLicense.LicenseDetained += ClsDetainedLicense_LicenseDetained;
+            clsDetainedLicense.LicenseReleased += ClsDetainedLicense_LicenseReleased;
+
             Mode = enMode.AddNew;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                UnSubscribeToEvents();
+            }
+
+            _disposed = true;
+        }
+
+        ~clsLicense()
+        {
+            Dispose(false);
         }
 
         // TODO: Refactor date handling. 
@@ -176,6 +229,41 @@ namespace DVLD_Business
             return false;
         }
 
+        private void SubscribeToEvents()
+        {
+            if (_isSubscribed)
+                return;
+            clsDetainedLicense.LicenseDetained += ClsDetainedLicense_LicenseDetained;
+            clsDetainedLicense.LicenseReleased += ClsDetainedLicense_LicenseReleased;
+            _isSubscribed = true;
+        }
+
+        private void UnSubscribeToEvents()
+        {
+            if (!_isSubscribed)
+                return;
+            clsDetainedLicense.LicenseDetained -= ClsDetainedLicense_LicenseDetained;
+            clsDetainedLicense.LicenseReleased -= ClsDetainedLicense_LicenseReleased;
+            _isSubscribed = false;
+        }
+
+        private void ClsDetainedLicense_LicenseReleased(object sender, clsDetainedLicense.LicenseReleasedEventArgs e)
+        {
+            if (e.LicenseID != this.LicenseID)
+                return;
+            OnLicenseUpdated(new LicenseUpdatedEventArgs(this.LicenseID, this.DriverID, this.ExpirationDate, this.Notes,
+                this.PaidFees, this.IsActive, this.IsDetained));
+        }
+
+        private void ClsDetainedLicense_LicenseDetained(object sender, clsDetainedLicense.LicenseDetainedEventArgs e)
+        {
+            if (e.LicenseID != this.LicenseID)
+                return;
+
+            OnLicenseUpdated(new LicenseUpdatedEventArgs(this.LicenseID, this.DriverID, this.ExpirationDate, this.Notes,
+                this.PaidFees, this.IsActive, this.IsDetained));
+        }
+
         private bool _UpdateLicense()
         {
             //call DataAccess Layer 
@@ -202,10 +290,11 @@ namespace DVLD_Business
                 {
                     IsActive = false;
                 }
-
-                return new clsLicense(LicenseID, ApplicationID, DriverID, LicenseClass,
+                clsLicense license = new clsLicense(LicenseID, ApplicationID, DriverID, LicenseClass,
                                  IssueDate, ExpirationDate, Notes,
                                  PaidFees, IsActive, (enIssueReason)IssueReason, CreatedByUserID);
+                license.SubscribeToEvents();
+                return license;
             }
 
             else
@@ -232,9 +321,12 @@ namespace DVLD_Business
                     IsActive = false;
                 }
 
-                return new clsLicense(LicenseID, ApplicationID, DriverID, LicenseClass,
-                                 IssueDate, ExpirationDate, Notes,
-                                 PaidFees, IsActive, (enIssueReason)IssueReason, CreatedByUserID);
+                clsLicense license = new clsLicense(LicenseID, ApplicationID, DriverID, LicenseClass,
+                                  IssueDate, ExpirationDate, Notes,
+                                  PaidFees, IsActive, (enIssueReason)IssueReason, CreatedByUserID);
+                license.SubscribeToEvents();
+
+                return license;
             }
 
             else
@@ -324,6 +416,11 @@ namespace DVLD_Business
         public Boolean IsLicensExpired()
         {
             return this.ExpirationDate < clsUtilData.GetServerDate();
+        }
+
+        protected virtual void OnLicenseUpdated(LicenseUpdatedEventArgs e)
+        {
+            LicenseUpdated?.Invoke(this, e);
         }
 
         private static float _CalculatePaidFees(clsApplication.enApplicationType ApplicationType, int LicenseClassID)
@@ -534,6 +631,8 @@ namespace DVLD_Business
             {
                 if (license.Save())
                 {
+                    OnLicenseUpdated(new LicenseUpdatedEventArgs(this.LicenseID, this.DriverID, this.ExpirationDate, this.Notes,
+                                    this.PaidFees, this.IsActive, this.IsDetained));
                     return license;
                 }
                 return null;
@@ -549,6 +648,7 @@ namespace DVLD_Business
             {
                 if (license.Save())
                 {
+                    license.SubscribeToEvents();
                     return license;
                 }
                 return null;
@@ -563,6 +663,8 @@ namespace DVLD_Business
             {
                 if (license.Save())
                 {
+                    OnLicenseUpdated(new LicenseUpdatedEventArgs(this.LicenseID, this.DriverID, this.ExpirationDate, this.Notes,
+                this.PaidFees, this.IsActive, this.IsDetained));
                     return license;
                 }
             }
