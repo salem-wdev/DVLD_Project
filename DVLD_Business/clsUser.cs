@@ -13,6 +13,7 @@ namespace DVLD_Business
     {
         public enum enMode { AddNew = 0, Update = 1 }
         public enMode Mode { get; private set; }
+        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         public int UserID { get; private set; }
         public int PersonID { get; private set; }
@@ -43,6 +44,12 @@ namespace DVLD_Business
             this.Password = Password;
             this.IsActive = true;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew, _AddNewUser },
+                {enMode.Update, _UpdateUser},
+            };
+
             Mode = enMode.AddNew;
         }
 
@@ -57,6 +64,11 @@ namespace DVLD_Business
             this.Password = Password;
             this.IsActive = IsActive;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew, _AddNewUser },
+                {enMode.Update, _UpdateUser},
+            };
 
             Mode = enMode.Update;
         }
@@ -71,7 +83,12 @@ namespace DVLD_Business
             this.UserID = clsUserData.AddNewUser(this.PersonID, this.UserName,
                 this.Password, this.IsActive);
 
-            return (UserID != -1);
+            if (UserID != -1)
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+            return false;
         }
 
         private bool _UpdateUser()
@@ -195,29 +212,7 @@ namespace DVLD_Business
         // 'ValidateBusinessRules()' method within clsUser before calling Save().
         public bool Save()
         {
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    {
-                        if (_AddNewUser())
-                        {
-                            Mode = enMode.Update;
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                case enMode.Update:
-                    {
-                        return _UpdateUser();
-                    }
-                default:
-                    {
-                        return false;
-                    }
-            }
+            return _saveDictionary[this.Mode]();
         }
 
         public bool ChangeUserCredentials(string NewUserName, string NewPassword)
