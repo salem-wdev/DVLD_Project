@@ -12,6 +12,7 @@ namespace DVLD_Business
     {
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode { private set; get; } = enMode.AddNew;
+        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         private clsPerson _PersonInfo = null;
         public clsPerson PersonInfo
@@ -38,6 +39,13 @@ namespace DVLD_Business
             this.PersonID = PersonID;
             this.CreatedByUserID = CreatedByUserID;
             this.CreatedDate = DateTime.Now;
+
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewDriver},
+                {enMode.Update,_UpdateDriver}
+            };
+
             Mode = enMode.AddNew;
 
         }
@@ -50,6 +58,12 @@ namespace DVLD_Business
             this.CreatedByUserID = CreatedByUserID;
             this.CreatedDate = CreatedDate;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewDriver},
+                {enMode.Update,_UpdateDriver}
+            };
+
             Mode = enMode.Update;
         }
 
@@ -60,7 +74,12 @@ namespace DVLD_Business
             this.DriverID = clsDriverData.AddNewDriver(PersonID, CreatedByUserID);
             this.CreatedDate = clsUtilData.GetServerDate();
 
-            return (this.DriverID != -1);
+            if (this.DriverID != -1)
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+            return false;
         }
 
         private bool _UpdateDriver()
