@@ -22,7 +22,7 @@ namespace DVLD_Business
         public byte DefaultValidityLength { private set; get; }
         public float ClassFees { set; get; }
 
-        public clsLicenseClass()
+        private clsLicenseClass()
 
         {
             this.LicenseClassID = -1;
@@ -42,7 +42,7 @@ namespace DVLD_Business
 
         }
 
-        public clsLicenseClass(int LicenseClassID, string ClassName,
+        private clsLicenseClass(int LicenseClassID, string ClassName,
             string ClassDescription,
             byte MinimumAllowedAge, byte DefaultValidityLength, float ClassFees)
 
