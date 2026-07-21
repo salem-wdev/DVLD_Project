@@ -39,6 +39,7 @@ namespace DVLD_Business
 
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
+        private readonly Dictionary<enMode, Func<bool>> _saveDispatcher;
 
         public enum enIssueReason { FirstTime = 1, Renew = 2, DamagedReplacement = 3, LostReplacement = 4 };
 
@@ -126,6 +127,12 @@ namespace DVLD_Business
             this.IssueReason = IssueReason;
             this.CreatedByUserID = CreatedByUserID;
 
+            _saveDispatcher = new Dictionary<enMode, Func<bool>>
+            {
+                { enMode.AddNew, _AddNewLicense },
+                { enMode.Update, _UpdateLicense }
+            };
+
             Mode = enMode.AddNew;
 
         }
@@ -147,6 +154,12 @@ namespace DVLD_Business
             this.IssueReason = IssueReason;
             this.CreatedByUserID = CreatedByUserID;
 
+            _saveDispatcher = new Dictionary<enMode, Func<bool>>
+            {
+                { enMode.AddNew, _AddNewLicense },
+                { enMode.Update, _UpdateLicense }
+            };
+
             Mode = enMode.Update;
         }
 
@@ -164,6 +177,12 @@ namespace DVLD_Business
             this.IsActive = OldLicense.IsActive;
             this.IssueReason = OldLicense.IssueReason;
             this.CreatedByUserID = OldLicense.CreatedByUserID;
+
+            _saveDispatcher = new Dictionary<enMode, Func<bool>>
+            {
+                { enMode.AddNew, _AddNewLicense },
+                { enMode.Update, _UpdateLicense }
+            };
 
             clsDetainedLicense.LicenseDetained += ClsDetainedLicense_LicenseDetained;
             clsDetainedLicense.LicenseReleased += ClsDetainedLicense_LicenseReleased;
@@ -199,6 +218,17 @@ namespace DVLD_Business
         // Need to move expiration logic (Class Validity) here to comply with Rich Domain Model.
         private bool _AddNewLicense()
         {
+            if (IssueReason != enIssueReason.FirstTime)
+            {
+                // To deactivate the old license upon renewal
+                if (!clsLicenseData.DeactivateLicenseIDByDriverID(this.DriverID, this.LicenseClassID))
+                {
+
+                    return false;
+
+                }
+            }
+
             int OldLicenseID = -1;
             if (clsApplication.GetApplicationStatus(ApplicationID) != clsApplication.enApplicationStatus.New)
             {
@@ -223,6 +253,7 @@ namespace DVLD_Business
                 {
                     clsLicense.DeactivateLicense(OldLicenseID);
                 }
+                Mode = enMode.Update;
                 return true;
             }
 
@@ -343,39 +374,7 @@ namespace DVLD_Business
         private bool Save()
         {
 
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    if (IssueReason != enIssueReason.FirstTime)
-                    {
-                        // To deactivate the old license upon renewal
-                        if (!clsLicenseData.DeactivateLicenseIDByDriverID(this.DriverID, this.LicenseClassID))
-                        {
-
-                            return false;
-
-                        }
-                    }
-
-                    if (_AddNewLicense())
-                    {
-
-                        Mode = enMode.Update;
-                        return true;
-
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case enMode.Update:
-
-                    return _UpdateLicense();
-
-            }
-
-            return false;
+            return _saveDispatcher[this.Mode]();
         }
 
         public static string GetIssueReasonText(enIssueReason IssueReason)
