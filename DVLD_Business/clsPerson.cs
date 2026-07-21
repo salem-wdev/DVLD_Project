@@ -15,6 +15,8 @@ namespace DVLD_Business
         public enum enMode { AddNew = 0, Update = 1 }
         public enMode Mode { get; private set; }
 
+        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+
         public int PersonID { get; private set; }
         private bool _IsNationalNoChanged = false;
         private string _NationalNo = "";
@@ -103,6 +105,12 @@ namespace DVLD_Business
             NationalityCountryID = 1;
             ImagePath = string.Empty;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewPerson},
+                {enMode.Update,_UpdatePerson}
+            };
+
             Mode = enMode.AddNew;
         }
 
@@ -124,6 +132,12 @@ namespace DVLD_Business
             this.NationalityCountryID = NationalityCountryID;
             this._ImagePath = ImagePath;
             this._OldImagePath = ImagePath;
+
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewPerson},
+                {enMode.Update,_UpdatePerson}
+            };
 
             Mode = enMode.AddNew;
         }
@@ -150,6 +164,12 @@ namespace DVLD_Business
             this._ImagePath = ImagePath;
             this._OldImagePath = ImagePath;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewPerson},
+                {enMode.Update,_UpdatePerson}
+            };
+
             Mode = enMode.Update;
         }
 
@@ -173,6 +193,7 @@ namespace DVLD_Business
             {
                 this._OldImagePath = this._ImagePath;
                 this._IsImagePathChanged = false;
+                Mode = enMode.Update;
                 return true;
             }
             else
@@ -331,27 +352,7 @@ namespace DVLD_Business
 
         public bool Save()
         {
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    {
-                        if (_AddNewPerson())
-                        {
-                            Mode = enMode.Update;
-                            return true;
-                        }
-
-                        return false;
-                    }
-                case enMode.Update:
-                    {
-                        return _UpdatePerson();
-                    }
-                default:
-                    {
-                        return false; 
-                    }
-            }
+            return _saveDictionary[this.Mode]();
         }
 
         public static bool HasPeople()

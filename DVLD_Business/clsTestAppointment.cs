@@ -12,6 +12,7 @@ namespace DVLD_Business
     {
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
+        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         public int TestAppointmentID { private set; get; }
         public clsTestType.enTestType TestTypeID { private set; get; }
@@ -68,6 +69,13 @@ namespace DVLD_Business
             this.IsLocked = false;
             this.CreatedByUserID = CreatedByUserID;
             this.RetakeTestApplicationID = -1;
+
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew, _AddNewTestAppointment },
+                {enMode.Update, _UpdateTestAppointment },
+            };
+
             Mode = enMode.AddNew;
 
         }
@@ -85,6 +93,13 @@ namespace DVLD_Business
             this.CreatedByUserID = CreatedByUserID;
             this.IsLocked = IsLocked;
             this.RetakeTestApplicationID = RetakeTestApplicationID;
+
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew, _AddNewTestAppointment },
+                {enMode.Update, _UpdateTestAppointment },
+            };
+
             Mode = enMode.Update;
         }
 
@@ -101,11 +116,33 @@ namespace DVLD_Business
             this.TestAppointmentID = clsTestAppointmentData.AddNewTestAppointment((int)this.TestTypeID, this.LocalDrivingLicenseApplicationID,
                 this.AppointmentDate, this.PaidFees, this.CreatedByUserID, this.RetakeTestApplicationID);
 
-            return (this.TestAppointmentID != -1);
+            if (this.TestAppointmentID != -1)
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+
+            if (this.RetakeTestApplicationID != -1)
+            {
+                // Delete the retake test application if the test appointment save fails.
+                clsApplication.Delete(this.RetakeTestApplicationID);
+            }
+            return false;
         }
 
         private bool _UpdateTestAppointment()
         {
+            if (this._AppointmentDate < clsUtilData.GetServerDate())
+            {
+                this.IsLocked = true;
+                return false;
+            }
+
+            if (clsTestAppointmentData.GetIsAppointmentLockedByID(this.TestAppointmentID))
+            {
+                return false;
+            }
+
             //call DataAccess Layer 
 
             return clsTestAppointmentData.UpdateTestAppointment(this.TestAppointmentID, (int)this.TestTypeID, this.LocalDrivingLicenseApplicationID,
@@ -202,49 +239,12 @@ namespace DVLD_Business
 
         public bool Save()
         {
-
-
             if (RetakeTestAppInfo != null)
             {
                 RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
             }
 
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    if (_AddNewTestAppointment())
-                    {
-
-                        Mode = enMode.Update;
-                        return true;
-                    }
-                    else
-                    {
-                        if (this.RetakeTestApplicationID != -1)
-                        {
-                            // Delete the retake test application if the test appointment save fails.
-                            clsApplication.Delete(this.RetakeTestApplicationID);
-                        }
-                        return false;
-                    }
-
-                case enMode.Update:
-
-                    if (this._AppointmentDate < clsUtilData.GetServerDate())
-                    {
-                        this.IsLocked = true;
-                        return false;
-                    }
-
-                    if (clsTestAppointmentData.GetIsAppointmentLockedByID(this.TestAppointmentID))
-                    {
-                        return false;
-                    }
-                    return _UpdateTestAppointment();
-
-            }
-
-            return false;
+            return _saveDictionary[this.Mode]();
         }
 
         private int _GetTestID()

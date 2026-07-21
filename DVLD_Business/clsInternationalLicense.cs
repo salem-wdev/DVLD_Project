@@ -1,17 +1,19 @@
-﻿using System;
+﻿using DVLD_Business;
+using DVLD_DataAccess;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.Eventing.Reader;
 using System.Xml.Linq;
-using DVLD_Business;
-using DVLD_DataAccess;
 
 namespace DVLD_Business
 {
     public class clsInternationalLicense:clsApplication
     {
 
-        public enum enMode { AddNew = 0, Update = 1 };
-        public enMode Mode { get; protected set; } = enMode.AddNew;
+        public new enum enMode { AddNew = 0, Update = 1 };
+        public new enMode Mode { get; protected set; } = enMode.AddNew;
+        private new readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         // Holds the cached driver information; backing field for the lazy-loaded DriverInfo property.
         private clsDriver _DriverInfo = null;
@@ -53,7 +55,21 @@ namespace DVLD_Business
             this.ExpirationDate = ExpirationDate;
            
             this.IsActive = IsActive;
-            
+
+            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            {
+                [enMode.AddNew] = () =>
+                {
+                    base.Mode = clsApplication.enMode.AddNew;
+                    return base._AddNewApplication() && this._AddNewInternationalLicense();
+                },
+
+                [enMode.Update] = () =>
+                {
+                    base.Mode = clsApplication.enMode.Update;
+                    return base._UpdateApplication() && this._UpdateInternationalLicense();
+                }
+            };
 
             Mode = enMode.AddNew;
 
@@ -72,6 +88,21 @@ namespace DVLD_Business
             this.ExpirationDate = ExpirationDate;
             this.IsActive = IsActive;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            {
+                [enMode.AddNew] = () =>
+                {
+                    base.Mode = clsApplication.enMode.AddNew;
+                    return base._AddNewApplication() && this._AddNewInternationalLicense();
+                },
+
+                [enMode.Update] = () =>
+                {
+                    base.Mode = clsApplication.enMode.Update;
+                    return base._UpdateApplication() && this._UpdateInternationalLicense();
+                }
+            }; 
+            
             Mode = enMode.Update;
         }
 
@@ -87,12 +118,28 @@ namespace DVLD_Business
                this.IsActive, this.CreatedByUserID);
 
 
-            return (this.InternationalLicenseID != -1);
+            if (this.InternationalLicenseID != -1)
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+            clsApplication.Delete(this.ApplicationID);
+            return false;
         }
 
         private bool _UpdateInternationalLicense()
         {
             //call DataAccess Layer 
+
+            clsLicense license = clsLicense.Find(IssuedUsingLocalLicenseID);
+
+            if (license == null || license.ExpirationDate < clsUtilData.GetServerDate()
+                || license.IsActive == false
+                || clsDetainedLicense.IsLicenseDetained(IssuedUsingLocalLicenseID))
+            {
+                IsActive = false;
+                return false;
+            }
 
             return clsInternationalLicenseData.UpdateInternationalLicense(
                 this.InternationalLicenseID,this.ApplicationID, this.DriverID, this.IssuedUsingLocalLicenseID,
@@ -147,43 +194,7 @@ namespace DVLD_Business
                 return false;
             }
 
-            //Because of inheritance first we call the save method in the base class,
-            //it will take care of adding all information to the application table.
-            base.Mode = (clsApplication.enMode)Mode;
-            if (!base.Save())
-                return false;
-
-            switch (this.Mode)
-            {
-                case enMode.AddNew:
-                    if (_AddNewInternationalLicense())
-                    {
-
-                        Mode = enMode.Update;
-                        return true;
-                    }
-                    else
-                    {
-                        clsApplication.Delete(this.ApplicationID);
-                        return false;
-                    }
-
-                case enMode.Update:
-                    clsLicense license = clsLicense.Find(IssuedUsingLocalLicenseID);
-
-                    if (license == null || license.ExpirationDate < clsUtilData.GetServerDate()
-                        || license.IsActive == false
-                        || clsDetainedLicense.IsLicenseDetained(IssuedUsingLocalLicenseID))
-                    {
-                        IsActive = false;
-                        return false;
-                    }
-                    
-                        return _UpdateInternationalLicense();
-
-            }
-
-            return false;
+            return _saveDictionary[this.Mode]();
         }
 
         public static int GetActiveInternationalLicenseIDByDriverID(int DriverID)

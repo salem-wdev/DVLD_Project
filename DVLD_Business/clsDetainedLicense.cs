@@ -58,6 +58,7 @@ namespace DVLD_Business
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode { private set; get; } = enMode.AddNew;
 
+        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         public int DetainID { private set; get; }
         public int LicenseID { private set; get; }
@@ -123,7 +124,11 @@ namespace DVLD_Business
             this.ReleasedByUserID = 0;
             this.ReleaseApplicationID = -1;
 
-
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewDetainedLicense},
+                {enMode.Update,_UpdateDetainedLicense}
+            };
 
             Mode = enMode.AddNew;
 
@@ -145,6 +150,13 @@ namespace DVLD_Business
             this.ReleaseDate = ReleaseDate;
             this.ReleasedByUserID = ReleasedByUserID;
             this.ReleaseApplicationID = ReleaseApplicationID;
+
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewDetainedLicense},
+                {enMode.Update,_UpdateDetainedLicense}
+            };
+
             Mode = enMode.Update;
         }
 
@@ -155,7 +167,12 @@ namespace DVLD_Business
             this.DetainID = clsDetainedLicenseData.AddNewDetainedLicense(
                 this.LicenseID, this.DetainDate, this.FineFees, this.CreatedByUserID);
 
-            return (this.DetainID != -1);
+            if (this.DetainID != -1) 
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+            return false;
         }
 
         private bool _UpdateDetainedLicense()
@@ -220,27 +237,7 @@ namespace DVLD_Business
 
         public bool Save()
         {
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    if (_AddNewDetainedLicense())
-                    {
-
-                        Mode = enMode.Update;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case enMode.Update:
-
-                    return _UpdateDetainedLicense();
-
-            }
-
-            return false;
+            return _saveDictionary[this.Mode]();
         }
 
         public static bool IsLicenseDetained(int LicenseID)

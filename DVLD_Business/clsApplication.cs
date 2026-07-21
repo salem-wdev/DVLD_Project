@@ -13,6 +13,8 @@ namespace DVLD_Business
 
 
         public enum enMode { AddNew = 0, Update = 1 }
+        protected readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+
         public enum enApplicationStatus : sbyte
         {
             None = -1,
@@ -109,6 +111,11 @@ namespace DVLD_Business
             this.PaidFees = 0;
             this.CreatedByUserID = CreatedByUserID;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewApplication},
+                {enMode.Update,_UpdateApplication}
+            };
 
             Mode = enMode.AddNew;
         }
@@ -125,6 +132,11 @@ namespace DVLD_Business
             this.PaidFees = 0;
             this.CreatedByUserID = -1;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewApplication},
+                {enMode.Update,_UpdateApplication}
+            };
 
             Mode = enMode.AddNew;
         }
@@ -145,6 +157,11 @@ namespace DVLD_Business
             this.PaidFees = PaidFees;
             this.CreatedByUserID = CreatedByUserID;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewApplication},
+                {enMode.Update,_UpdateApplication}
+            };
 
             Mode = enMode.Update;
         }
@@ -160,11 +177,16 @@ namespace DVLD_Business
             this.PaidFees = BaseApplication.PaidFees;
             this.CreatedByUserID = BaseApplication.CreatedByUserID;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewApplication},
+                {enMode.Update,_UpdateApplication}
+            };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewApplication()
+        protected bool _AddNewApplication()
         {
             //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
             //{
@@ -179,10 +201,15 @@ namespace DVLD_Business
 
             this._ApplicationStatus = (enApplicationStatus)applicationStatus;
 
-            return (ApplicationID != -1);
+            if (ApplicationID != -1)
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+            return false;
         }
 
-        private bool _UpdateApplication()
+        protected bool _UpdateApplication()
         {
             //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
             //{
@@ -294,31 +321,7 @@ namespace DVLD_Business
 
         public virtual bool Save()
         {
-
-
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    {
-                        if (_AddNewApplication())
-                        {
-                            Mode = enMode.Update;
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                case enMode.Update:
-                    {
-                        return _UpdateApplication();
-                    }
-                default:
-                    {
-                        return false;
-                    }
-            }
+            return _saveDictionary[this.Mode]();
         }
 
         public static bool DoesPersonHaveActiveApplication(int PersonID, int ApplicationTypeID)

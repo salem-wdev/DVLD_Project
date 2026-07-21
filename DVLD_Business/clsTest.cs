@@ -12,6 +12,7 @@ namespace DVLD_Business
     {
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
+        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         public int TestID { private set; get; }
         public int TestAppointmentID { private set; get; }
@@ -54,6 +55,12 @@ namespace DVLD_Business
             this.Notes = Notes;
             this.CreatedByUserID = CreatedByUserID;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew, _AddNewTest },
+                {enMode.Update, _UpdateTest },
+            };
+
             Mode = enMode.AddNew;
         }
 
@@ -66,6 +73,12 @@ namespace DVLD_Business
             this.TestResult = TestResult;
             this.Notes = Notes;
             this.CreatedByUserID = CreatedByUserID;
+
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew, _AddNewTest },
+                {enMode.Update, _UpdateTest },
+            };
 
             Mode = enMode.Update;
         }
@@ -84,7 +97,7 @@ namespace DVLD_Business
             {
                 TestAppointmentInfo.RetakeTestAppInfo.SetComplete();
             }
-
+            Mode = enMode.Update;
             return true;
         }
 
@@ -141,27 +154,7 @@ namespace DVLD_Business
 
         public bool Save()
         {
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    if (_AddNewTest())
-                    {
-
-                        Mode = enMode.Update;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case enMode.Update:
-
-                    return _UpdateTest();
-
-            }
-
-            return false;
+            return _saveDictionary[this.Mode]();
         }
 
         public static byte GetPassedTestCount(int LocalDrivingLicenseApplicationID)

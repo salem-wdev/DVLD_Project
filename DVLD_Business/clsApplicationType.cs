@@ -14,21 +14,26 @@ namespace DVLD_Business
 
         public enum enMode { AddNew = 0, Update = 1 }
         public enMode Mode { get; private set; }
+        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         public int ApplicationTypeID { get; private set; }
         public string ApplicationTypeTitle { get; set; }
         public decimal ApplicationTypeFees { get; set; }
 
-        public clsApplicationType()
+        private clsApplicationType()
         {
             ApplicationTypeID = -1;
             ApplicationTypeFees = 0.0m;
             ApplicationTypeTitle = string.Empty;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                 {enMode.AddNew,_AddNewApplicationType},
+                 {enMode.Update,_UpdateApplicationType}
+            };
+
             Mode = enMode.AddNew;
         }
-
-
 
         // New overload that sets ApplicationTypeID so instances returned from Find have correct ID
         private clsApplicationType(int ApplicationTypeID,
@@ -37,7 +42,13 @@ namespace DVLD_Business
             this.ApplicationTypeID = ApplicationTypeID;
             this.ApplicationTypeTitle = ApplicationTypeTitle;
             this.ApplicationTypeFees = ApplicationTypeFees;
-           
+
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                 {enMode.AddNew,_AddNewApplicationType},
+                 {enMode.Update,_UpdateApplicationType}
+            };
+
             Mode = enMode.Update;
         }
 
@@ -45,7 +56,12 @@ namespace DVLD_Business
         {
             this.ApplicationTypeID = clsApplicationTypeData.AddNewApplicationType(ApplicationTypeTitle, ApplicationTypeFees);
 
-            return (ApplicationTypeID != -1);
+            if (ApplicationTypeID != -1)
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+            return false;
         }
 
         private bool _UpdateApplicationType()
@@ -77,28 +93,7 @@ namespace DVLD_Business
 
         public bool Save()
         {
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    {
-                        if (_AddNewApplicationType())
-                        {
-                            Mode = enMode.Update;
-                            return true;
-                        }
-
-                        return false;
-                        
-                    }
-                case enMode.Update:
-                    {
-                        return _UpdateApplicationType();
-                    }
-                default:
-                    {
-                        return false;
-                    }
-            }
+            return _saveDictionary[this.Mode]();
         }
 
     }
