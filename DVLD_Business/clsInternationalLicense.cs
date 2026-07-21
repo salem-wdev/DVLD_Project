@@ -11,9 +11,9 @@ namespace DVLD_Business
     public class clsInternationalLicense:clsApplication
     {
 
-        public enum enMode { AddNew = 0, Update = 1 };
-        public enMode Mode { get; protected set; } = enMode.AddNew;
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        public new enum enMode { AddNew = 0, Update = 1 };
+        public new enMode Mode { get; protected set; } = enMode.AddNew;
+        private new readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         // Holds the cached driver information; backing field for the lazy-loaded DriverInfo property.
         private clsDriver _DriverInfo = null;
