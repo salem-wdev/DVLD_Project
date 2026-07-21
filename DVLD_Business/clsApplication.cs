@@ -186,7 +186,7 @@ namespace DVLD_Business
             Mode = enMode.Update;
         }
 
-        private bool _AddNewApplication()
+        protected bool _AddNewApplication()
         {
             //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
             //{
@@ -209,7 +209,7 @@ namespace DVLD_Business
             return false;
         }
 
-        private bool _UpdateApplication()
+        protected bool _UpdateApplication()
         {
             //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
             //{
