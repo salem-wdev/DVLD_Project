@@ -58,7 +58,7 @@ namespace DVLD_Business
 
             if (ApplicationTypeID != -1)
             {
-                Mode = enMode.AddNew;
+                Mode = enMode.Update;
                 return true;
             }
             return false;
