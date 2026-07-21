@@ -20,7 +20,7 @@ namespace DVLD_Business
         public string ApplicationTypeTitle { get; set; }
         public decimal ApplicationTypeFees { get; set; }
 
-        public clsApplicationType()
+        private clsApplicationType()
         {
             ApplicationTypeID = -1;
             ApplicationTypeFees = 0.0m;
@@ -34,8 +34,6 @@ namespace DVLD_Business
 
             Mode = enMode.AddNew;
         }
-
-
 
         // New overload that sets ApplicationTypeID so instances returned from Find have correct ID
         private clsApplicationType(int ApplicationTypeID,
