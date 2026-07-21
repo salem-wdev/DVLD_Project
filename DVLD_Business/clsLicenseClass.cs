@@ -12,6 +12,8 @@ namespace DVLD_Business
     {
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
+        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+
 
         public int LicenseClassID { private set; get; }
         public string ClassName { set; get; }
@@ -30,6 +32,12 @@ namespace DVLD_Business
             this.DefaultValidityLength = 10;
             this.ClassFees = 0;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewLicenseClass},
+                {enMode.Update,_UpdateLicenseClass}
+            };
+
             Mode = enMode.AddNew;
 
         }
@@ -45,6 +53,13 @@ namespace DVLD_Business
             this.MinimumAllowedAge = MinimumAllowedAge;
             this.DefaultValidityLength = DefaultValidityLength;
             this.ClassFees = ClassFees;
+
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew,_AddNewLicenseClass},
+                {enMode.Update,_UpdateLicenseClass}
+            };
+
             Mode = enMode.Update;
         }
 
@@ -56,7 +71,12 @@ namespace DVLD_Business
                 this.MinimumAllowedAge, this.DefaultValidityLength, this.ClassFees);
 
 
-            return (this.LicenseClassID != -1);
+            if (this.LicenseClassID != -1)
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+            return false;
         }
 
         private bool _UpdateLicenseClass()
@@ -105,27 +125,7 @@ namespace DVLD_Business
 
         public bool Save()
         {
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    if (_AddNewLicenseClass())
-                    {
-
-                        Mode = enMode.Update;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case enMode.Update:
-
-                    return _UpdateLicenseClass();
-
-            }
-
-            return false;
+            return _saveDictionary[this.Mode]();
         }
     }
 }
