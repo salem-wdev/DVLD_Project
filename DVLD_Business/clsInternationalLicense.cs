@@ -58,8 +58,17 @@ namespace DVLD_Business
 
             _saveDictionary = new Dictionary<enMode, Func<bool>>()
             {
-                [enMode.AddNew] = () => base._AddNewApplication() && this._AddNewInternationalLicense(),
-                [enMode.Update] = () => base._UpdateApplication() && this._UpdateInternationalLicense()
+                [enMode.AddNew] = () =>
+                {
+                    base.Mode = clsApplication.enMode.AddNew;
+                    return base._AddNewApplication() && this._AddNewInternationalLicense();
+                },
+
+                [enMode.Update] = () =>
+                {
+                    base.Mode = clsApplication.enMode.Update;
+                    return base._UpdateApplication() && this._UpdateInternationalLicense();
+                }
             };
 
             Mode = enMode.AddNew;
@@ -78,11 +87,22 @@ namespace DVLD_Business
             this.IssueDate = IssueDate;
             this.ExpirationDate = ExpirationDate;
             this.IsActive = IsActive;
+
             _saveDictionary = new Dictionary<enMode, Func<bool>>()
             {
-                [enMode.AddNew] = () => base._AddNewApplication() && this._AddNewInternationalLicense(),
-                [enMode.Update] = () => base._UpdateApplication() && this._UpdateInternationalLicense()
-            };
+                [enMode.AddNew] = () =>
+                {
+                    base.Mode = clsApplication.enMode.AddNew;
+                    return base._AddNewApplication() && this._AddNewInternationalLicense();
+                },
+
+                [enMode.Update] = () =>
+                {
+                    base.Mode = clsApplication.enMode.Update;
+                    return base._UpdateApplication() && this._UpdateInternationalLicense();
+                }
+            }; 
+            
             Mode = enMode.Update;
         }
 
