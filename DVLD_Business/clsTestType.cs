@@ -14,6 +14,7 @@ namespace DVLD_Business
 
         public enum enMode { AddNew = 0, Update = 1 }
         public enMode Mode { get; private set; }
+        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         public enum enTestType
         {
@@ -35,10 +36,14 @@ namespace DVLD_Business
             TestTypeTitle = string.Empty;
             TestTypeDescription = string.Empty;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew, _AddNewTestType },
+                {enMode.Update, _UpdateTestType},
+            };
+
             Mode = enMode.AddNew;
         }
-
-
 
         // New overload that sets TestTypeID so instances returned from Find have correct ID
         private clsTestType(enTestType ID,
@@ -49,6 +54,12 @@ namespace DVLD_Business
             this.TestTypeDescription = TestTypeDescription;
             this.TestTypeFees = TestTypeFees;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            {
+                {enMode.AddNew, _AddNewTestType },
+                {enMode.Update, _UpdateTestType},
+            };
+
             Mode = enMode.Update;
         }
 
@@ -57,7 +68,12 @@ namespace DVLD_Business
             
             this.ID = (enTestType)clsTestTypeData.AddNewTestType(TestTypeTitle, TestTypeDescription, TestTypeFees);
 
-            return (ID != enTestType.None);
+            if (ID != enTestType.None)
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+            return false;
         }
 
         private bool _UpdateTestType()
@@ -90,28 +106,7 @@ namespace DVLD_Business
 
         public bool Save()
         {
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    {
-                        if (_AddNewTestType())
-                        {
-                            Mode = enMode.Update;
-                            return true;
-                        }
-
-                        return false;
-
-                    }
-                case enMode.Update:
-                    {
-                        return _UpdateTestType();
-                    }
-                default:
-                    {
-                        return false;
-                    }
-            }
+            return _saveDictionary[this.Mode]();
         }
 
 
