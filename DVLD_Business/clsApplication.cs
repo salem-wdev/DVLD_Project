@@ -13,7 +13,7 @@ namespace DVLD_Business
 
 
         public enum enMode { AddNew = 0, Update = 1 }
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        protected readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         public enum enApplicationStatus : sbyte
         {
