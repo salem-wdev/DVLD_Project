@@ -29,7 +29,7 @@ namespace DVLD_Business
         public string TestTypeDescription { get; set; }
         public decimal TestTypeFees { get; set; }
 
-        public clsTestType()
+        private clsTestType()
         {
             ID = clsTestType.enTestType.None;
             TestTypeFees = 0.0m;
