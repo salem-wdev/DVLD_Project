@@ -12,9 +12,10 @@ namespace DVLD_Business
 {
     public class clsLocalDrivingLicenseApplication : clsApplication
     {
-        public enum enMode { AddNew = 0, Update = 1 }
+        public new enum enMode { AddNew = 0, Update = 1 }
 
-        public enMode Mode { get; protected set; } = enMode.AddNew;
+        public new enMode Mode { get; protected set; } = enMode.AddNew;
+        private new readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
         public int LocalDrivingLicenseApplicationID { private set; get; }
 
@@ -71,6 +72,20 @@ namespace DVLD_Business
             this.LocalDrivingLicenseApplicationID = -1;
             this.LicenseClassID = -1;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            {
+                [enMode.AddNew] = () =>
+                {
+                    base.Mode = clsApplication.enMode.AddNew;
+                    return base._AddNewApplication() && this._AddNewLocalDrivingLicenseApplication();
+                },
+
+                [enMode.Update] = () =>
+                {
+                    base.Mode = clsApplication.enMode.Update;
+                    return base._UpdateApplication() && this._UpdateLocalDrivingLicenseApplication();
+                }
+            };
 
             Mode = enMode.AddNew;
 
@@ -85,6 +100,21 @@ namespace DVLD_Business
             this.ApplicantPersonID = ApplicantPersonID;
             this.ApplicationTypeID = ApplicationTypeID;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            {
+                [enMode.AddNew] = () =>
+                {
+                    base.Mode = clsApplication.enMode.AddNew;
+                    return base._AddNewApplication() && this._AddNewLocalDrivingLicenseApplication();
+                },
+
+                [enMode.Update] = () =>
+                {
+                    base.Mode = clsApplication.enMode.Update;
+                    return base._UpdateApplication() && this._UpdateLocalDrivingLicenseApplication();
+                }
+            };
+
 
             Mode = enMode.AddNew;
 
@@ -97,18 +127,44 @@ namespace DVLD_Business
             this.LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID; ;
             this.LicenseClassID = LicenseClassID;
 
+            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            {
+                [enMode.AddNew] = () =>
+                {
+                    base.Mode = clsApplication.enMode.AddNew;
+                    return base._AddNewApplication() && this._AddNewLocalDrivingLicenseApplication();
+                },
+
+                [enMode.Update] = () =>
+                {
+                    base.Mode = clsApplication.enMode.Update;
+                    return base._UpdateApplication() && this._UpdateLocalDrivingLicenseApplication();
+                }
+            };
+
+
             Mode = enMode.Update;
         }
 
         private bool _AddNewLocalDrivingLicenseApplication()
         {
+            if (clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID) != -1)
+            {
+                return false;
+            }
+
             //call DataAccess Layer 
 
             this.LocalDrivingLicenseApplicationID = clsLocalDrivingLicenseApplicationData.AddNewLocalDrivingLicenseApplication
                 (
                 this.ApplicationID, this.LicenseClassID);
 
-            return (this.LocalDrivingLicenseApplicationID != -1);
+            if (this.LocalDrivingLicenseApplicationID != -1)
+            {
+                Mode = enMode.Update;
+                return true;
+            }
+            return false;
         }
 
         private bool _UpdateLocalDrivingLicenseApplication()
@@ -171,41 +227,7 @@ namespace DVLD_Business
 
         public override bool Save()
         {
-            if (Mode == enMode.AddNew && clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID) != -1)
-            {
-                return false;
-            }
-
-
-            //Because of inheritance first we call the save method in the base class,
-            //it will take care of adding all information to the application table.
-            if (!base.Save())
-                return false;
-
-
-
-            //After we save the main application now we save the sub application.
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    if (_AddNewLocalDrivingLicenseApplication())
-                    {
-
-                        Mode = enMode.Update;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case enMode.Update:
-
-                    return _UpdateLocalDrivingLicenseApplication();
-
-            }
-
-            return false;
+            return _saveDictionary[this.Mode]();
         }
 
         public static DataTable GetAllLocalDrivingLicenseApplications()
