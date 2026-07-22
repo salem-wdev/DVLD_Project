@@ -299,9 +299,15 @@ namespace DVLD_Business
         {
             //call DataAccess Layer 
 
-            return clsLicenseData.UpdateLicense(this.ApplicationID, this.LicenseID, this.DriverID, this.LicenseClassID,
+            if (clsLicenseData.UpdateLicense(this.ApplicationID, this.LicenseID, this.DriverID, this.LicenseClassID,
                this.Notes, this.PaidFees, this.IsActive, (byte)this.IssueReason,
-               this.CreatedByUserID);
+               this.CreatedByUserID))
+            {
+                OnLicenseUpdated(new LicenseUpdatedEventArgs(this.LicenseID, this.DriverID, this.ExpirationDate, this.Notes,
+                        this.PaidFees, this.IsActive, this.IsDetained));
+                return true;
+            }
+            return false;
         }
 
         public static clsLicense Find(int LicenseID)
