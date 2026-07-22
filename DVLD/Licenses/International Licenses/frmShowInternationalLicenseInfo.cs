@@ -28,5 +28,10 @@ namespace DVLD.Licenses.International_Licenses
                 return;
             }
         }
+
+        private void frmShowInternationalLicenseInfo_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ctrlDriverInternationalLicenseInfo1?.Dispose();
+        }
     }
 }
