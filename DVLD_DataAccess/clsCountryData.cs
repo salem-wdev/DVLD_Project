@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace DVLD_DataAccess
@@ -9,25 +10,29 @@ namespace DVLD_DataAccess
         public static bool GetCountryByID(int CountryID, ref string CountryName)
         {
             bool IsFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string Query = "SELECT * FROM Countries WHERE CountryID = @CountryID";
-            SqlCommand Command = new SqlCommand(Query, connection);
-            Command.Parameters.AddWithValue("@CountryID", CountryID);
             try
             {
-                connection.Open();
-                SqlDataReader reader = Command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    CountryName = reader["CountryName"].ToString();
-                    IsFound = true;
+                    string Query = "SELECT * FROM Countries WHERE CountryID = @CountryID";
+                    using (SqlCommand Command = new SqlCommand(Query, connection))
+                    {
+                        Command.Parameters.AddWithValue("@CountryID", CountryID);
+
+                        connection.Open();
+                        using (SqlDataReader reader = Command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                CountryName = reader["CountryName"].ToString();
+                                IsFound = true;
+                            }  
+                        } 
+                    }
                 }
-                reader.Close();
             }
-            catch { }
-            finally
+            catch (Exception ex)
             {
-                connection.Close();
             }
             return IsFound;
         }
@@ -35,25 +40,29 @@ namespace DVLD_DataAccess
         public static bool GetCountryByCountryName(string CountryName, ref int CountryID)
         {
             bool IsFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string Query = "SELECT * FROM Countries WHERE CountryName = @CountryName";
-            SqlCommand Command = new SqlCommand(Query, connection);
-            Command.Parameters.AddWithValue("@CountryName", CountryName);
             try
             {
-                connection.Open();
-                SqlDataReader reader = Command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    CountryID = (int)reader["CountryID"];
-                    IsFound = true;
+                    string Query = "SELECT * FROM Countries WHERE CountryName = @CountryName";
+                    using (SqlCommand Command = new SqlCommand(Query, connection))
+                    {
+                        Command.Parameters.AddWithValue("@CountryName", CountryName);
+
+                        connection.Open();
+                        using (SqlDataReader reader = Command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                CountryID = (int)reader["CountryID"];
+                                IsFound = true;
+                            }   
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch { }
-            finally
+            catch (Exception ex)
             {
-                connection.Close();
             }
             return IsFound;
         }
@@ -62,29 +71,27 @@ namespace DVLD_DataAccess
         public static DataTable GetAllCountries()
         {
             DataTable Table = new DataTable();
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string Query = "SELECT * FROM Countries";
-
-            SqlCommand Command = new SqlCommand(Query, connection);
-
             try
             {
-                connection.Open();
-                SqlDataReader reader = Command.ExecuteReader();
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    string Query = "SELECT * FROM Countries";
 
-                Table.Load(reader);
-                reader.Close();
+                    using (SqlCommand Command = new SqlCommand(Query, connection))
+                    {
+
+                        connection.Open();
+                        using (SqlDataReader reader = Command.ExecuteReader())
+                        {
+                            Table.Load(reader);  
+                        } 
+                    }
+                }
             }
-            catch { }
-            finally
+            catch (Exception)
             {
-                connection.Close();
             }
-
             return Table;
-
         }
 
 
