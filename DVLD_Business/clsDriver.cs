@@ -28,11 +28,11 @@ namespace DVLD_Business
         }
 
         public int DriverID { private set; get; }
-        public int PersonID { private set; get; }
+        public int? PersonID { private set; get; }
         public int CreatedByUserID { private set; get; }
         public DateTime CreatedDate { private set; get; }
 
-        private clsDriver(int PersonID, int CreatedByUserID)
+        private clsDriver(int? PersonID, int CreatedByUserID)
 
         {
             this.DriverID = -1;
@@ -50,7 +50,7 @@ namespace DVLD_Business
 
         }
 
-        private clsDriver(int DriverID, int PersonID, int CreatedByUserID, DateTime CreatedDate)
+        private clsDriver(int DriverID, int? PersonID, int CreatedByUserID, DateTime CreatedDate)
 
         {
             this.DriverID = DriverID;
@@ -102,8 +102,11 @@ namespace DVLD_Business
 
         }
 
-        public static clsDriver FindByPersonID(int PersonID)
+        public static clsDriver FindByPersonID(int? PersonID)
         {
+
+            if (PersonID == null || PersonID <= 0)
+                return null;
 
             int DriverID = -1; int CreatedByUserID = -1; DateTime CreatedDate = DateTime.Now;
 

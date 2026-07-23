@@ -42,8 +42,11 @@ namespace DVLD
             }
         }
 
-        public bool LoadData(int PersonID)
+        public bool LoadData(int? PersonID)
         {
+            if (!PersonID.HasValue || PersonID <= 0)
+                return false;
+
             _Person = clsPerson.Find(PersonID);
             return LoadData(_Person);
         }
@@ -59,7 +62,7 @@ namespace DVLD
             _Person = Person;
             if (_Person != null)
             {
-                _PersonID = Person.PersonID;
+                _PersonID = Person.PersonID.HasValue ? (int)Person.PersonID : -1;
                 _FillPersonInfo();
                 return true;
             }
@@ -90,7 +93,7 @@ namespace DVLD
         private void _FillPersonInfo()
         {
             llEditPersonInfo.Enabled = true;
-            _PersonID = _Person.PersonID;
+            _PersonID = _Person.PersonID.HasValue ? (int)_Person.PersonID : -1;
             lblPersonID.Text = _Person.PersonID.ToString();
             lblNationalNo.Text = _Person.NationalNo;
             lblFullName.Text = _Person.FullName;
@@ -126,8 +129,10 @@ namespace DVLD
 
         }
 
-        private void BackData(object sender, int personID)
+        private void BackData(object sender, int? personID)
         {
+            if (!personID.HasValue || personID <= 0)
+                return;
             LoadData(personID);
         }
 

@@ -23,7 +23,7 @@ namespace DVLD.People.Forms
 
         }
 
-        public frmShowPersonInfo(int PersonID)
+        public frmShowPersonInfo(int? PersonID)
         {
             InitializeComponent();
 
