@@ -107,6 +107,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmShowInternationalLicenseInfo";
             this.Text = "International License Info";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmShowInternationalLicenseInfo_FormClosed);
             this.Load += new System.EventHandler(this.frmShowInternationalLicenseInfo_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbTestTypeImage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
