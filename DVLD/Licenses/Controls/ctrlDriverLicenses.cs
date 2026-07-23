@@ -133,8 +133,14 @@ namespace DVLD.Licenses.Controls
             _RefreshDataGrids();
         }
 
-        public void LoadInfoByPersonID(int PersonID)
+        public void LoadInfoByPersonID(int? PersonID)
         {
+
+            if (PersonID == null || PersonID <= 0)
+            {
+                MessageBox.Show("No driver information found for the provided PersonID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             _Driver = clsDriver.FindByPersonID(PersonID);
             if (_Driver == null)
