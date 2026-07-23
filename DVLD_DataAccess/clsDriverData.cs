@@ -59,10 +59,15 @@ namespace DVLD_DataAccess
             return isFound;
         }
 
-        public static bool GetDriverInfoByPersonID(int PersonID, ref int DriverID,
+        public static bool GetDriverInfoByPersonID(int? PersonID, ref int DriverID,
             ref int CreatedByUserID, ref DateTime CreatedDate)
         {
             bool isFound = false;
+
+
+            if (PersonID == null || PersonID <= 0)
+                return false;
+
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
@@ -151,9 +156,14 @@ namespace DVLD_DataAccess
 
         }
 
-        public static int AddNewDriver(int PersonID, int CreatedByUserID)
+        public static int AddNewDriver(int? PersonID, int CreatedByUserID)
         {
             int DriverID = -1;
+
+
+            if (PersonID == null || PersonID <= 0)
+                return DriverID;
+
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
@@ -194,10 +204,16 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateDriver(int DriverID, int PersonID, int CreatedByUserID)
+        public static bool UpdateDriver(int DriverID, int? PersonID, int CreatedByUserID)
         {
 
             int rowsAffected = 0;
+
+
+            if (PersonID == null || PersonID <= 0)
+                return false;
+
+
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             //we dont update the createddate for the driver.
             string query = @"Update  Drivers  
