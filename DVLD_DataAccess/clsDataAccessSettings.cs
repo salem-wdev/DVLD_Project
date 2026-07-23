@@ -1,6 +1,6 @@
 ﻿namespace DVLD_DataAccess
 {
-    public class clsDataAccessSettings
+    public static class clsDataAccessSettings
     {
         public static string LocalDataBaseName { get; } = "DVLD_Database.mdf";
         public static string ServerDataBaseName { get; } = "DVLD";
