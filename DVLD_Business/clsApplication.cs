@@ -369,19 +369,26 @@ namespace DVLD_Business
             return (enApplicationStatus)clsApplicationData.GetApplicationStatus(ApplicationID);
         }
 
-        protected static clsApplication GetNewApplicationobject(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        protected static clsApplication GetNewApplicationobject(int CreatedByUserID, int? ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
-            if (DoesPersonHaveActiveApplication(ApplicantPersonID, (int)ApplicationTypeID))
+            if (!ApplicantPersonID.HasValue || ApplicantPersonID <= 0)
+                return null;
+
+            if (DoesPersonHaveActiveApplication((int)ApplicantPersonID, (int)ApplicationTypeID))
             {
                 return null;
             }
 
-            clsApplication application = new clsApplication(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
+            clsApplication application = new clsApplication(CreatedByUserID, (int)ApplicantPersonID, ApplicationTypeID);
             return application;
         }
 
-        internal static clsApplication GetNewApplication(int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        internal static clsApplication GetNewApplication(int CreatedByUserID, int? ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
+
+            if (!ApplicantPersonID.HasValue || ApplicantPersonID <= 0)
+                return null;
+
             clsApplication application = GetNewApplicationobject(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
             if (application != null)
             {
