@@ -92,7 +92,7 @@ namespace DVLD.Licenses.Local_Licenses.Controls
 
         private void SelectedLicenseInfo_LicenseUpdated(object sender, clsLicense.LicenseUpdatedEventArgs e)
         {
-            ctrlDriverLicenseInfo1.SelectedLicenseInfo.Dispose();
+            ctrlDriverLicenseInfo1?.SelectedLicenseInfo?.Dispose();
             _Find();
 
         }
