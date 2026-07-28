@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{45BFF457-AD05-4A4C-8155-00D5C523C0F1}</ProjectGuid>
+    <ProjectGuid>{515BF002-3597-468D-81CF-E6CCEEFB2FF4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DVLD_Business</RootNamespace>
-    <AssemblyName>DVLD_Business</AssemblyName>
+    <RootNamespace>DVLD_Shared</RootNamespace>
+    <AssemblyName>DVLD_Shared</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -41,35 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsApplication.cs" />
-    <Compile Include="clsApplicationType.cs" />
-    <Compile Include="Extensions\StringArrayExtensions.cs" />
-    <Compile Include="Global_Classes\clsBusinessSettings.cs" />
-    <Compile Include="Global_Classes\clsFileStorage.cs" />
-    <Compile Include="Global_Classes\clsGlobal.cs" />
-    <Compile Include="clsCountry.cs" />
-    <Compile Include="clsDetainedLicense.cs" />
-    <Compile Include="clsDriver.cs" />
-    <Compile Include="clsInternationalLicense.cs" />
-    <Compile Include="clsLicense.cs" />
-    <Compile Include="clsLicenseClass.cs" />
-    <Compile Include="clsLocalDrivingLicenseApplication.cs" />
-    <Compile Include="clsPerson.cs" />
-    <Compile Include="clsTest.cs" />
-    <Compile Include="clsTestAppointment.cs" />
-    <Compile Include="clsTestType.cs" />
-    <Compile Include="clsUser.cs" />
+    <Compile Include="clsLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DVLD_DataAccess\DVLD_DataAccess.csproj">
-      <Project>{695dcede-5c5d-4237-99d7-51d252d6d8a8}</Project>
-      <Name>DVLD_DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DVLD_Shared\DVLD_Shared.csproj">
-      <Project>{515bf002-3597-468d-81cf-e6cceefb2ff4}</Project>
-      <Name>DVLD_Shared</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

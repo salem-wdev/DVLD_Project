@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using DVLD_Shared;
 
 namespace DVLD_DataAccess
 {
@@ -81,7 +82,10 @@ namespace DVLD_DataAccess
                     IsFound = false;
                 }
             }
-            catch { }
+            catch (Exception ex) 
+            {
+                clsLogger.LogException(ex, $"Failed to retrieve person info for PersonID: {PersonID ?? 0}");
+            }
             finally
             {
                 connection.Close();

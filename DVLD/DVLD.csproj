@@ -484,6 +484,10 @@
       <Project>{45bff457-ad05-4a4c-8155-00d5c523c0f1}</Project>
       <Name>DVLD_Business</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DVLD_Shared\DVLD_Shared.csproj">
+      <Project>{515bf002-3597-468d-81cf-e6cceefb2ff4}</Project>
+      <Name>DVLD_Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\account_settings 64.png" />
