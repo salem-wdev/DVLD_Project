@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DVLD_Shared
 {
-    public class Class1
+    public class clsLogger
     {
     }
 }
