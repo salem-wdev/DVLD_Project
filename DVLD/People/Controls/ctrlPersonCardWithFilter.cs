@@ -29,7 +29,7 @@ namespace DVLD.People.Controls
 
         public sealed class PersonSelectedEventArgs : EventArgs
         {
-            public int PersonID { get; }
+            public int? PersonID { get; }
             public string NationalNo { get; }
             public PersonSelectedEventArgs(int personID, string nationalNo)
             {
@@ -125,13 +125,21 @@ namespace DVLD.People.Controls
             txtFilterValue.Focus();
         }
 
-        public void LoadPersonInfo(int PersonID)
+        public void LoadPersonInfo(int? PersonID)
         {
+
+            if (PersonID == null || PersonID <= 0)
+                return;
+
             DataBackEvent(this, PersonID);
         }
 
-        private void DataBackEvent(object sender, int personID)
+        private void DataBackEvent(object sender, int? personID)
         {
+
+            if (personID == null || personID <= 0)
+                return;
+
             cbFilterBy.SelectedIndex = 0;
             txtFilterValue.Text = personID.ToString();
             _FindNow();

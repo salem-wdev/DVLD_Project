@@ -10,6 +10,32 @@ namespace DVLD_Business
 {
     public class clsInternationalLicense:clsApplication
     {
+        public sealed class InternationalLicenseUpdatedEventArgs : EventArgs
+        {
+            public int InternationalLicenseID { get; }
+            public int DriverID { get; }
+            public DateTime ExpirationDate { get; }
+            public bool IsActive { get; }
+
+            public enApplicationStatus ApplicationStatus;
+            public DateTime LastStatusDate;
+
+
+            public InternationalLicenseUpdatedEventArgs(int InternationalLicenseID, int DriverID, DateTime ExpirationDate
+                , bool IsActive, enApplicationStatus ApplicationStatus, DateTime LastStatusDate)
+            {
+                this.InternationalLicenseID = InternationalLicenseID;
+                this.DriverID = DriverID;
+                this.ExpirationDate = ExpirationDate;
+                this.IsActive = IsActive;
+                this.ApplicationStatus = ApplicationStatus;
+                this.LastStatusDate = LastStatusDate;
+            }
+
+
+        }
+        public event EventHandler<InternationalLicenseUpdatedEventArgs> InternationalLicenseUpdated;
+
 
         public new enum enMode { AddNew = 0, Update = 1 };
         public new enMode Mode { get; protected set; } = enMode.AddNew;
@@ -141,10 +167,15 @@ namespace DVLD_Business
                 return false;
             }
 
-            return clsInternationalLicenseData.UpdateInternationalLicense(
+            if (clsInternationalLicenseData.UpdateInternationalLicense(
                 this.InternationalLicenseID,this.ApplicationID, this.DriverID, this.IssuedUsingLocalLicenseID,
                this.IssueDate, this.ExpirationDate, 
-               this.IsActive, this.CreatedByUserID);
+               this.IsActive, this.CreatedByUserID))
+            {
+                OnInternationalLicenseUpdated(new InternationalLicenseUpdatedEventArgs(InternationalLicenseID, DriverID
+                    , ExpirationDate, IsActive, ApplicationStatus, LastStatusDate));
+            }
+            return true;
         }
 
         public static clsInternationalLicense FindByInternationalLicenseID(int InternationalLicenseID)
@@ -312,6 +343,11 @@ namespace DVLD_Business
         public static bool DeactvateExpiredLicenses()
         {
             return clsInternationalLicenseData.DeactvateInternationalLicensesforExpiredLocalLicenses();
+        }
+
+        protected virtual void OnInternationalLicenseUpdated(InternationalLicenseUpdatedEventArgs e)
+        {
+            InternationalLicenseUpdated?.Invoke(this, e);
         }
 
     }

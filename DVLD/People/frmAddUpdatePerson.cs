@@ -24,11 +24,11 @@ namespace DVLD.People.Forms
         private enMode _Mode;
 
         clsPerson _Person;
-        int _PersonID = -1;
+        int? _PersonID = -1;
 
         public delegate void PersonDataReceivedEventHandlerInForm(object sender, clsPerson Person);
 
-        public delegate void PersonIDReceivedEventHandlerInForm(object sender, int PersonID);
+        public delegate void PersonIDReceivedEventHandlerInForm(object sender, int? PersonID);
 
         public event PersonIDReceivedEventHandlerInForm SendPersonIDBack;
 

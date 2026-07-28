@@ -6,12 +6,15 @@ namespace DVLD_DataAccess
 {
     public class clsPersonData
     {
-        public static bool GetPersonInfoByID(int PersonID, ref string NationalNo, ref string FirstName, ref string SecondName,
+        public static bool GetPersonInfoByID(int? PersonID, ref string NationalNo, ref string FirstName, ref string SecondName,
             ref string ThirdName, ref string LastName, ref DateTime DateOfBirth,
             ref short Gender, ref string Address, ref string Phone, ref string Email,
             ref int NationalityCountryID, ref string ImagePath)
         {
             bool IsFound = false;
+
+            if (PersonID == null)
+                return false;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
@@ -87,13 +90,14 @@ namespace DVLD_DataAccess
             return IsFound;
         }
 
-        public static bool GetPersonInfoByNationalNo(string NationalNo, ref int PersonID, ref string FirstName, ref string SecondName,
+        public static bool GetPersonInfoByNationalNo(string NationalNo, ref int? PersonID, ref string FirstName, ref string SecondName,
             ref string ThirdName, ref string LastName, ref DateTime DateOfBirth,
             ref short Gender, ref string Address, ref string Phone, ref string Email,
             ref int NationalityCountryID, ref string ImagePath)
         {
             bool IsFound = false;
-
+            if (string.IsNullOrWhiteSpace(NationalNo))
+                return false;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
             string Query = "SELECT * FROM People  WHERE NationalNo = @NationalNo;";
@@ -167,13 +171,13 @@ namespace DVLD_DataAccess
             return IsFound;
         }
 
-        public static int AddNewPerson(string FirstName, string SecondName,
+        public static Nullable<int> AddNewPerson(string FirstName, string SecondName,
              string ThirdName, string LastName, string NationalNo, DateTime DateOfBirth,
              short Gender, string Address, string Phone, string Email,
              int NationalityCountryID, string ImagePath)
         {
 
-            int PersonID = -1;
+            int? PersonID = null;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
@@ -233,7 +237,7 @@ namespace DVLD_DataAccess
                 }
                 else
                 {
-                    PersonID = -1;
+                    PersonID = null;
                 }
 
             }
@@ -247,12 +251,15 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdatePerson(int PersonID, string NationalNo, string FirstName, string SecondName,
+        public static bool UpdatePerson(int? PersonID, string NationalNo, string FirstName, string SecondName,
             string ThirdName, string LastName, DateTime DateOfBirth,
             short Gender, string Address, string Phone, string Email,
             int NationalityCountryID, string ImagePath)
         {
             int NumberOfEffectedRows = 0;
+
+            if (PersonID == null)
+                return false;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
@@ -320,9 +327,12 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool IsPersonExists(int PersonID)
+        public static bool IsPersonExists(int? PersonID)
         {
             bool IsExist = false;
+
+            if (PersonID == null)
+                return false;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
@@ -390,9 +400,12 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool IsNationalNoUsed(int PersonID, string NationalNo)
+        public static bool IsNationalNoUsed(int? PersonID, string NationalNo)
         {
             bool IsUsed = false;
+
+            if (PersonID == null || string.IsNullOrWhiteSpace(NationalNo))
+                return false;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
@@ -421,9 +434,12 @@ namespace DVLD_DataAccess
         }
 
 
-        public static bool DeletePerson(int PersonID)
+        public static bool DeletePerson(int? PersonID)
         {
             int NumberOfEffectedRows = 0;
+
+            if (PersonID == null)
+                return false;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 

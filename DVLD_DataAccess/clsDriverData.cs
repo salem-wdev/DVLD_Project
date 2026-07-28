@@ -52,7 +52,7 @@ namespace DVLD_DataAccess
             return isFound;
         }
 
-        public static bool GetDriverInfoByPersonID(int PersonID, ref int DriverID,
+        public static bool GetDriverInfoByPersonID(int? PersonID, ref int DriverID,
             ref int CreatedByUserID, ref DateTime CreatedDate)
         {
             bool isFound = false;
@@ -126,7 +126,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static int AddNewDriver(int PersonID, int CreatedByUserID)
+        public static int AddNewDriver(int? PersonID, int CreatedByUserID)
         {
             int DriverID = -1;
             try
@@ -162,7 +162,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateDriver(int DriverID, int PersonID, int CreatedByUserID)
+        public static bool UpdateDriver(int DriverID, int? PersonID, int CreatedByUserID)
         {
 
             int rowsAffected = 0;

@@ -13,14 +13,14 @@ namespace DVLD.Licenses.Local_Licenses
 {
     public partial class frmShowPersonLicenseHistory : Form
     {
-        private int _PersonID;
+        private int? _PersonID;
 
         public frmShowPersonLicenseHistory()
         {
             InitializeComponent();
         }
 
-        public frmShowPersonLicenseHistory(int personID)
+        public frmShowPersonLicenseHistory(int? personID)
         {
             InitializeComponent();
             _PersonID = personID;
@@ -28,7 +28,8 @@ namespace DVLD.Licenses.Local_Licenses
 
         private void frmShowPersonLicenseHistory_Load(object sender, EventArgs e)
         {
-            if (_PersonID > 0)
+            if (_PersonID == null || _PersonID <= 0)
+
             {
                 ctrlPersonCardWithFilter1.FilterEnabled = false;
                 ctrlPersonCardWithFilter1.LoadPersonInfo(_PersonID);

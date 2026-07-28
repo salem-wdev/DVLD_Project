@@ -17,7 +17,7 @@ namespace DVLD_Business
 
         private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
 
-        public int PersonID { get; private set; }
+        public Nullable<int> PersonID { get; private set; } = null;
         private bool _IsNationalNoChanged = false;
         private string _NationalNo = "";
 
@@ -144,7 +144,7 @@ namespace DVLD_Business
 
 
         // New overload that sets PersonID so instances returned from Find have correct ID
-        private clsPerson(int PersonID, string FirstName, string SecondName, string ThirdName
+        private clsPerson(int? PersonID, string FirstName, string SecondName, string ThirdName
             ,string LastName, string NationalNo, DateTime DateOfBirth, short Gender 
             ,string Address, string Phone, string Email, int NationalityCountryID
             ,string ImagePath)
@@ -268,8 +268,12 @@ namespace DVLD_Business
             return false;
         }
 
-        public static clsPerson Find(int PersonID)
+        public static clsPerson Find(int? PersonID)
         {
+
+            if (PersonID == null)
+                return null;
+
             string FirstName = string.Empty;
             string SecondName = string.Empty;
             string ThirdName = string.Empty;
@@ -301,7 +305,7 @@ namespace DVLD_Business
 
         public static clsPerson Find(string NationalNo)
         {
-            int PersonID = -1;
+            int? PersonID = null;
             string FirstName = string.Empty;
             string SecondName = string.Empty;
             string ThirdName = string.Empty;
@@ -340,7 +344,7 @@ namespace DVLD_Business
             return clsPersonData.IsPersonExists(NationalNo);
         }
 
-        private static bool _IsNationalNoUsed(int PersonID, string NationalNo)
+        private static bool _IsNationalNoUsed(int? PersonID, string NationalNo)
         {
             return clsPersonData.IsNationalNoUsed(PersonID, NationalNo);
         }

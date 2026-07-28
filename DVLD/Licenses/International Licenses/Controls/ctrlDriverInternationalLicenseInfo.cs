@@ -1,11 +1,12 @@
 ﻿using DVLD.Classes;
 using DVLD.Properties;
 using DVLD_Business;
-using System.IO;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,14 +14,19 @@ using System.Windows.Forms;
 
 namespace DVLD.Licenses.International_Licenses.Controls
 {
-    public partial class ctrlDriverInternationalLicenseInfo : UserControl
+    public partial class ctrlDriverInternationalLicenseInfo : UserControl, IDisposable
     {
         private int _InternationalLicenseID;
         private clsInternationalLicense _InternationalLicense;
-
+        private bool _disposed = false;
         public ctrlDriverInternationalLicenseInfo()
         {
             InitializeComponent();
+        }
+
+        private void SelectedLicenseInfo_InternationalLicenseUpdated(object sender, clsInternationalLicense.InternationalLicenseUpdatedEventArgs e)
+        {
+            throw new System.NotImplementedException();
         }
 
         public int LicenseID
@@ -106,9 +112,34 @@ namespace DVLD.Licenses.International_Licenses.Controls
             else
             {
                 _FillControlWithData();
+                SelectedLicenseInfo.InternationalLicenseUpdated += SelectedLicenseInfo_InternationalLicenseUpdated;
                 return true;
             }
 
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                if (SelectedLicenseInfo != null)
+                    SelectedLicenseInfo.InternationalLicenseUpdated -= SelectedLicenseInfo_InternationalLicenseUpdated;
+            }
+
+            if (disposing)
+            {
+
+                if (components != null)
+                {
+                    components.Dispose();
+                }
+            }
+
+            base.Dispose(disposing);
+
+            _disposed = true;
         }
     }
 }

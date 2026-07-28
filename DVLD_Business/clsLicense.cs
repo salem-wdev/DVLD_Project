@@ -299,9 +299,15 @@ namespace DVLD_Business
         {
             //call DataAccess Layer 
 
-            return clsLicenseData.UpdateLicense(this.ApplicationID, this.LicenseID, this.DriverID, this.LicenseClassID,
+            if (clsLicenseData.UpdateLicense(this.ApplicationID, this.LicenseID, this.DriverID, this.LicenseClassID,
                this.Notes, this.PaidFees, this.IsActive, (byte)this.IssueReason,
-               this.CreatedByUserID);
+               this.CreatedByUserID))
+            {
+                OnLicenseUpdated(new LicenseUpdatedEventArgs(this.LicenseID, this.DriverID, this.ExpirationDate, this.Notes,
+                        this.PaidFees, this.IsActive, this.IsDetained));
+                return true;
+            }
+            return false;
         }
 
         public static clsLicense Find(int LicenseID)
@@ -432,8 +438,11 @@ namespace DVLD_Business
             return clsLicenseClass.Find(LicenseClassID).ClassFees + (float)clsApplicationType.Find((int)ApplicationType).ApplicationTypeFees;
         }
 
-        private static int _CreateNewApplicationID(int CreatedByUserID, int PersonID, clsApplication.enApplicationType ApplicationType)
+        private static int? _CreateNewApplicationID(int CreatedByUserID, int? PersonID, clsApplication.enApplicationType ApplicationType)
         {
+            if (!PersonID.HasValue || PersonID <= 0)
+                return null;
+
             clsApplication application = clsApplication.GetNewApplication(CreatedByUserID, PersonID, ApplicationType);
             if(application != null)
             {
@@ -551,8 +560,9 @@ namespace DVLD_Business
 
                 NewLicense = new clsLicense(OldLicense);
                 NewLicense.IssueReason = enIssueReason.Renew;
-                NewLicense.ApplicationID = _CreateNewApplicationID(CreatedByUserID,
+                int? ApplicationID = _CreateNewApplicationID(CreatedByUserID,
                     NewLicense.DriverInfo.PersonID, clsApplication.enApplicationType.RenewDrivingLicense);
+                NewLicense.ApplicationID = ApplicationID.HasValue ? (int)ApplicationID : -1;
                 NewLicense.CreatedByUserID = CreatedByUserID;
                 NewLicense.Notes = Notes;
                 NewLicense.PaidFees = _CalculatePaidFees(clsApplication.enApplicationType.RenewDrivingLicense
@@ -591,8 +601,9 @@ namespace DVLD_Business
 
             NewLicense.PaidFees = _CalculatePaidFees(applicationType, NewLicense.LicenseClassID);
             NewLicense.IssueReason = IssueReason;
-            NewLicense.ApplicationID = _CreateNewApplicationID(CreatedByUserID,
+            int? ApplicationID = _CreateNewApplicationID(CreatedByUserID,
                 NewLicense.DriverInfo.PersonID, applicationType);
+            NewLicense.ApplicationID = ApplicationID.HasValue ? (int)ApplicationID : -1;
             NewLicense.CreatedByUserID = CreatedByUserID;
             NewLicense.Notes = Notes;
             NewLicense.IsActive = true;
