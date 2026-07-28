@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using DVLD_Shared;
 
 namespace DVLD
 {
@@ -49,6 +50,8 @@ namespace DVLD
 
         private void frmLogin_Load(object sender, EventArgs e)
         {
+            clsLogger.Log("Login Form Loaded");
+
             string rememberedUsername = string.Empty;
             string rememberedPassword = string.Empty;
             if(clsGlobal.GetStoredCredential(ref rememberedUsername, ref rememberedPassword))
