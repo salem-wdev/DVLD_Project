@@ -66,6 +66,10 @@
       <Project>{695dcede-5c5d-4237-99d7-51d252d6d8a8}</Project>
       <Name>DVLD_DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DVLD_Shared\DVLD_Shared.csproj">
+      <Project>{515bf002-3597-468d-81cf-e6cceefb2ff4}</Project>
+      <Name>DVLD_Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
