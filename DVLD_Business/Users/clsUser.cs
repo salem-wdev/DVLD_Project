@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DVLD_Business
+namespace DVLD_Business.Users
 {
     public class clsUser
     {
