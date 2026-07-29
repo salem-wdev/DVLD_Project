@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="clsApplication.cs" />
     <Compile Include="clsApplicationType.cs" />
-    <Compile Include="enUserPermissions.cs" />
+    <Compile Include="User\enUserPermissions.cs" />
     <Compile Include="Extensions\StringArrayExtensions.cs" />
     <Compile Include="Global_Classes\clsBusinessSettings.cs" />
     <Compile Include="Global_Classes\clsFileStorage.cs" />
@@ -59,7 +59,7 @@
     <Compile Include="clsTest.cs" />
     <Compile Include="clsTestAppointment.cs" />
     <Compile Include="clsTestType.cs" />
-    <Compile Include="clsUser.cs" />
+    <Compile Include="User\clsUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
