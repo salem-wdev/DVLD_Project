@@ -315,5 +315,10 @@ namespace DVLD_Business.Users
             return clsUserData.HasUsers();
         }
 
+        public static enUserPermissions GetUserPermissions(int UserID)
+        {
+            return (enUserPermissions)clsUserData.GetUserPermissionsByUserID(UserID);
+        }
+
     }
 }
