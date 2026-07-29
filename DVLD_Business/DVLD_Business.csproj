@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="clsApplication.cs" />
     <Compile Include="clsApplicationType.cs" />
+    <Compile Include="Users\clsPermissionEvaluator.cs" />
     <Compile Include="Users\enUserPermissions.cs" />
     <Compile Include="Extensions\StringArrayExtensions.cs" />
     <Compile Include="Global_Classes\clsBusinessSettings.cs" />
