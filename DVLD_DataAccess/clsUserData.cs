@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DVLD_Shared;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -615,6 +616,41 @@ namespace DVLD_DataAccess
 
             return isFound;
         }
+
+        public static int GetUserPermissionsByUserID(int UserID)
+        {
+            int Permissions = 0;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    string Query = @"SELECT
+                                    Permission
+                                 FROM Users WHERE UserID = @UserID;";
+
+                    using (SqlCommand command = new SqlCommand(Query, connection))
+                    {
+                        command.Parameters.Add("@UserID", SqlDbType.Int).Value = UserID;
+
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
+                        {
+                            if (reader.Read())
+                            {
+                                Permissions = reader.GetInt32(0);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                clsLogger.LogException(ex, $"Failed to retrieve User Permissions for UserID: {UserID}");
+            }
+
+            return Permissions;
+        }
+
 
     }
 }
