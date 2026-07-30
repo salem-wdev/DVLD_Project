@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DVLD_Business.Users
 {
+
     public class clsPermissionEvaluator
     {
         /// <summary>
@@ -29,6 +32,22 @@ namespace DVLD_Business.Users
 
             // 4. Perform a Bitwise AND operation to verify if the specific permission bit is set.
             return ((userPermissionsValue & permissionValue) == permissionValue);
+        }
+
+        public static bool ValidationUser(int userID)
+        {
+            StackTrace stackTrace = new StackTrace();
+            MethodBase callingMethod = stackTrace.GetFrame(1)?.GetMethod();
+
+            if (callingMethod == null)
+                return false;
+
+            EnforcePermissionAttribute attribute = callingMethod.GetCustomAttribute<EnforcePermissionAttribute>();
+
+            if (attribute == null)
+                return true;
+
+            return HasPermission(userID, attribute.Permission);
         }
     }
 }
