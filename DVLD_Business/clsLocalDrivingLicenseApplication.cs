@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static DVLD_Business.clsApplication;
 using static DVLD_Business.clsLicense;
+using DVLD_Business.Users;
 
 namespace DVLD_Business
 {

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DVLD_Business
+namespace DVLD_Business.Users
 {
     public class clsUser
     {
@@ -313,6 +313,11 @@ namespace DVLD_Business
         public static bool HasUsers()
         {
             return clsUserData.HasUsers();
+        }
+
+        public static enUserPermissions GetUserPermissions(int UserID)
+        {
+            return (enUserPermissions)clsUserData.GetUserPermissionsByUserID(UserID);
         }
 
     }
