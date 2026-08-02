@@ -391,15 +391,15 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
+                        command.Parameters.Add("@ApplicationID", SqlDbType.Int).Value = ApplicationID;
 
                         connection.Open();
 
                         object result = command.ExecuteScalar();
 
-                        if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                        if (result is int retrievedID)
                         {
-                            LicenseID = insertedID;
+                            LicenseID = retrievedID;
                         }
                     }
                 }
@@ -427,16 +427,15 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@DriverID", DriverID);
-                        command.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
+                        command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
+                        command.Parameters.Add("@LicenseClassID", SqlDbType.Int).Value = LicenseClassID;
 
                         connection.Open();
                         object scalar = command.ExecuteScalar();
 
-                        if (scalar != null && int.TryParse(scalar.ToString(), out int parsedID))
+                        if (scalar is int retrievedID)
                         {
-
-                            lastLicenseID = parsedID;
+                            lastLicenseID = retrievedID;
                         }
                     }
                 }
@@ -468,16 +467,16 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@DriverID", DriverID);
-                        command.Parameters.AddWithValue("@LicenseClass", LicenseClassID);
+                        command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
+                        command.Parameters.Add("@LicenseClass", SqlDbType.Int).Value = LicenseClassID;
 
                         connection.Open();
 
                         object result = command.ExecuteScalar();
 
-                        if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                        if (result is int retrievedID)
                         {
-                            LicenseID = insertedID;
+                            LicenseID = retrievedID;
                         }
                     }
                 }
@@ -507,16 +506,16 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@DriverID", DriverID);
-                        command.Parameters.AddWithValue("@LicenseClass", LicenseClassID);
+                        command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
+                        command.Parameters.Add("@LicenseClass", SqlDbType.Int).Value = LicenseClassID;
 
                         connection.Open();
 
                         object result = command.ExecuteScalar();
 
-                        if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                        if (result is int retrievedID)
                         {
-                            LicenseID = insertedID;
+                            LicenseID = retrievedID;
                         }
                     }
                 }
@@ -549,8 +548,8 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@DriverID", DriverID);
-                        command.Parameters.AddWithValue("@LicenseClass", LicenseClassID);
+                        command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
+                        command.Parameters.Add("@LicenseClass", SqlDbType.Int).Value = LicenseClassID;
 
                         connection.Open();
 
