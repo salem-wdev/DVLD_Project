@@ -359,7 +359,7 @@ namespace DVLD_DataAccess
                     using (SqlCommand Command = new SqlCommand(Query, connection))
                     {
                         connection.Open();
-                        using (SqlDataReader reader = Command.ExecuteReader(CommandBehavior.SequentialAccess))
+                        using (SqlDataReader reader = Command.ExecuteReader())
                         {
                             if (reader.HasRows)
                             {
