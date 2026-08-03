@@ -314,9 +314,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LicenseClass", SqlDbType.Int).Value = LicenseClass;
 
                         if (Notes == "")
-                            command.Parameters.Add("@Notes", SqlDbType.NVarChar).Value = DBNull.Value;
+                            command.Parameters.Add("@Notes", SqlDbType.NVarChar, 500).Value = DBNull.Value;
                         else
-                            command.Parameters.Add("@Notes", SqlDbType.NVarChar).Value = Notes;
+                            command.Parameters.Add("@Notes", SqlDbType.NVarChar, 500).Value = Notes;
 
                         command.Parameters.Add("@PaidFees", SqlDbType.Float).Value = PaidFees;
                         command.Parameters.Add("@IsActive", SqlDbType.Bit).Value = IsActive;
@@ -581,7 +581,7 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@LicenseID", LicenseID);
+                        command.Parameters.Add("@LicenseID", SqlDbType.Int).Value = LicenseID;
 
                         connection.Open();
                         rowsAffected = command.ExecuteNonQuery();
@@ -609,7 +609,7 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@LicenseID", LicenseID);
+                        command.Parameters.Add("@LicenseID", SqlDbType.Int).Value = LicenseID;
 
                         connection.Open();
 
