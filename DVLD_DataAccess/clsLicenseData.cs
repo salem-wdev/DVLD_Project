@@ -268,7 +268,7 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@CreatedByUserID", SqlDbType.Int).Value = CreatedByUserID;
 
                         connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleResult | CommandBehavior.SequentialAccess))
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             if (reader.Read())
                             {
@@ -336,7 +336,7 @@ namespace DVLD_DataAccess
 
             return (rowsAffected > 0);
         }
-
+      
         public static int GetActiveLicenseIDByPersonID(int PersonID, int LicenseClassID)
         {
             int LicenseID = -1;

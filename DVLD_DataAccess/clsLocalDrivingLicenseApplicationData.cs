@@ -104,7 +104,7 @@ namespace DVLD_DataAccess
                     {
                         connection.Open();
 
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SequentialAccess))
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             if (reader.HasRows)
                             {
