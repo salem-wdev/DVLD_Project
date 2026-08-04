@@ -390,7 +390,10 @@ namespace DVLD_DataAccess
 
                         connection.Open();
 
-                        HasActiveAppointment = command.ExecuteScalar() != null;
+                        if (command.ExecuteScalar() is bool hasActiveAppointment)
+                        {
+                            HasActiveAppointment = hasActiveAppointment;
+                        }
                     }
                 }
             }
@@ -409,7 +412,7 @@ namespace DVLD_DataAccess
             {
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    string query = @"SELECT        CAST TOP (1) (Applications.ApplicationStatus AS TINYINT)
+                    string query = @"SELECT TOP (1) CAST(Applications.ApplicationStatus AS TINYINT)
                               FROM            Applications INNER JOIN
                               LocalDrivingLicenseApplications ON Applications.ApplicationID = LocalDrivingLicenseApplications.ApplicationID 
                               AND LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
@@ -459,7 +462,10 @@ namespace DVLD_DataAccess
 
                         connection.Open();
 
-                        IsFound = command.ExecuteScalar() != null;
+                        if (command.ExecuteScalar() is bool found)
+                        {
+                            IsFound = found;
+                        }
                     }
                 }
             }
