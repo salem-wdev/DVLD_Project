@@ -38,7 +38,7 @@ namespace DVLD_DataAccess
                                 ThirdName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3);
                                 LastName = reader.GetString(4);
                                 DateOfBirth = reader.GetDateTime(5);
-                                Gender = reader.GetInt16(6);
+                                Gender = reader.GetByte(6);
                                 Address = reader.GetString(7);
                                 Phone = reader.GetString(8);
                                 Email = reader.IsDBNull(9) ? string.Empty : reader.GetString(9);
