@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using DVLD_Shared;
 
 namespace DVLD_DataAccess
 {
@@ -20,23 +21,22 @@ namespace DVLD_DataAccess
             try
             {
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-                using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    connection.Open();
-
-                    // Using ExecuteScalar because we expect exactly one single value (one cell)
-                    object result = command.ExecuteScalar();
-
-                    if (result != null && DateTime.TryParse(result.ToString(), out DateTime date))
+                    using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        serverDate = date;
+                        connection.Open();
+
+                        // Using ExecuteScalar because we expect exactly one single value (one cell)
+                        if (command.ExecuteScalar() is DateTime date)
+                        {
+                            serverDate = date;
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                // TODO: Implement error logging here (e.g., Event Viewer or a text file)
-                // For now, it will safely fall back to returning the local machine's DateTime.Now
+                clsLogger.LogException(ex, "Failed to retrieve server date. Falling back to local machine time.");
             }
 
             return serverDate;

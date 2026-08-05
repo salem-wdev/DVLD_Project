@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DVLD_Shared;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -10,155 +11,142 @@ namespace DVLD_DataAccess
         ref string TestTypeTitle, ref string TestTypeDescription, ref decimal TestTypeFees)
         {
             bool IsFound = false;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string Query = "SELECT TestTypeID, TestTypeTitle," +
-                " TestTypeDescription, TestTypeFees" +
-                " FROM TestTypes" +
-                " WHERE TestTypeID = @TestTypeID;";
-
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("@TestTypeID", TestTypeID);
-
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
+                    string Query = @"SELECT TestTypeTitle, TestTypeDescription, TestTypeFees
+                                     FROM TestTypes
+                                     WHERE TestTypeID = @TestTypeID;";
 
-                    TestTypeTitle = reader["TestTypeTitle"].ToString();
-                    TestTypeDescription = reader["TestTypeDescription"].ToString();
-                    TestTypeFees = Convert.ToDecimal(reader["TestTypeFees"]);
+                    using (SqlCommand command = new SqlCommand(Query, connection))
+                    {
+                        command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-
-                    reader.Close();
-
-                    IsFound = true;
-                }
-                else
-                {
-                    IsFound = false;
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        {
+                            if (reader.Read())
+                            {
+                                TestTypeTitle = reader.IsDBNull(0) ? string.Empty : reader.GetString(0);
+                                TestTypeDescription = reader.IsDBNull(1) ? string.Empty : reader.GetString(1);
+                                TestTypeFees = reader.GetDecimal(2);
+                                IsFound = true;
+                            }
+                            else
+                            {
+                                IsFound = false;
+                            }
+                        }
+                    }
                 }
             }
-            catch { }
-            finally
+            catch (Exception ex)
             {
-                connection.Close();
+                clsLogger.LogException(ex, $"Failed to retrieve test type info by ID: {TestTypeID}");
+                IsFound = false;
             }
 
             return IsFound;
         }
 
-
         public static int AddNewTestType(string TestTypeTitle,
            string TestTypeDescription, decimal TestTypeFees)
         {
-
             int TestTypeID = -1;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string Query = "INSERT INTO TestTypes " +
-            "(TestTypeTitle, TestTypeDescription, TestTypeFees)" +
-            " VALUES (@TestTypeTitle, @TestTypeDescription, @TestTypeFees);" +
-                " SELECT SCOPE_IDENTITY();";
-
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("@TestTypeTitle", TestTypeTitle);
-            command.Parameters.AddWithValue("@TestTypeFees", TestTypeFees);
-            command.Parameters.AddWithValue("@TestTypeDescription", TestTypeDescription);
-
             try
             {
-                connection.Open();
-                object newTestTypeID = command.ExecuteScalar();
-                if (int.TryParse(newTestTypeID?.ToString(), out int NewID))
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    TestTypeID = NewID;
-                }
-                else
-                {
-                    TestTypeID = -1;
-                }
+                    string Query = @"INSERT INTO TestTypes (TestTypeTitle, TestTypeDescription, TestTypeFees)
+                                     VALUES (@TestTypeTitle, @TestTypeDescription, @TestTypeFees);
+                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
+                    using (SqlCommand command = new SqlCommand(Query, connection))
+                    {
+                        command.Parameters.Add("@TestTypeTitle", SqlDbType.NVarChar).Value = TestTypeTitle;
+                        command.Parameters.Add("@TestTypeDescription", SqlDbType.NVarChar).Value = TestTypeDescription;
+                        command.Parameters.Add("@TestTypeFees", SqlDbType.Decimal).Value = TestTypeFees;
+
+                        connection.Open();
+                        if (command.ExecuteScalar() is int NewID)
+                        {
+                            TestTypeID = NewID;
+                        }
+                    }
+                }
             }
-            catch { }
-            finally
+            catch (Exception ex)
             {
-                connection.Close();
+                clsLogger.LogException(ex, $"Failed to add new test type: {TestTypeTitle}");
             }
 
             return TestTypeID;
-
         }
 
         public static bool UpdateTestType(int TestTypeID,
         string TestTypeTitle, string TestTypeDescription, decimal TestTypeFees)
         {
             int NumberOfEffectedRows = 0;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string Query = "UPDATE TestTypes " +
-                "SET TestTypeTitle = @TestTypeTitle " +
-                ",TestTypeDescription = @TestTypeDescription" +
-                ",TestTypeFees = @TestTypeFees" +
-                " WHERE TestTypeID = @TestTypeID";
-
-            SqlCommand Command = new SqlCommand(Query, connection);
-
-            Command.Parameters.AddWithValue("@TestTypeID", TestTypeID);
-            Command.Parameters.AddWithValue("@TestTypeDescription", TestTypeDescription);
-            Command.Parameters.AddWithValue("@TestTypeTitle", TestTypeTitle);
-            Command.Parameters.AddWithValue("@TestTypeFees", TestTypeFees);
-
-
             try
             {
-                connection.Open();
-                NumberOfEffectedRows = Command.ExecuteNonQuery();
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    string Query = @"UPDATE TestTypes
+                                     SET TestTypeTitle = @TestTypeTitle,
+                                         TestTypeDescription = @TestTypeDescription,
+                                         TestTypeFees = @TestTypeFees
+                                     WHERE TestTypeID = @TestTypeID";
+
+                    using (SqlCommand Command = new SqlCommand(Query, connection))
+                    {
+                        Command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
+                        Command.Parameters.Add("@TestTypeDescription", SqlDbType.NVarChar).Value = TestTypeDescription;
+                        Command.Parameters.Add("@TestTypeTitle", SqlDbType.NVarChar).Value = TestTypeTitle;
+                        Command.Parameters.Add("@TestTypeFees", SqlDbType.Decimal).Value = TestTypeFees;
+
+                        connection.Open();
+                        NumberOfEffectedRows = Command.ExecuteNonQuery();
+                    }
+                }
             }
-            catch { }
-            finally
+            catch (Exception ex)
             {
-                connection.Close();
+                clsLogger.LogException(ex, $"Failed to update test type ID: {TestTypeID}");
             }
 
             return NumberOfEffectedRows > 0;
-
         }
 
         public static DataTable GetAllTestTypes()
         {
             DataTable Table = new DataTable();
-
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string Query = "SELECT TestTypeID, TestTypeTitle," +
-                " TestTypeDescription, TestTypeFees" +
-                " FROM TestTypes";
-
-            SqlCommand Command = new SqlCommand(Query, connection);
-
             try
             {
-                connection.Open();
-                SqlDataReader reader = Command.ExecuteReader();
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    string Query = @"SELECT TestTypeID, TestTypeTitle, TestTypeDescription, TestTypeFees
+                                     FROM TestTypes";
 
-                Table.Load(reader);
-                reader.Close();
+                    using (SqlCommand Command = new SqlCommand(Query, connection))
+                    {
+                        connection.Open();
+                        using (SqlDataReader reader = Command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                Table.Load(reader);
+                            }
+                        }
+                    }
+                }
             }
-            catch { }
-            finally
+            catch (Exception ex)
             {
-                connection.Close();
+                clsLogger.LogException(ex, "Failed to retrieve all test types.");
             }
 
             return Table;
-
         }
 
     }
