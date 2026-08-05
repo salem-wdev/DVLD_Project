@@ -249,7 +249,7 @@ namespace DVLD_DataAccess
                                            ,@CreatedByUserID);
                                 
                                 
-                                SELECT SCOPE_IDENTITY() AS NewLicenseID, @CurrentDate AS DB_IssueDate, @CalculatedExpirationDate AS DB_ExpirationDate;";
+                                SELECT CAST(SCOPE_IDENTITY() AS INT) AS NewLicenseID, @CurrentDate AS DB_IssueDate, @CalculatedExpirationDate AS DB_ExpirationDate;";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.Add("@ApplicationID", SqlDbType.Int).Value = ApplicationID;
