@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DVLD_Shared;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -11,60 +12,46 @@ namespace DVLD_DataAccess
             ref string Notes, ref int CreatedByUserID)
         {
             bool isFound = false;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = "SELECT * FROM Tests WHERE TestID = @TestID";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@TestID", TestID);
-
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
+                    string query = @"SELECT TestAppointmentID, TestResult, Notes, CreatedByUserID
+                                     FROM Tests
+                                     WHERE TestID = @TestID";
 
-                    // The record was found
-                    isFound = true;
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.Add("@TestID", SqlDbType.Int).Value = TestID;
 
-                    TestAppointmentID = (int)reader["TestAppointmentID"];
-                    TestResult = (bool)reader["TestResult"];
-                    if (reader["Notes"] == DBNull.Value)
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
 
-                        Notes = "";
-                    else
-                        Notes = (string)reader["Notes"];
-
-                    CreatedByUserID = (int)reader["CreatedByUserID"];
-
+                                TestAppointmentID = reader.GetInt32(0);
+                                TestResult = reader.GetBoolean(1);
+                                Notes = reader.IsDBNull(2) ? string.Empty : reader.GetString(2);
+                                CreatedByUserID = reader.GetInt32(3);
+                            }
+                            else
+                            {
+                                isFound = false;
+                            }
+                        }
+                    }
                 }
-                else
-                {
-                    // The record was not found
-                    isFound = false;
-                }
-
-                reader.Close();
-
-
             }
             catch (Exception ex)
             {
-                //Console.WriteLine("Error: " + ex.Message);
+                clsLogger.LogException(ex, $"Failed to retrieve test info by ID: {TestID}");
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isFound;
         }
-
 
         public static bool GetLastTestByPersonAndTestTypeAndLicenseClass
             (int PersonID, int LicenseClassID, int TestTypeID, ref int TestID,
@@ -72,209 +59,168 @@ namespace DVLD_DataAccess
               ref string Notes, ref int CreatedByUserID)
         {
             bool isFound = false;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = @"SELECT  top 1 Tests.TestID, 
-                Tests.TestAppointmentID, Tests.TestResult, 
-			    Tests.Notes, Tests.CreatedByUserID, Applications.ApplicantPersonID
-                FROM            LocalDrivingLicenseApplications INNER JOIN
-                                         Tests INNER JOIN
-                                         TestAppointments ON Tests.TestAppointmentID = TestAppointments.TestAppointmentID ON LocalDrivingLicenseApplications.LocalDrivingLicenseApplicationID = TestAppointments.LocalDrivingLicenseApplicationID INNER JOIN
-                                         Applications ON LocalDrivingLicenseApplications.ApplicationID = Applications.ApplicationID
-                WHERE        (Applications.ApplicantPersonID = @PersonID) 
-                        AND (LocalDrivingLicenseApplications.LicenseClassID = @LicenseClassID)
-                        AND ( TestAppointments.TestTypeID=@TestTypeID)
-                ORDER BY Tests.TestAppointmentID DESC";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@PersonID", PersonID);
-            command.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
-            command.Parameters.AddWithValue("@TestTypeID", TestTypeID);
-
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
+                    string query = @"SELECT TOP (1) Tests.TestID,
+                                            Tests.TestAppointmentID,
+                                            Tests.TestResult,
+                                            Tests.Notes,
+                                            Tests.CreatedByUserID
+                                     FROM LocalDrivingLicenseApplications
+                                     INNER JOIN TestAppointments
+                                         ON LocalDrivingLicenseApplications.LocalDrivingLicenseApplicationID = TestAppointments.LocalDrivingLicenseApplicationID
+                                     INNER JOIN Tests
+                                         ON Tests.TestAppointmentID = TestAppointments.TestAppointmentID
+                                     INNER JOIN Applications
+                                         ON LocalDrivingLicenseApplications.ApplicationID = Applications.ApplicationID
+                                     WHERE Applications.ApplicantPersonID = @PersonID
+                                       AND LocalDrivingLicenseApplications.LicenseClassID = @LicenseClassID
+                                       AND TestAppointments.TestTypeID = @TestTypeID
+                                     ORDER BY Tests.TestAppointmentID DESC";
 
-                    // The record was found
-                    isFound = true;
-                    TestID = (int)reader["TestID"];
-                    TestAppointmentID = (int)reader["TestAppointmentID"];
-                    TestResult = (bool)reader["TestResult"];
-                    if (reader["Notes"] == DBNull.Value)
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
+                        command.Parameters.Add("@LicenseClassID", SqlDbType.Int).Value = LicenseClassID;
+                        command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        Notes = "";
-                    else
-                        Notes = (string)reader["Notes"];
-
-                    CreatedByUserID = (int)reader["CreatedByUserID"];
-
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
+                                TestID = reader.GetInt32(0);
+                                TestAppointmentID = reader.GetInt32(1);
+                                TestResult = reader.GetBoolean(2);
+                                Notes = reader.IsDBNull(3) ? string.Empty : reader.GetString(3);
+                                CreatedByUserID = reader.GetInt32(4);
+                            }
+                            else
+                            {
+                                isFound = false;
+                            }
+                        }
+                    }
                 }
-                else
-                {
-                    // The record was not found
-                    isFound = false;
-                }
-
-                reader.Close();
-
-
             }
             catch (Exception ex)
             {
-                //Console.WriteLine("Error: " + ex.Message);
+                clsLogger.LogException(ex, $"Failed to retrieve last test for PersonID: {PersonID}, LicenseClassID: {LicenseClassID}, TestTypeID: {TestTypeID}");
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isFound;
         }
 
-
         public static DataTable GetAllTests()
         {
-
             DataTable dt = new DataTable();
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = "SELECT * FROM Tests order by TestID";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
             try
             {
-                connection.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.HasRows)
-
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    dt.Load(reader);
+                    string query = @"SELECT TestID, TestAppointmentID, TestResult, Notes, CreatedByUserID
+                                     FROM Tests
+                                     ORDER BY TestID";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        connection.Open();
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                dt.Load(reader);
+                            }
+                        }
+                    }
                 }
-
-                reader.Close();
-
-
             }
-
             catch (Exception ex)
             {
-                // Console.WriteLine("Error: " + ex.Message);
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LogException(ex, "Failed to retrieve all tests.");
             }
 
             return dt;
-
         }
 
         public static int AddNewTest(int TestAppointmentID, bool TestResult,
              string Notes, int CreatedByUserID)
         {
             int TestID = -1;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = @"Insert Into Tests (TestAppointmentID,TestResult,
-                                                Notes,   CreatedByUserID)
-                            Values (@TestAppointmentID,@TestResult,
-                                                @Notes,   @CreatedByUserID);
-                            
-                                UPDATE TestAppointments 
-                                SET IsLocked=1 where TestAppointmentID = @TestAppointmentID;
-
-                                SELECT SCOPE_IDENTITY();";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@TestAppointmentID", TestAppointmentID);
-            command.Parameters.AddWithValue("@TestResult", TestResult);
-
-            if (Notes != "" && Notes != null)
-                command.Parameters.AddWithValue("@Notes", Notes);
-            else
-                command.Parameters.AddWithValue("@Notes", System.DBNull.Value);
-
-
-
-            command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
-
             try
             {
-                connection.Open();
-
-                object result = command.ExecuteScalar();
-
-                if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    TestID = insertedID;
+                    string query = @"INSERT INTO Tests (TestAppointmentID, TestResult, Notes, CreatedByUserID)
+                                     VALUES (@TestAppointmentID, @TestResult, @Notes, @CreatedByUserID);
+
+                                     UPDATE TestAppointments
+                                     SET IsLocked = 1
+                                     WHERE TestAppointmentID = @TestAppointmentID;
+
+                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.Add("@TestAppointmentID", SqlDbType.Int).Value = TestAppointmentID;
+                        command.Parameters.Add("@TestResult", SqlDbType.Bit).Value = TestResult;
+                        command.Parameters.Add("@Notes", SqlDbType.NVarChar, 500).Value = !string.IsNullOrEmpty(Notes) ? (object)Notes : DBNull.Value;
+                        command.Parameters.Add("@CreatedByUserID", SqlDbType.Int).Value = CreatedByUserID;
+
+                        connection.Open();
+
+                        if (command.ExecuteScalar() is int insertedID)
+                        {
+                            TestID = insertedID;
+                        }
+                    }
                 }
             }
-
             catch (Exception ex)
             {
-                //Console.WriteLine("Error: " + ex.Message);
-
+                clsLogger.LogException(ex, $"Failed to add new test for TestAppointmentID: {TestAppointmentID}");
             }
-
-            finally
-            {
-                connection.Close();
-            }
-
 
             return TestID;
-
         }
 
         public static bool UpdateTest(int TestID, int TestAppointmentID, bool TestResult,
              string Notes, int CreatedByUserID)
         {
-
             int rowsAffected = 0;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = @"Update  Tests  
-                            set TestAppointmentID = @TestAppointmentID,
-                                TestResult=@TestResult,
-                                Notes = @Notes,
-                                CreatedByUserID=@CreatedByUserID
-                                where TestID = @TestID";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@TestID", TestID);
-            command.Parameters.AddWithValue("@TestAppointmentID", TestAppointmentID);
-            command.Parameters.AddWithValue("@TestResult", TestResult);
-            command.Parameters.AddWithValue("@Notes", Notes);
-            command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
-
             try
             {
-                connection.Open();
-                rowsAffected = command.ExecuteNonQuery();
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    string query = @"UPDATE Tests
+                                     SET TestAppointmentID = @TestAppointmentID,
+                                         TestResult = @TestResult,
+                                         Notes = @Notes,
+                                         CreatedByUserID = @CreatedByUserID
+                                     WHERE TestID = @TestID";
 
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.Add("@TestID", SqlDbType.Int).Value = TestID;
+                        command.Parameters.Add("@TestAppointmentID", SqlDbType.Int).Value = TestAppointmentID;
+                        command.Parameters.Add("@TestResult", SqlDbType.Bit).Value = TestResult;
+                        command.Parameters.Add("@Notes", SqlDbType.NVarChar, 500).Value = (object)Notes ?? DBNull.Value;
+                        command.Parameters.Add("@CreatedByUserID", SqlDbType.Int).Value = CreatedByUserID;
+
+                        connection.Open();
+                        rowsAffected = command.ExecuteNonQuery();
+                    }
+                }
             }
             catch (Exception ex)
             {
-                //Console.WriteLine("Error: " + ex.Message);
+                clsLogger.LogException(ex, $"Failed to update test ID: {TestID}");
                 return false;
-            }
-
-            finally
-            {
-                connection.Close();
             }
 
             return (rowsAffected > 0);
@@ -283,91 +229,70 @@ namespace DVLD_DataAccess
         public static byte GetPassedTestCount(int LocalDrivingLicenseApplicationID)
         {
             byte PassedTestCount = 0;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = @"SELECT PassedTestCount = count(TestTypeID)
-                         FROM Tests INNER JOIN
-                         TestAppointments ON Tests.TestAppointmentID = TestAppointments.TestAppointmentID
-						 where LocalDrivingLicenseApplicationID =@LocalDrivingLicenseApplicationID and TestResult=1";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
-
-
             try
             {
-                connection.Open();
-
-                object result = command.ExecuteScalar();
-
-                if (result != null && byte.TryParse(result.ToString(), out byte ptCount))
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    PassedTestCount = ptCount;
+                    string query = @"SELECT CAST(COUNT(TestTypeID) AS TINYINT)
+                                     FROM Tests
+                                     INNER JOIN TestAppointments ON Tests.TestAppointmentID = TestAppointments.TestAppointmentID
+                                     WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID
+                                       AND TestResult = 1";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
+
+                        connection.Open();
+
+                        if (command.ExecuteScalar() is byte ptCount)
+                        {
+                            PassedTestCount = ptCount;
+                        }
+                    }
                 }
             }
-
             catch (Exception ex)
             {
-                //Console.WriteLine("Error: " + ex.Message);
-
-            }
-
-            finally
-            {
-                connection.Close();
+                clsLogger.LogException(ex, $"Failed to retrieve passed test count for LocalDrivingLicenseApplicationID: {LocalDrivingLicenseApplicationID}");
             }
 
             return PassedTestCount;
-
-
-
         }
 
         public static bool GetIsPassedTestByTestAppointmentID(int TestAppointmentID)
         {
             bool isFound = false;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = "SELECT TOP 1 1 FROM Tests" +
-                " WHERE Tests.TestAppointmentID = @TestAppointmentID " +
-                "AND Tests.TestResult = 1;";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@TestAppointmentID", TestAppointmentID);
-
             try
             {
-                connection.Open();
-                object scalar = command.ExecuteScalar();
-
-                if (scalar != null)
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
+                    string query = @"SELECT TOP (1) CAST(1 AS BIT)
+                                     FROM Tests
+                                     WHERE Tests.TestAppointmentID = @TestAppointmentID
+                                       AND Tests.TestResult = 1;";
 
-                    // The record was found
-                    isFound = true;
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.Add("@TestAppointmentID", SqlDbType.Int).Value = TestAppointmentID;
 
+                        connection.Open();
 
+                        if (command.ExecuteScalar() is bool found)
+                        {
+                            isFound = found;
+                        }
+                        else
+                        {
+                            isFound = false;
+                        }
+                    }
                 }
-                else
-                {
-                    // The record was not found
-                    isFound = false;
-                }
-
-
             }
             catch (Exception ex)
             {
-                //Console.WriteLine("Error: " + ex.Message);
+                clsLogger.LogException(ex, $"Failed to check passed test by TestAppointmentID: {TestAppointmentID}");
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isFound;
