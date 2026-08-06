@@ -1,7 +1,7 @@
 ﻿using DVLD.Global_Classes;
 using DVLD.People.Forms;
 using DVLD.Users;
-using DVLD_Business;
+using DVLD_Business.Users;
 using DVLD_Business.Global_Classes;
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DVLD_Shared;
+using DVLD_Shared.Storage;
 
 namespace DVLD
 {
@@ -54,10 +55,12 @@ namespace DVLD
 
             string rememberedUsername = string.Empty;
             string rememberedPassword = string.Empty;
-            if(clsGlobal.GetStoredCredential(ref rememberedUsername, ref rememberedPassword))
+            Dictionary<string, string> storedCredentials = clsRegistryManager.GetRegisteredValues(new[] { "Username", "Username" }, @"SOFTWARE\DVLD");
+
+            if (storedCredentials.Count > 0)
             {
-                txtUserName.Text = rememberedUsername;
-                txtPassword.Text = rememberedPassword;
+                txtUserName.Text = storedCredentials.ContainsKey(rememberedUsername) ? storedCredentials["Username"] : string.Empty;
+                txtPassword.Text = storedCredentials.ContainsKey(rememberedPassword) ? storedCredentials["Password"] : string.Empty;
                 chkRememberMe.Checked = true;
             }
             else
