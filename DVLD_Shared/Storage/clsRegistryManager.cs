@@ -9,105 +9,92 @@ namespace DVLD_Shared.Storage
 {
     public static class clsRegistryManager
     {
-        private static readonly string _SubKeyPath = @"SOFTWARE\DVLD";
-
-        private static bool RegisterCredentials(string username, string password)
+        public static bool RegisterValues(Dictionary<string,string> values, string subKeyPath)
         {
+            string failedKey = string.Empty;
             try
             {
-                using (RegistryKey Key = Registry.CurrentUser.CreateSubKey(_SubKeyPath))
+                using (RegistryKey Key = Registry.CurrentUser.CreateSubKey(subKeyPath))
                 {
                     if (Key != null)
                     {
-                        Key.SetValue("Username", username, RegistryValueKind.String);
-                        Key.SetValue("Password", password, RegistryValueKind.String);
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                clsLogger.LogException(ex, $"Error registering credentials in registry for {username}");
-                DeleteCredentials();
-                return false;
-            }
-            return true;
-        }
-
-        private static bool DeleteCredentials()
-        {
-            try
-            {
-                using (RegistryKey Key = Registry.CurrentUser.OpenSubKey(_SubKeyPath, true))
-                {
-                    if (Key != null)
-                    {
-                        Key.DeleteValue("Username", false);
-                        Key.DeleteValue("Password", false);
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                clsLogger.LogException(ex, $"Error deleting credentials from registry");
-                return false;
-            }
-            return true;
-        }
-
-        internal static bool RememberUsernameAndPassword(string Username, string Password, bool Remember)
-        {
-            if (Remember)
-            {
-                return RegisterCredentials(Username, Password);
-            }
-            else
-            {
-                return DeleteCredentials();
-            }
-        }
-
-        public static bool GetStoredCredential(ref string username, ref string password)
-        {
-            try
-            {
-                using (RegistryKey Key = Registry.CurrentUser.OpenSubKey(_SubKeyPath))
-                {
-                    if (Key != null)
-                    {
-                        username = Key.GetValue("Username") as string;
-                        password = Key.GetValue("Password") as string;
-
-                        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                        foreach (var kvp in values)
                         {
-                            username = null;
-                            password = null;
-                            return false;
+                            failedKey = kvp.Key;
+                            Key.SetValue(kvp.Key, kvp.Value, RegistryValueKind.String);
                         }
                     }
                     else
                     {
-                        username = null;
-                        password = null;
                         return false;
                     }
                 }
             }
             catch (Exception ex)
             {
-                clsLogger.LogException(ex, $"Error retrieving credentials from registry");
-                username = null;
-                password = null;
+                clsLogger.LogException(ex, $"Error registering Key in registry for {failedKey}");
+                DeleteValues(values.Keys.ToArray(), subKeyPath);
                 return false;
             }
             return true;
+        }
+
+        private static bool DeleteValues(string[] keys, string subKeyPath)
+        {
+            string failedKey = string.Empty;
+            try
+            {
+                using (RegistryKey Key = Registry.CurrentUser.OpenSubKey(subKeyPath, true))
+                {
+                    if (Key != null)
+                    {
+                        foreach (var kvp in keys)
+                        {
+                            failedKey = kvp;
+                            Key.DeleteValue(kvp, false);
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                clsLogger.LogException(ex, $"Error deleting Key from registry for {failedKey}");
+                return false;
+            }
+            return true;
+        }
+
+        public static Dictionary<string, string> GetRegisteredValues(string[] keys, string subKeyPath)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            string failedKey = string.Empty;
+            try
+            {
+                using (RegistryKey Key = Registry.CurrentUser.OpenSubKey(subKeyPath))
+                {
+                    if (Key != null)
+                    {
+                        foreach (var kvp in keys)
+                        {
+                            failedKey = kvp;
+                            var value = Key.GetValue(kvp) as string;
+                            if (!string.IsNullOrWhiteSpace(value))
+                            {
+                                result[kvp] = value as string;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                clsLogger.LogException(ex, $"Error retrieving key from registry for {failedKey}");
+            }
+            return result;
         }
 
     }
