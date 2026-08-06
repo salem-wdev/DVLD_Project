@@ -52,7 +52,7 @@ namespace DVLD_Business.Global_Classes
 
         }
 
-        public static bool CopyImageToProjectImagesFolder(ref string sourceFile, string DestinationFolder)
+        public static bool CopyFileToDestinationFolderWithGUID(ref string sourceFile, string DestinationFolder)
         {
             // this funciton will copy the image to the
             // project images foldr after renaming it
