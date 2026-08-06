@@ -178,7 +178,7 @@ namespace DVLD_Business
             if (!string.IsNullOrWhiteSpace(this._ImagePath))
             {
                 string sourceFilePath = this.ImagePath;
-                if (!clsFileStorage.CopyImageToProjectImagesFolder(ref sourceFilePath, @"C:\DVLD-People-Images\"))
+                if (!clsFileStorage.CopyFileToDestinationFolderWithGUID(ref sourceFilePath, @"C:\DVLD-People-Images\"))
                 {
                     return false;
                 }
@@ -223,7 +223,7 @@ namespace DVLD_Business
             if (this._IsImagePathChanged && !string.IsNullOrWhiteSpace(this.ImagePath))
             {
                 string sourceFilePath = this.ImagePath;
-                if (!clsFileStorage.CopyImageToProjectImagesFolder(ref sourceFilePath, @"C:\DVLD-People-Images\"))
+                if (!clsFileStorage.CopyFileToDestinationFolderWithGUID(ref sourceFilePath, @"C:\DVLD-People-Images\"))
                 {
                     return false;
                 }
