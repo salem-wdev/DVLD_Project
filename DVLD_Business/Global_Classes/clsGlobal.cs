@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DVLD_Business.Users;
+using Microsoft.Win32;
+using DVLD_Shared;
 
 
 namespace DVLD_Business.Global_Classes
@@ -14,79 +16,106 @@ namespace DVLD_Business.Global_Classes
     {
         public static clsUser CurrentUser;
 
-        private static readonly string _filePath 
-            = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
-                , "DVLD_Project\\data.txt");
+        private static readonly string _SubKeyPath = @"SOFTWARE\DVLD";
 
-        internal static bool RememberUsernameAndPassword(string Username, string Password)
+        private static bool RegisterCredentials(string username, string password)
         {
             try
             {
-                string folderPath = Path.GetDirectoryName(_filePath);
-
-                if (!Directory.Exists(folderPath))
+                using (RegistryKey Key = Registry.CurrentUser.CreateSubKey(_SubKeyPath))
                 {
-                    Directory.CreateDirectory(folderPath);
-                }
-
-                if (Username == "" && File.Exists(_filePath))
-                {
-                    File.Delete(_filePath);
+                    if (Key != null)
+                    {
+                        Key.SetValue("Username", username, RegistryValueKind.String);
+                        Key.SetValue("Password", password, RegistryValueKind.String);
+                    }
+                    else
+                    { 
                     return false;
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                clsLogger.LogException(ex, $"Error registering credentials in registry for {username}");
+                DeleteCredentials();
+                return false;
+            }
+            return true;
+        }
 
-                string DataToSave = Username + "#//#" + Password;
-
-                using (StreamWriter writer = new StreamWriter(_filePath))
+        private static bool DeleteCredentials()
+        {
+            try
+            {
+                using (RegistryKey Key = Registry.CurrentUser.OpenSubKey(_SubKeyPath, true))
                 {
-                    writer.WriteLine(DataToSave);
-                    return true;
+                    if (Key != null)
+                    {
+                        Key.DeleteValue("Username", false);
+                        Key.DeleteValue("Password", false);
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-
             }
             catch (Exception ex)
             {
+                clsLogger.LogException(ex, $"Error deleting credentials from registry");
+                return false;
             }
-
-            return false;
+            return true;
         }
 
-        public static bool GetStoredCredential(ref string Username, ref string Password)
+        internal static bool RememberUsernameAndPassword(string Username, string Password, bool Remember)
+        {
+            if (Remember)
+            {
+                return RegisterCredentials(Username, Password);
+            }
+            else
+            {
+                return DeleteCredentials();
+            }
+        }
+
+        public static bool GetStoredCredential(ref string username, ref string password)
         {
             try
             {
-
-
-
-                if (File.Exists(_filePath))
+                using (RegistryKey Key = Registry.CurrentUser.OpenSubKey(_SubKeyPath))
                 {
-                    using (StreamReader reader = new StreamReader(_filePath))
+                    if (Key != null)
                     {
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
+                        username = Key.GetValue("Username") as string;
+                        password = Key.GetValue("Password") as string;
+
+                        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
                         {
-                            Console.WriteLine(line);
-                            string[] strings = line.Split(new string[] { "#//#" }, StringSplitOptions.None);
-                            Username = strings[0];
-                            Password = strings[1];
+                            username = null;
+                            password = null;
+                            return false;
                         }
-                        return true;
+                    }
+                    else
+                    {
+                        username = null;
+                        password = null;
+                        return false;
                     }
                 }
-                else
-                {
-                    return false;
-                }
             }
-            catch
+            catch (Exception ex)
             {
+                clsLogger.LogException(ex, $"Error retrieving credentials from registry");
+                username = null;
+                password = null;
                 return false;
             }
-
-            return false;
-
+            return true;
         }
-
         public static DateTime GetServerDateTime()
         {
             return clsBusinessSettings.GetServerDateTime();
