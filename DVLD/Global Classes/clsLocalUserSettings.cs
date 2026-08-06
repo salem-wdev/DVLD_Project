@@ -7,7 +7,7 @@ using DVLD_Shared.Storage;
 
 namespace DVLD_Business.Users
 {
-    public static class clsUserSettings
+    public static class clsLocalUserSettings
     {
         private const string _RegistryPath = @"SOFTWARE\DVLD";
         private const string _UsernameKey = "Username";

@@ -33,13 +33,13 @@ namespace DVLD
                 if (chkRememberMe.Checked)
                 {
                     //store username and password in registry.
-                    chkRememberMe.Checked = clsUserSettings.RememberMe(txtUserName.Text.Trim(), txtPassword.Text.Trim());
+                    chkRememberMe.Checked = clsLocalUserSettings.RememberMe(txtUserName.Text.Trim(), txtPassword.Text.Trim());
 
                 }
                 else
                 {
                     // delete username and password from registry.
-                    chkRememberMe.Checked = !clsUserSettings.RemoveRememberedCredentials();
+                    chkRememberMe.Checked = !clsLocalUserSettings.RemoveRememberedCredentials();
                 }
 
                 frmMain frm = new frmMain(this);
@@ -62,7 +62,7 @@ namespace DVLD
         {
             clsLogger.Log("Login Form Loaded");
 
-            var (rememberedUsername, rememberedPassword) = clsUserSettings.GetRememberedCredentials();
+            var (rememberedUsername, rememberedPassword) = clsLocalUserSettings.GetRememberedCredentials();
             bool isRemembered = !string.IsNullOrEmpty(rememberedUsername) && !string.IsNullOrEmpty(rememberedPassword);
 
             if (!isRemembered)

@@ -124,7 +124,7 @@
     <Compile Include="Drivers\frmListDrivers.Designer.cs">
       <DependentUpon>frmListDrivers.cs</DependentUpon>
     </Compile>
-    <Compile Include="Global Classes\clsUserSettings.cs" />
+    <Compile Include="Global Classes\clsLocalUserSettings.cs" />
     <Compile Include="Licenses\Controls\ctrlDriverLicenses.cs">
       <SubType>UserControl</SubType>
     </Compile>
