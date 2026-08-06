@@ -280,7 +280,7 @@ namespace DVLD_Business.Users
             return new clsUser(PersonID, UserName, Password);
         }
 
-        public static clsUser Login(string UserName, string Password, bool IsRememberd)
+        public static clsUser Login(string UserName, string Password)
         {
             clsUser user = clsUser.FindByUsernameAndPassword(UserName, Password);
 
@@ -289,26 +289,6 @@ namespace DVLD_Business.Users
             {
                 return null;
             }
-
-            if (IsRememberd)
-            {
-                //store username and password in registry.
-                clsRegistryManager.RegisterValues(
-                    new Dictionary<string, string>
-                    {
-                            { "Username", UserName.Trim() },
-                            { "Password", Password.Trim() }
-                    }
-                    , @"SOFTWARE\DVLD");
-
-            }
-            else
-            {
-                // delete username and password from registry.
-                clsRegistryManager.DeleteValues(new[] { "Username", "Password" }, @"SOFTWARE\DVLD");
-
-            }
-
             return user;
         }
 

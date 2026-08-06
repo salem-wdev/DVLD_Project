@@ -1,8 +1,10 @@
 ﻿using DVLD.Global_Classes;
 using DVLD.People.Forms;
 using DVLD.Users;
-using DVLD_Business.Users;
 using DVLD_Business.Global_Classes;
+using DVLD_Business.Users;
+using DVLD_Shared;
+using DVLD_Shared.Storage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,8 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DVLD_Shared;
-using DVLD_Shared.Storage;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace DVLD
 {
@@ -27,9 +28,27 @@ namespace DVLD
         private void btnLogin_Click(object sender, EventArgs e)
         {
             if ((clsGlobal.CurrentUser =
-                clsUser.Login(txtUserName.Text.Trim(), txtPassword.Text.Trim(),
-                chkRememberMe.Checked))!= null)
+                clsUser.Login(txtUserName.Text.Trim(), txtPassword.Text.Trim()))!= null)
             {
+                if (chkRememberMe.Checked)
+                {
+                    //store username and password in registry.
+                    clsRegistryManager.RegisterValues(
+                        new Dictionary<string, string>
+                        {
+                            { "Username", txtUserName.Text.Trim() },
+                            { "Password", txtPassword.Text.Trim() }
+                        }
+                        , @"SOFTWARE\DVLD");
+
+                }
+                else
+                {
+                    // delete username and password from registry.
+                    clsRegistryManager.DeleteValues(new[] { "Username", "Password" }, @"SOFTWARE\DVLD");
+
+                }
+
                 frmMain frm = new frmMain(this);
                 frm.Show();
                 this.Hide();
