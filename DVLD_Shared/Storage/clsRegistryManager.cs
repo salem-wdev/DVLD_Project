@@ -39,7 +39,7 @@ namespace DVLD_Shared.Storage
             return true;
         }
 
-        private static bool DeleteValues(string[] keys, string subKeyPath)
+        public static bool DeleteValues(string[] keys, string subKeyPath)
         {
             string failedKey = string.Empty;
             try
