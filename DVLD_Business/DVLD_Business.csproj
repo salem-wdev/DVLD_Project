@@ -44,6 +44,7 @@
     <Compile Include="clsApplication.cs" />
     <Compile Include="clsApplicationType.cs" />
     <Compile Include="Users\clsPermissionEvaluator.cs" />
+    <Compile Include="Users\clsUserSettings.cs" />
     <Compile Include="Users\EnforcePermissionAttribute.cs" />
     <Compile Include="Users\enUserPermissions.cs" />
     <Compile Include="Extensions\StringArrayExtensions.cs" />
