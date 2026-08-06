@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using DVLD_Shared.Storage;
 
-namespace DVLD_Business.Users
+namespace DVLD.Global_Classes
 {
-    public static class clsUserSettings
+    public static class clsLocalUserSettings
     {
         private const string _RegistryPath = @"SOFTWARE\DVLD";
         private const string _UsernameKey = "Username";
