@@ -116,9 +116,6 @@ namespace DVLD_Business.Global_Classes
             }
             return true;
         }
-        public static DateTime GetServerDateTime()
-        {
-            return clsBusinessSettings.GetServerDateTime();
-        }
+        
     }
 }
