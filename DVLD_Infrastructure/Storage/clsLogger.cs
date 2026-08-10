@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace DVLD_Shared
+namespace DVLD_Infrastructure.Storage
 {
     public static class clsLogger
     {

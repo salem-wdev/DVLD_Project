@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsLogger.cs" />
     <Compile Include="clsUtil.cs" />
     <Compile Include="Extensions\StringArrayExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
