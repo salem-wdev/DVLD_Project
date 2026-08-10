@@ -67,6 +67,10 @@
       <Project>{695dcede-5c5d-4237-99d7-51d252d6d8a8}</Project>
       <Name>DVLD_DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DVLD_Infrastructure\DVLD_Infrastructure.csproj">
+      <Project>{02f33be3-3833-4ebe-bcc6-e9e527521bb8}</Project>
+      <Name>DVLD_Infrastructure</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DVLD_Shared\DVLD_Shared.csproj">
       <Project>{515bf002-3597-468d-81cf-e6cceefb2ff4}</Project>
       <Name>DVLD_Shared</Name>
