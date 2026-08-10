@@ -13,6 +13,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DVLD_Setup", "..\DVLD_Setup
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVLD_Shared", "..\DVLD_Shared\DVLD_Shared.csproj", "{515BF002-3597-468D-81CF-E6CCEEFB2FF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVLD_Infrastructure", "..\DVLD_Infrastructure\DVLD_Infrastructure.csproj", "{02F33BE3-3833-4EBE-BCC6-E9E527521BB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{515BF002-3597-468D-81CF-E6CCEEFB2FF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{515BF002-3597-468D-81CF-E6CCEEFB2FF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{515BF002-3597-468D-81CF-E6CCEEFB2FF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02F33BE3-3833-4EBE-BCC6-E9E527521BB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02F33BE3-3833-4EBE-BCC6-E9E527521BB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02F33BE3-3833-4EBE-BCC6-E9E527521BB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02F33BE3-3833-4EBE-BCC6-E9E527521BB8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

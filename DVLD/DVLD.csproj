@@ -126,6 +126,7 @@
     </Compile>
     <Compile Include="Global Classes\clsGlobal.cs" />
     <Compile Include="Global Classes\clsLocalUserSettings.cs" />
+    <Compile Include="Global Classes\clsRegistryManager.cs" />
     <Compile Include="Licenses\Controls\ctrlDriverLicenses.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -211,7 +212,7 @@
     <Compile Include="Login\frmLogin.Designer.cs">
       <DependentUpon>frmLogin.cs</DependentUpon>
     </Compile>
-    <Compile Include="Global Classes\clsUtil.cs" />
+    <Compile Include="Global Classes\clsUIHelper.cs" />
     <Compile Include="Global Classes\clsValidation.cs" />
     <Compile Include="People\Controls\ctrlPersonCard.cs">
       <SubType>UserControl</SubType>

@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using DVLD_Shared;
+using DVLD_Infrastructure.Storage;
 
 namespace DVLD_DataAccess
 {

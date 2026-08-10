@@ -329,7 +329,7 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         private void dgvLocalDrivingLicenseApplications_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvLocalDrivingLicenseApplications);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvLocalDrivingLicenseApplications);
         }
 
         private void CancelApplicaitonToolStripMenuItem_Click(object sender, EventArgs e)

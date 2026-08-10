@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DVLD_Business
+namespace DVLD_Shared.Users
 {
     [Flags]
     public enum enUserPermissions : int

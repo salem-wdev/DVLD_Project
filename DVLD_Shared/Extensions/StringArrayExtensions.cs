@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DVLD_Business.Extensions
+namespace DVLD_Shared.Extensions
 {
     /// <summary>
     /// Provides extension methods for array types to streamline common validation logic.

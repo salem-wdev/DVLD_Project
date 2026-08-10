@@ -1,13 +1,13 @@
-﻿using DVLD_Business.Global_Classes;
+﻿using DVLD_Infrastructure.Storage;
 using DVLD_DataAccess;
 using DVLD_Shared;
-using DVLD_Shared.Storage;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DVLD_Shared.Users;
 
 namespace DVLD_Business.Users
 {
@@ -302,5 +302,16 @@ namespace DVLD_Business.Users
             return (enUserPermissions)clsUserData.GetUserPermissionsByUserID(UserID);
         }
 
+        public static bool ValidationUser(int UserID)
+        {
+            enUserPermissions userPermissionsValue = GetUserPermissions(UserID);
+            return clsPermissionEvaluator.ValidationUser(userPermissionsValue);
+        }
+
+        public bool ValidationUser()
+        {
+            enUserPermissions userPermissionsValue = GetUserPermissions(this.UserID);
+            return clsPermissionEvaluator.ValidationUser(userPermissionsValue);
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DVLD_Business.Global_Classes;
+using DVLD_Infrastructure.Storage;
 using DVLD_DataAccess;
 
 namespace DVLD_Business

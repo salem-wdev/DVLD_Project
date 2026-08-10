@@ -61,7 +61,7 @@ namespace DVLD.Tests.Test_Types
 
         private void dgvTestTypes_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvTestTypes);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvTestTypes);
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)

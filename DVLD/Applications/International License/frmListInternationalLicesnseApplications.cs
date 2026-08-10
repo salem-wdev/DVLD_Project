@@ -171,7 +171,7 @@ namespace DVLD.Applications.International_License
 
         private void dgvInternationalLicenses_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvInternationalLicenses);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvInternationalLicenses);
         }
 
         private void PesonDetailsToolStripMenuItem_Click(object sender, EventArgs e)

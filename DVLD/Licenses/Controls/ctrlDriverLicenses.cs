@@ -168,12 +168,12 @@ namespace DVLD.Licenses.Controls
 
         private void dgvLocalLicensesHistory_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvLocalLicensesHistory);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvLocalLicensesHistory);
         }
 
         private void dgvInternationalLicensesHistory_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvInternationalLicensesHistory);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvInternationalLicensesHistory);
         }
     }
 }

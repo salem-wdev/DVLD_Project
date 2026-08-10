@@ -155,7 +155,7 @@ namespace DVLD.Drivers
 
         private void dgvDrivers_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvDrivers);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvDrivers);
         }
 
         private void txtFilterValue_KeyPress(object sender, KeyPressEventArgs e)

@@ -59,7 +59,7 @@ namespace DVLD.Applications.Application_Types
 
         private void dgvApplicationTypes_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvApplicationTypes);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvApplicationTypes);
         }
     }
 }
