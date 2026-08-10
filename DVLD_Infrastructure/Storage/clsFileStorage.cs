@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DVLD_Business.Global_Classes
+namespace DVLD_Infrastructure.Storage
 {
     public class clsFileStorage
     {
