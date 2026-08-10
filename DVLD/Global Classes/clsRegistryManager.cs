@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DVLD_Shared.Storage
+namespace DVLD.Global_Classes
 {
     public static class clsRegistryManager
     {
@@ -32,7 +32,7 @@ namespace DVLD_Shared.Storage
             }
             catch (Exception ex)
             {
-                clsLogger.LogException(ex, $"Error registering Key in registry for {failedKey}");
+                //clsLogger.LogException(ex, $"Error registering Key in registry for {failedKey}");
                 DeleteValues(values.Keys.ToArray(), subKeyPath);
                 return false;
             }
@@ -62,7 +62,7 @@ namespace DVLD_Shared.Storage
             }
             catch (Exception ex)
             {
-                clsLogger.LogException(ex, $"Error deleting Key from registry for {failedKey}");
+                //clsLogger.LogException(ex, $"Error deleting Key from registry for {failedKey}");
                 return false;
             }
             return true;
@@ -92,7 +92,7 @@ namespace DVLD_Shared.Storage
             }
             catch (Exception ex)
             {
-                clsLogger.LogException(ex, $"Error retrieving key from registry for {failedKey}");
+                //clsLogger.LogException(ex, $"Error retrieving key from registry for {failedKey}");
             }
             return result;
         }
