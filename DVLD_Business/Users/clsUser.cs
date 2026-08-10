@@ -1,4 +1,4 @@
-﻿using DVLD_Business.Global_Classes;
+﻿using DVLD_Infrastructure.Storage;
 using DVLD_DataAccess;
 using DVLD_Shared;
 using System;
