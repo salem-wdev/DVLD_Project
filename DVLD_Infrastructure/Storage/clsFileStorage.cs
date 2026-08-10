@@ -4,22 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DVLD_Shared;
 
 namespace DVLD_Infrastructure.Storage
 {
     public class clsFileStorage
     {
-        public static string GenerateGUID()
-        {
-
-            // Generate a new GUID
-            Guid newGuid = Guid.NewGuid();
-
-            // convert the GUID to a string
-            return newGuid.ToString();
-
-        }
-
         public static bool CreateFolderIfDoesNotExist(string FolderPath)
         {
 
@@ -48,7 +38,7 @@ namespace DVLD_Infrastructure.Storage
             string fileName = sourceFile;
             FileInfo fi = new FileInfo(fileName);
             string extn = fi.Extension;
-            return GenerateGUID() + extn;
+            return clsUtil.GenerateGUID() + extn;
 
         }
 
@@ -90,6 +80,5 @@ namespace DVLD_Infrastructure.Storage
                 return false;
             }
         }
-
     }
 }
