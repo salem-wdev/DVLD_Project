@@ -43,7 +43,6 @@
   <ItemGroup>
     <Compile Include="clsApplication.cs" />
     <Compile Include="clsApplicationType.cs" />
-    <Compile Include="Extensions\StringArrayExtensions.cs" />
     <Compile Include="Global_Classes\clsBusinessSettings.cs" />
     <Compile Include="clsCountry.cs" />
     <Compile Include="clsDetainedLicense.cs" />
