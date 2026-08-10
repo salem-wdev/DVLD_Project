@@ -212,7 +212,7 @@
     <Compile Include="Login\frmLogin.Designer.cs">
       <DependentUpon>frmLogin.cs</DependentUpon>
     </Compile>
-    <Compile Include="Global Classes\clsUtil.cs" />
+    <Compile Include="Global Classes\clsUIHelper.cs" />
     <Compile Include="Global Classes\clsValidation.cs" />
     <Compile Include="People\Controls\ctrlPersonCard.cs">
       <SubType>UserControl</SubType>

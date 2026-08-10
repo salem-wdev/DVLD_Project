@@ -130,7 +130,7 @@ namespace DVLD.Tests
 
         private void dgvLicenseTestAppointments_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvLicenseTestAppointments);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvLicenseTestAppointments);
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)

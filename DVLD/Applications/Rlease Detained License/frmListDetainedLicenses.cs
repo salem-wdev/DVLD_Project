@@ -208,7 +208,7 @@ namespace DVLD.Applications.Rlease_Detained_License
 
         private void dgvDetainedLicenses_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvDetainedLicenses);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvDetainedLicenses);
         }
 
         private void PesonDetailsToolStripMenuItem_Click(object sender, EventArgs e)

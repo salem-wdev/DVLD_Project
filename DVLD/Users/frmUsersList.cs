@@ -246,7 +246,7 @@ namespace DVLD.Users
 
         private void dgvUsers_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            clsUtil.ConfigureDataGridViewContextMenu(e, dgvUsers);
+            clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvUsers);
 
         }
     }

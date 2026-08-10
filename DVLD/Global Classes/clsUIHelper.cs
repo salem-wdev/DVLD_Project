@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace DVLD.Global_Classes
 {
-    public class clsUtil
+    public class clsUIHelper
     {
         
         public static void ConfigureDataGridViewContextMenu(DataGridViewCellMouseEventArgs e, DataGridView dgv)
