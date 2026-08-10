@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DVLD_Business.Users
+namespace DVLD_Shared.Users
 {
     // Restriction: This attribute can only be applied to methods, not classes or properties.
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
