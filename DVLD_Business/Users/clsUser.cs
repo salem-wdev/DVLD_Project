@@ -1,5 +1,7 @@
 ﻿using DVLD_Business.Global_Classes;
 using DVLD_DataAccess;
+using DVLD_Shared;
+using DVLD_Shared.Storage;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -278,36 +280,16 @@ namespace DVLD_Business.Users
             return new clsUser(PersonID, UserName, Password);
         }
 
-        public static clsUser Login(string UserName, string Password, bool IsRememberd)
+        public static clsUser Login(string UserName, string Password)
         {
             clsUser user = clsUser.FindByUsernameAndPassword(UserName, Password);
 
-            if (user != null)
-            {
-                if (IsRememberd)
-                {
-                    //store username and password
-                    clsGlobal.RememberUsernameAndPassword(UserName.Trim(), Password.Trim());
-
-                }
-                else
-                {
-                    //store empty username and password
-                    clsGlobal.RememberUsernameAndPassword("", "");
-
-                }
-
-                //incase the user is not active
-                if (!user.IsActive)
-                {
-                    return null;
-                }
-                return user;
-            }
-            else
+            //incase the user is null or not active.
+            if (user == null || !user.IsActive)
             {
                 return null;
             }
+            return user;
         }
 
         public static bool HasUsers()
