@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using DVLD_Infrastructure.Storage;
@@ -17,7 +18,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT * FROM InternationalLicenses WHERE InternationalLicenseID = @InternationalLicenseID";
 
@@ -62,7 +63,7 @@ namespace DVLD_DataAccess
             DataTable dt = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT    InternationalLicenseID, ApplicationID,DriverID,
 		                                          IssuedUsingLocalLicenseID , IssueDate, 
@@ -101,7 +102,7 @@ namespace DVLD_DataAccess
             DataTable dt = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT    InternationalLicenseID, ApplicationID,
 		                                       IssuedUsingLocalLicenseID , IssueDate, 
@@ -143,7 +144,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"
                                Update InternationalLicenses 
@@ -211,7 +212,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0; try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE InternationalLicenses
                                             SET 
@@ -254,7 +255,7 @@ namespace DVLD_DataAccess
             int InternationalLicenseID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) InternationalLicenseID
                              FROM [InternationalLicenses]
@@ -290,7 +291,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"  UPDATE [InternationalLicenses]
                                    SET [IsActive] = 0

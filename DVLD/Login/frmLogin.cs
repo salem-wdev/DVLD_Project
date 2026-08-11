@@ -59,7 +59,7 @@ namespace DVLD
 
         private void frmLogin_Load(object sender, EventArgs e)
         {
-            clsLogger.Log("Login Form Loaded");
+            //clsLogger.Log("Login Form Loaded");
 
             var (rememberedUsername, rememberedPassword) = clsLocalUserSettings.GetRememberedCredentials();
             bool isRemembered = !string.IsNullOrEmpty(rememberedUsername) && !string.IsNullOrEmpty(rememberedPassword);

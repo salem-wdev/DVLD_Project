@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Configuration;
 using System.Data.SqlClient;
 using DVLD_Shared;
 using DVLD_Infrastructure.Storage;
@@ -21,7 +22,7 @@ namespace DVLD_DataAccess
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {

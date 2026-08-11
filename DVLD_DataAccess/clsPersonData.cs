@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using DVLD_Shared;
@@ -19,7 +20,7 @@ namespace DVLD_DataAccess
                 return false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT NationalNo, FirstName, SecondName, ThirdName, LastName, DateOfBirth, Gendor, Address, Phone, Email, NationalityCountryID, ImagePath FROM People WHERE PersonID = @PersonID;";
 
@@ -75,7 +76,7 @@ namespace DVLD_DataAccess
                 return false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT PersonID, FirstName, SecondName, ThirdName, LastName, DateOfBirth, Gendor, Address, Phone, Email, NationalityCountryID, ImagePath FROM People WHERE NationalNo = @NationalNo;";
 
@@ -128,7 +129,7 @@ namespace DVLD_DataAccess
             int? PersonID = null;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "INSERT INTO People (NationalNo, FirstName, SecondName, ThirdName, " +
                         "LastName, DateOfBirth, Gendor, Address, Phone, Email, NationalityCountryID," +
@@ -179,7 +180,7 @@ namespace DVLD_DataAccess
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "UPDATE People SET [NationalNo] = @NationalNo, [FirstName] = @FirstName, " +
                         "[SecondName] = @SecondName,[ThirdName] = @ThirdName,[LastName] = @LastName," +
@@ -225,7 +226,7 @@ namespace DVLD_DataAccess
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT TOP 1 1 FROM People WHERE PersonID = @PersonID";
 
@@ -252,7 +253,7 @@ namespace DVLD_DataAccess
             bool IsExist = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT TOP 1 1 FROM People WHERE NationalNo = @NationalNo";
 
@@ -283,7 +284,7 @@ namespace DVLD_DataAccess
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT TOP 1 1 FROM People
                  WHERE NationalNo = @NationalNo AND PersonID != @PersonID;";
@@ -317,7 +318,7 @@ namespace DVLD_DataAccess
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "DELETE FROM People WHERE PersonID = @PersonID";
 
@@ -343,7 +344,7 @@ namespace DVLD_DataAccess
             DataTable Table = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT People.PersonID, People.NationalNo, People.FirstName, People.SecondName, " +
                         "People.ThirdName, People.LastName, People.DateOfBirth, " +
@@ -384,7 +385,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT TOP 1 1 FROM People;";
 

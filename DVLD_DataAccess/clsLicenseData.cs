@@ -1,6 +1,7 @@
-﻿using DVLD_Shared;
+using DVLD_Shared;
 using DVLD_Infrastructure.Storage;
 using System;
+using System.Configuration;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
@@ -17,7 +18,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT * FROM Licenses WHERE LicenseID = @LicenseID";
 
@@ -76,7 +77,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT * FROM Licenses WHERE ApplicationID = @ApplicationID";
 
@@ -133,7 +134,7 @@ namespace DVLD_DataAccess
 
             DataTable dt = new DataTable();
             try
-            {   using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {   using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT * FROM Licenses";
                     using (SqlCommand command = new SqlCommand(query, connection))
@@ -163,7 +164,7 @@ namespace DVLD_DataAccess
             DataTable dt = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT     
                            Licenses.LicenseID,
@@ -203,7 +204,7 @@ namespace DVLD_DataAccess
             int LicenseID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"DECLARE @CalculatedExpirationDate DATETIME;
                                 DECLARE @CurrentDate DATETIME = GETDATE();
@@ -296,7 +297,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE Licenses
                            SET ApplicationID=@ApplicationID, DriverID = @DriverID,
@@ -343,7 +344,7 @@ namespace DVLD_DataAccess
             int LicenseID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT CAST(Licenses.LicenseID AS INT)
                             FROM Licenses INNER JOIN
@@ -384,7 +385,7 @@ namespace DVLD_DataAccess
             int LicenseID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT [LicenseID]
                              FROM [dbo].[Licenses]
@@ -419,7 +420,7 @@ namespace DVLD_DataAccess
             int lastLicenseID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) LicenseID
                               FROM Licenses
@@ -455,7 +456,7 @@ namespace DVLD_DataAccess
             int LicenseID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT        Licenses.LicenseID
                             FROM Licenses INNER JOIN
@@ -495,7 +496,7 @@ namespace DVLD_DataAccess
             int LicenseID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT        Licenses.LicenseID
                             FROM Licenses INNER JOIN
@@ -535,7 +536,7 @@ namespace DVLD_DataAccess
             int effectedRows = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "UPDATE Licenses " +
                         "SET IsActive = 0 " +
@@ -572,7 +573,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE Licenses
                            SET 
@@ -602,7 +603,7 @@ namespace DVLD_DataAccess
             bool isActive = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT [IsActive]
                              FROM [dbo].[Licenses]
@@ -637,7 +638,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE [dbo].[Licenses]
                              SET [IsActive] = 0

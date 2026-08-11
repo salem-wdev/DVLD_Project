@@ -1,6 +1,7 @@
-﻿using DVLD_Shared;
+using DVLD_Shared;
 using DVLD_Infrastructure.Storage;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -17,7 +18,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TestTypeID, LocalDrivingLicenseApplicationID, AppointmentDate, CAST(PaidFees AS REAL) AS PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID
                                      FROM TestAppointments
@@ -66,7 +67,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) TestAppointmentID, AppointmentDate, CAST(PaidFees AS REAL) AS PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID
                                      FROM TestAppointments
@@ -117,7 +118,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) TestAppointmentID, AppointmentDate, CAST(PaidFees AS REAL) AS PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID
                                      FROM TestAppointments
@@ -165,7 +166,7 @@ namespace DVLD_DataAccess
             DataTable dt = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TestAppointmentID, TestTypeID, LocalDrivingLicenseApplicationID, AppointmentDate, CAST(PaidFees AS REAL) AS PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID
                                      FROM TestAppointments
@@ -198,7 +199,7 @@ namespace DVLD_DataAccess
             DataTable dt = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TestAppointmentID, AppointmentDate, CAST(PaidFees AS REAL) AS PaidFees, IsLocked
                                      FROM TestAppointments
@@ -238,7 +239,7 @@ namespace DVLD_DataAccess
             int TestAppointmentID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"INSERT INTO TestAppointments (TestTypeID, LocalDrivingLicenseApplicationID, AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID)
                                      VALUES (@TestTypeID, @LocalDrivingLicenseApplicationID, @AppointmentDate, @PaidFees, @CreatedByUserID, 0, @RetakeTestApplicationID);
@@ -277,7 +278,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE TestAppointments
                                      SET TestTypeID = @TestTypeID,
@@ -320,7 +321,7 @@ namespace DVLD_DataAccess
             int TestID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TestID FROM Tests WHERE TestAppointmentID = @TestAppointmentID;";
 
@@ -351,7 +352,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) CAST(1 AS BIT)
                                      FROM [TestAppointments]
@@ -389,7 +390,7 @@ namespace DVLD_DataAccess
             bool IsLocked = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) IsLocked
                                      FROM [TestAppointments]
@@ -425,7 +426,7 @@ namespace DVLD_DataAccess
             bool IsLocked = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) IsLocked
                                      FROM [DVLD].[dbo].[TestAppointments]
@@ -459,7 +460,7 @@ namespace DVLD_DataAccess
             bool IsLocked = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE TestAppointments
                                      SET IsLocked = 1
@@ -497,7 +498,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) CAST(1 AS BIT)
                                      FROM [DVLD].[dbo].[TestAppointments]
@@ -533,7 +534,7 @@ namespace DVLD_DataAccess
             int EffectedRows = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE [dbo].[TestAppointments]
                                      SET IsLocked = 1

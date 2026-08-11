@@ -1,5 +1,6 @@
-﻿using DVLD_Shared;
+using DVLD_Shared;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using DVLD_Infrastructure.Storage;
@@ -14,7 +15,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT PersonID, UserName, [Password], IsActive
                                      FROM Users
@@ -59,7 +60,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT UserID, PersonID, [Password], IsActive
                                      FROM Users
@@ -104,7 +105,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT UserID, UserName, [Password], IsActive
                                      FROM Users
@@ -148,7 +149,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT UserID, PersonID, UserName, [Password], IsActive
                                      FROM Users
@@ -196,7 +197,7 @@ namespace DVLD_DataAccess
             int UserID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"INSERT INTO [Users] ([PersonID], [UserName], [Password], [IsActive])
                                      VALUES (@PersonID, @UserName, @Password, @IsActive);
@@ -231,7 +232,7 @@ namespace DVLD_DataAccess
             int NumberOfEffectedRows = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"UPDATE Users
                                      SET [UserName] = @UserName,
@@ -264,7 +265,7 @@ namespace DVLD_DataAccess
             bool IsExist = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT TOP (1) CAST(1 AS BIT)
                                      FROM Users
@@ -300,7 +301,7 @@ namespace DVLD_DataAccess
             bool IsExist = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT TOP (1) CAST(1 AS BIT)
                                      FROM Users
@@ -336,7 +337,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) CAST(1 AS BIT)
                                      FROM Users
@@ -372,7 +373,7 @@ namespace DVLD_DataAccess
             int NumberOfEffectedRows = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"DELETE FROM Users
                                      WHERE UserID = @UserID";
@@ -399,7 +400,7 @@ namespace DVLD_DataAccess
             DataTable Table = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT Users.UserID,
                                             Users.PersonID,
@@ -435,7 +436,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) CAST(1 AS BIT)
                                      FROM Users
@@ -471,7 +472,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE Users
                                      SET UserName = @UserName,
@@ -503,7 +504,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE Users
                                      SET [Password] = @Password
@@ -533,7 +534,7 @@ namespace DVLD_DataAccess
             bool IsSucceed = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"UPDATE [Users]
                                      SET [IsActive] = @IsActive
@@ -563,7 +564,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) CAST(1 AS BIT)
                                      FROM Users;";
@@ -596,7 +597,7 @@ namespace DVLD_DataAccess
             int Permissions = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT
                                     Permission

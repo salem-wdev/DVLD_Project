@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using DVLD_Infrastructure.Storage;
@@ -13,7 +14,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT * FROM Countries WHERE CountryID = @CountryID";
                     using (SqlCommand Command = new SqlCommand(Query, connection))
@@ -43,7 +44,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT * FROM Countries WHERE CountryName = @CountryName";
                     using (SqlCommand Command = new SqlCommand(Query, connection))
@@ -74,7 +75,7 @@ namespace DVLD_DataAccess
             DataTable Table = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT * FROM Countries";
 

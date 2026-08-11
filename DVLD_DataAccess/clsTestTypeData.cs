@@ -1,6 +1,7 @@
-﻿using DVLD_Shared;
+using DVLD_Shared;
 using DVLD_Infrastructure.Storage;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -14,7 +15,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT TestTypeTitle, TestTypeDescription, TestTypeFees
                                      FROM TestTypes
@@ -57,7 +58,7 @@ namespace DVLD_DataAccess
             int TestTypeID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"INSERT INTO TestTypes (TestTypeTitle, TestTypeDescription, TestTypeFees)
                                      VALUES (@TestTypeTitle, @TestTypeDescription, @TestTypeFees);
@@ -91,7 +92,7 @@ namespace DVLD_DataAccess
             int NumberOfEffectedRows = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"UPDATE TestTypes
                                      SET TestTypeTitle = @TestTypeTitle,
@@ -124,7 +125,7 @@ namespace DVLD_DataAccess
             DataTable Table = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = @"SELECT TestTypeID, TestTypeTitle, TestTypeDescription, TestTypeFees
                                      FROM TestTypes";

@@ -1,6 +1,7 @@
-﻿using DVLD_Shared;
+using DVLD_Shared;
 using DVLD_Infrastructure.Storage;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -15,7 +16,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT ApplicationID, LicenseClassID FROM LocalDrivingLicenseApplications WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
 
@@ -56,7 +57,7 @@ namespace DVLD_DataAccess
             bool isFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT LocalDrivingLicenseApplicationID, LicenseClassID FROM LocalDrivingLicenseApplications WHERE ApplicationID = @ApplicationID";
 
@@ -95,7 +96,7 @@ namespace DVLD_DataAccess
             DataTable dt = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT *
                               FROM LocalDrivingLicenseApplications_View
@@ -129,7 +130,7 @@ namespace DVLD_DataAccess
             int LocalDrivingLicenseApplicationID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"INSERT INTO LocalDrivingLicenseApplications ( 
                             ApplicationID,LicenseClassID)
@@ -164,7 +165,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"Update  LocalDrivingLicenseApplications  
                             set ApplicationID = @ApplicationID,
@@ -196,7 +197,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"Delete LocalDrivingLicenseApplications 
                                 where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
@@ -224,7 +225,7 @@ namespace DVLD_DataAccess
             byte TotalTrialsPerTest = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @" SELECT CAST(COUNT(TestID) AS TINYINT)
                             FROM LocalDrivingLicenseApplications INNER JOIN
@@ -264,7 +265,7 @@ namespace DVLD_DataAccess
             bool Result = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @" SELECT top 1 TestResult
                             FROM LocalDrivingLicenseApplications INNER JOIN
@@ -303,7 +304,7 @@ namespace DVLD_DataAccess
             bool Result = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = " SELECT TestResult " +
                         "FROM Tests " +
@@ -340,7 +341,7 @@ namespace DVLD_DataAccess
             bool HasLicense = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) CAST(1 AS BIT) 
                             FROM   Licenses L 
@@ -373,7 +374,7 @@ namespace DVLD_DataAccess
             bool HasActiveAppointment = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) CAST(1 AS BIT)
                              FROM            LocalDrivingLicenseApplications INNER JOIN
@@ -411,7 +412,7 @@ namespace DVLD_DataAccess
             int ApplicationStatus = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"SELECT TOP (1) CAST(Applications.ApplicationStatus AS TINYINT)
                               FROM            Applications INNER JOIN
@@ -445,7 +446,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @" SELECT top (1)  CAST(1 AS BIT)
                             FROM LocalDrivingLicenseApplications INNER JOIN

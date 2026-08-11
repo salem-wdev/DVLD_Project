@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using DVLD_Infrastructure.Storage;
@@ -14,7 +15,7 @@ namespace DVLD_DataAccess
             bool IsFound = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT * FROM ApplicationTypes" +
                     "  WHERE ApplicationTypeID = @ApplicationTypeID;";
@@ -58,7 +59,7 @@ namespace DVLD_DataAccess
             int ApplicationTypeID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string Query = "INSERT INTO ApplicationTypes " +
@@ -96,7 +97,7 @@ namespace DVLD_DataAccess
             int NumberOfEffectedRows = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string Query = "UPDATE ApplicationTypes " +
@@ -128,7 +129,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT ApplicationTypeID, ApplicationTypeTitle," +
                         " ApplicationFees" +

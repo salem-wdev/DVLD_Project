@@ -1,6 +1,7 @@
-﻿using DVLD_DataAccess;
+using DVLD_DataAccess;
 using DVLD_Infrastructure.Storage;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -18,7 +19,7 @@ namespace DVLD_Business
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT * FROM DetainedLicenses WHERE DetainID = @DetainID";
 
@@ -88,7 +89,7 @@ namespace DVLD_Business
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT top 1 * FROM DetainedLicenses WHERE LicenseID = @LicenseID order by DetainID desc";
 
@@ -156,7 +157,7 @@ namespace DVLD_Business
             DataTable dt = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "select * from detainedLicenses_View order by IsReleased ,DetainID;";
 
@@ -193,7 +194,7 @@ namespace DVLD_Business
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"INSERT INTO DetainedLicenses
                                (LicenseID,
@@ -249,7 +250,7 @@ namespace DVLD_Business
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE DetainedLicenses
                               SET LicenseID = @LicenseID, 
@@ -288,7 +289,7 @@ namespace DVLD_Business
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"UPDATE DetainedLicenses
                               SET IsReleased = 1, 
@@ -323,7 +324,7 @@ namespace DVLD_Business
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"select IsDetained=1 
                             from detainedLicenses 

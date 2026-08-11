@@ -1,6 +1,7 @@
-﻿using DVLD_Shared;
+using DVLD_Shared;
 using DVLD_Infrastructure.Storage;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -16,7 +17,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string query = "SELECT * FROM LicenseClasses WHERE LicenseClassID = @LicenseClassID";
@@ -68,7 +69,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string query = "SELECT * FROM LicenseClasses WHERE ClassName = @ClassName";
@@ -119,7 +120,7 @@ namespace DVLD_DataAccess
             DataTable dt = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT * FROM LicenseClasses order by ClassName";
 
@@ -154,7 +155,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = @"Insert Into LicenseClasses 
                                      (
@@ -207,7 +208,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string query = @"Update  LicenseClasses  

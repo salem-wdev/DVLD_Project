@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using DVLD_Infrastructure.Storage;
-
+using System.Configuration;
 namespace DVLD_DataAccess
 {
     public class clsApplicationData
@@ -17,7 +17,7 @@ namespace DVLD_DataAccess
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "SELECT [ApplicantPersonID]" +
                                     ",[ApplicationDate]" +
@@ -74,7 +74,7 @@ namespace DVLD_DataAccess
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
 
@@ -128,7 +128,7 @@ namespace DVLD_DataAccess
             int NumberOfEffectedRows = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string Query = "UPDATE [Applications] " +
@@ -166,7 +166,7 @@ namespace DVLD_DataAccess
             DataTable dt = new DataTable();
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string Query = "SELECT [ApplicationID]" + ",[ApplicationDate]" +
@@ -206,7 +206,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string Query = "SELECT [ApplicationID]" +
@@ -248,7 +248,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string Query = "SELECT TOP 1 1 FROM Applications " +
@@ -284,7 +284,7 @@ namespace DVLD_DataAccess
             int ActiveApplicationID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string query = "SELECT TOP 1 ActiveApplicationID=ApplicationID FROM Applications WHERE ApplicantPersonID = @ApplicantPersonID and ApplicationTypeID=@ApplicationTypeID and ApplicationStatus=1";
@@ -321,7 +321,7 @@ namespace DVLD_DataAccess
             try
             {
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string query = @"SELECT TOP 1 ActiveApplicationID=Applications.ApplicationID  
@@ -365,7 +365,7 @@ namespace DVLD_DataAccess
             int NumberOfEffectedRows = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "DELETE FROM Applications " +
                         "WHERE ApplicationID = @ApplicationID";
@@ -393,7 +393,7 @@ namespace DVLD_DataAccess
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string Query = "select * from ApplicationsList_View order by ApplicationDate desc";
 
@@ -420,7 +420,7 @@ namespace DVLD_DataAccess
             int rowsAffected = 0;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string query = @"Update  Applications  
@@ -458,7 +458,7 @@ namespace DVLD_DataAccess
             bool Result = false;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
                     string query = "SELECT TOP (1) 1 " +
                                 "FROM Applications " +
@@ -492,7 +492,7 @@ namespace DVLD_DataAccess
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string query = "SELECT TOP (1) ApplicationTypeID " +
@@ -528,7 +528,7 @@ namespace DVLD_DataAccess
             int ActiveApplicationID = -1;
             try
             {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
 
                     string query = @"SELECT [ApplicationStatus]
