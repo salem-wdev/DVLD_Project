@@ -80,7 +80,6 @@ namespace DVLD.Users
             btnNext.Enabled = true;
             lblUserID.Text = _User.UserID.ToString();
             txtUserName.Text = _User.UserName;
-            txtPassword.Text = _User.Password;
             chkIsActive.Checked = _User.IsActive;
             ctrlPersonCardWithFilter1.LoadPersonInfo(_User.PersonID);
 
