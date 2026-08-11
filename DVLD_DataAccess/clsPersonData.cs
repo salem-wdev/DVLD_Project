@@ -95,7 +95,7 @@ namespace DVLD_DataAccess
                                 ThirdName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3);
                                 LastName = reader.GetString(4);
                                 DateOfBirth = reader.GetDateTime(5);
-                                Gender = reader.GetInt16(6);
+                                Gender = reader.GetByte(6);
                                 Address = reader.GetString(7);
                                 Phone = reader.GetString(8);
                                 Email = reader.IsDBNull(9) ? string.Empty : reader.GetString(9);
@@ -145,7 +145,7 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@ThirdName", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(ThirdName) ? (object)DBNull.Value : ThirdName;
                         command.Parameters.Add("@LastName", SqlDbType.NVarChar).Value = LastName;
                         command.Parameters.Add("@DateOfBirth", SqlDbType.DateTime).Value = DateOfBirth;
-                        command.Parameters.Add("@Gendor", SqlDbType.SmallInt).Value = Gender;
+                        command.Parameters.Add("@Gendor", SqlDbType.TinyInt).Value = Gender;
                         command.Parameters.Add("@Address", SqlDbType.NVarChar).Value = Address;
                         command.Parameters.Add("@Phone", SqlDbType.NVarChar).Value = Phone;
                         command.Parameters.Add("@Email", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(Email) ? (object)DBNull.Value : Email;
@@ -196,7 +196,7 @@ namespace DVLD_DataAccess
                         Command.Parameters.Add("@ThirdName", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(ThirdName) ? (object)DBNull.Value : ThirdName;
                         Command.Parameters.Add("@LastName", SqlDbType.NVarChar).Value = LastName;
                         Command.Parameters.Add("@DateOfBirth", SqlDbType.DateTime).Value = DateOfBirth;
-                        Command.Parameters.Add("@Gendor", SqlDbType.SmallInt).Value = Gender;
+                        Command.Parameters.Add("@Gendor", SqlDbType.TinyInt).Value = Gender;
                         Command.Parameters.Add("@Address", SqlDbType.NVarChar).Value = Address;
                         Command.Parameters.Add("@Phone", SqlDbType.NVarChar).Value = Phone;
                         Command.Parameters.Add("@Email", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(Email) ? (object)DBNull.Value : Email;
