@@ -20,7 +20,7 @@ namespace DVLD_Business.Users
         public int UserID { get; private set; }
         public int PersonID { get; private set; }
 
-        private clsPerson _Person; 
+        private clsPerson _Person;
 
         public clsPerson PersonInfo
         {
@@ -47,18 +47,18 @@ namespace DVLD_Business.Users
             this.IsActive = true;
 
             _saveDictionary = new Dictionary<enMode, Func<bool>>
-            {
-                {enMode.AddNew, _AddNewUser },
-                {enMode.Update, _UpdateUser},
-            };
+      {
+        {enMode.AddNew, _AddNewUser },
+        {enMode.Update, _UpdateUser},
+      };
 
             Mode = enMode.AddNew;
         }
 
 
-        // New overload that sets UserID so instances returned from Find have correct ID
-        private clsUser(int UserID, int PersonID, string UserName,
-            string Password, bool IsActive)
+        // New overload that sets UserID so instances returned from Find have correct ID
+        private clsUser(int UserID, int PersonID, string UserName,
+      string Password, bool IsActive)
         {
             this.UserID = UserID;
             this.PersonID = PersonID;
@@ -67,23 +67,23 @@ namespace DVLD_Business.Users
             this.IsActive = IsActive;
 
             _saveDictionary = new Dictionary<enMode, Func<bool>>
-            {
-                {enMode.AddNew, _AddNewUser },
-                {enMode.Update, _UpdateUser},
-            };
+      {
+        {enMode.AddNew, _AddNewUser },
+        {enMode.Update, _UpdateUser},
+      };
 
             Mode = enMode.Update;
         }
 
         private bool _AddNewUser()
         {
-            //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
-            //{
+            //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
+            //{
             //    return false;
-            //}
+            //}
 
-            this.UserID = clsUserData.AddNewUser(this.PersonID, this.UserName,
-                this.Password, this.IsActive);
+            this.UserID = clsUserData.AddNewUser(this.PersonID, this.UserName,
+        this.Password, this.IsActive);
 
             if (UserID != -1)
             {
@@ -95,13 +95,13 @@ namespace DVLD_Business.Users
 
         private bool _UpdateUser()
         {
-            //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
-            //{
-            //    return false;
-            //}
+            //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
+            //{
+            //    return false;
+            //}
 
-            return clsUserData.UpdateUser(this.UserID, this.UserName,
-                this.Password, this.IsActive);
+            return clsUserData.UpdateUser(this.UserID, this.UserName,
+        this.Password, this.IsActive);
         }
 
         public static bool Delete(int UserID)
@@ -118,13 +118,13 @@ namespace DVLD_Business.Users
 
 
             bool found = clsUserData.GetUserInfoByUserID(UserID, ref PersonID,
-                ref UserName, ref Password, ref IsActive);
+              ref UserName, ref Password, ref IsActive);
 
             if (found)
             {
                 return new clsUser(UserID, PersonID, UserName,
-                    Password, IsActive);
-                    
+                  Password, IsActive);
+
             }
             else
             {
@@ -140,7 +140,7 @@ namespace DVLD_Business.Users
             bool IsActive = false;
 
             bool found = clsUserData.GetUserInfoByPersonID(PersonID, ref UserID,
-                ref UserName, ref Password, ref IsActive);
+              ref UserName, ref Password, ref IsActive);
 
             if (found)
             {
@@ -161,7 +161,7 @@ namespace DVLD_Business.Users
 
 
             bool found = clsUserData.GetUserInfoByUserName(UserName,
-                ref UserID, ref PersonID, ref Password, ref IsActive);
+              ref UserID, ref PersonID, ref Password, ref IsActive);
 
             if (found)
             {
@@ -178,9 +178,10 @@ namespace DVLD_Business.Users
             int UserID = -1;
             int PersonID = -1;
             bool IsActive = false;
+            string HashedPassord = clsUtil.ComputeHash(Password);
 
             bool found = clsUserData.GetUserInfoByUsernameAndPassword(UserName,
-                Password, ref UserID, ref PersonID, ref IsActive);
+              HashedPassord, ref UserID, ref PersonID, ref IsActive);
             if (found)
             {
                 return new clsUser(UserID, PersonID, UserName, Password, IsActive);
@@ -210,16 +211,16 @@ namespace DVLD_Business.Users
         {
             return clsUserData.GetAllUsers();
         }
-        // TODO: Consider moving validation logic for IsActive/Credentials to a centralized 
-        // 'ValidateBusinessRules()' method within clsUser before calling Save().
-        public bool Save()
+        // TODO: Consider moving validation logic for IsActive/Credentials to a centralized 
+        // 'ValidateBusinessRules()' method within clsUser before calling Save().
+        public bool Save()
         {
             return _saveDictionary[this.Mode]();
         }
 
         public bool ChangeUserCredentials(string NewUserName, string NewPassword)
         {
-            if (ChangeUserCredentials(this.UserID, NewUserName, NewPassword))
+            if (ChangeUserCredentials(this.UserID, NewUserName, ref NewPassword))
             {
                 this.UserName = NewUserName;
                 this.Password = NewPassword;
@@ -240,14 +241,18 @@ namespace DVLD_Business.Users
             return false;
         }
 
-        public static bool ChangeUserCredentials(int UserID, string NewUserName, string NewPassword)
+        public static bool ChangeUserCredentials(int UserID, string NewUserName, ref string NewPassword)
         {
+            NewPassword = clsUtil.ComputeHash(NewPassword);
+
             return clsUserData.ChangeUserCredentials(UserID, NewUserName, NewPassword);
         }
 
         public static bool ChangePassword(int UserID, string NewPassword)
         {
-            return clsUserData.ChangePassword(UserID, NewPassword);
+            string HashedPassord = clsUtil.ComputeHash(NewPassword);
+
+            return clsUserData.ChangePassword(UserID, HashedPassord);
         }
 
         public static bool DoesPersonHaveUser(int PersonID)
@@ -267,25 +272,27 @@ namespace DVLD_Business.Users
                 return null;
             }
 
-            if(clsUser.IsUserExists(UserName))
+            if (clsUser.IsUserExists(UserName))
             {
                 return null;
             }
 
-            if(IsUserExistsForPersonID(PersonID))
+            if (IsUserExistsForPersonID(PersonID))
             {
                 return null;
             }
+            string HashedPassord = clsUtil.ComputeHash(Password);
 
-            return new clsUser(PersonID, UserName, Password);
+            return new clsUser(PersonID, UserName, HashedPassord);
         }
 
         public static clsUser Login(string UserName, string Password)
         {
+
             clsUser user = clsUser.FindByUsernameAndPassword(UserName, Password);
 
-            //incase the user is null or not active.
-            if (user == null || !user.IsActive)
+            //incase the user is null or not active.
+            if (user == null || !user.IsActive)
             {
                 return null;
             }
