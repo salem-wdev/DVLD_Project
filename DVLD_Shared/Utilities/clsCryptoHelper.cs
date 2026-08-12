@@ -37,7 +37,7 @@ namespace DVLD_Shared.Utilities
         /// <param name="plainText">The plain text string to encrypt.</param>
         /// <param name="key">The secret key used for encryption (must be 16, 24, or 32 characters long).</param>
         /// <returns>A Base64-encoded string representing the encrypted cipher text.</returns>
-        public static string Encrypt(string plainText, string key)
+        public static string EncryptTosymmetric(string plainText, string key)
         {
             if (plainText == null)
                 throw new ArgumentNullException(nameof(plainText), "plain Text cannot be null.");
@@ -78,7 +78,7 @@ namespace DVLD_Shared.Utilities
         /// <param name="cipherText">The Base64-encoded encrypted string to decrypt.</param>
         /// <param name="key">The secret key used during encryption.</param>
         /// <returns>The original decrypted plain text string.</returns>
-        public static string Decrypt(string cipherText, string key)
+        public static string DecryptFromsymmetric(string cipherText, string key)
         {
             if (cipherText == null)
                 throw new ArgumentNullException(nameof(cipherText), "cipher Text cannot be null.");
