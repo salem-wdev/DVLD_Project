@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DVLD_Shared.Users;
+using DVLD_Shared.Utilities;
 
 namespace DVLD_Business.Users
 {
@@ -178,7 +179,7 @@ namespace DVLD_Business.Users
             int UserID = -1;
             int PersonID = -1;
             bool IsActive = false;
-            string HashedPassord = clsUtil.ComputeHash(Password);
+            string HashedPassord = clsCryptoHelper.ComputeHash(Password);
 
             bool found = clsUserData.GetUserInfoByUsernameAndPassword(UserName,
               HashedPassord, ref UserID, ref PersonID, ref IsActive);
@@ -243,14 +244,14 @@ namespace DVLD_Business.Users
 
         public static bool ChangeUserCredentials(int UserID, string NewUserName, ref string NewPassword)
         {
-            NewPassword = clsUtil.ComputeHash(NewPassword);
+            NewPassword = clsCryptoHelper.ComputeHash(NewPassword);
 
             return clsUserData.ChangeUserCredentials(UserID, NewUserName, NewPassword);
         }
 
         public static bool ChangePassword(int UserID, string NewPassword)
         {
-            string HashedPassord = clsUtil.ComputeHash(NewPassword);
+            string HashedPassord = clsCryptoHelper.ComputeHash(NewPassword);
 
             return clsUserData.ChangePassword(UserID, HashedPassord);
         }
@@ -281,7 +282,7 @@ namespace DVLD_Business.Users
             {
                 return null;
             }
-            string HashedPassord = clsUtil.ComputeHash(Password);
+            string HashedPassord = clsCryptoHelper.ComputeHash(Password);
 
             return new clsUser(PersonID, UserName, HashedPassord);
         }
