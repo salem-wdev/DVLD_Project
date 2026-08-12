@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DVLD_Shared.Utilities
 {
-    class clsCryptoHelper
+    public static class clsCryptoHelper
     {
         /// <summary>
         /// Computes a SHA-256 hash for the given input string using the standard BitConverter method.
