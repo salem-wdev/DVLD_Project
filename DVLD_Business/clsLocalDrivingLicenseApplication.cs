@@ -273,9 +273,10 @@ namespace DVLD_Business
         /// <para>**TODO:** Refactor this method to address logic/performance issues before moving to production.</para>
         /// </remarks>
         /// <exception cref="NotImplementedException">Thrown because the method is unstable and pending refactoring.</exception>
+        [Obsolete("This method is unstable and pending refactoring.", true)]
         public int GetApplicationLicenseID()
         {
-            throw new NotImplementedException("This method is unstable and pending refactoring.");
+            //throw new NotImplementedException("This method is unstable and pending refactoring.");
 
             // This will get the license id that belongs to this application
             return clsLicense.GetLicenseIDByApplicationID(this.ApplicationID);
