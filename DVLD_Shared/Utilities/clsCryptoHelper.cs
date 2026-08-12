@@ -108,6 +108,7 @@ namespace DVLD_Shared.Utilities
             }
         }
 
+        [Obsolete("This method is obsolete. It generates asymmetric keys using the RSACryptoServiceProvider which is not recommended for new development.")]
         public static (string publicKey, string privateKey) GenerateAsymmetricKeys()
         {
             string rsaPublicKey = null;
@@ -128,6 +129,7 @@ namespace DVLD_Shared.Utilities
             return (rsaPublicKey, rsaPrivateKey);
         }
 
+        [Obsolete("This method is obsolete. It encrypts data using the RSACryptoServiceProvider which is not recommended for new development.")]
         public static string EncryptToAsymmetric(string plainText, string publicKey)
         {
             try
@@ -148,6 +150,7 @@ namespace DVLD_Shared.Utilities
             }
         }
 
+        [Obsolete("This method is obsolete. It decrypts data using the RSACryptoServiceProvider which is not recommended for new development.")]
         public static string DecryptFromAsymmetric(string cipherText, string privateKey)
         {
             try
