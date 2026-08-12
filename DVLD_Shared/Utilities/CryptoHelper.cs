@@ -17,6 +17,8 @@ namespace DVLD_Shared.Utilities
         /// <returns>The computed 64-character hexadecimal hash string.</returns>
         public static string ComputeHash(string input)
         {
+            if (input == null)
+                throw new ArgumentNullException(nameof(input), "Input cannot be null.");
             // Create an instance of the SHA256 algorithm
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -36,6 +38,12 @@ namespace DVLD_Shared.Utilities
         /// <returns>A Base64-encoded string representing the encrypted cipher text.</returns>
         public static string Encrypt(string plainText, string key)
         {
+            if (plainText == null)
+                throw new ArgumentNullException(nameof(plainText), "plain Text cannot be null.");
+
+            if (key == null)
+                throw new ArgumentNullException(nameof(key), "Key cannot be null.");
+
             using (Aes aesAlg = Aes.Create())
             {
                 // Convert the key string into a UTF-8 byte array
@@ -71,6 +79,12 @@ namespace DVLD_Shared.Utilities
         /// <returns>The original decrypted plain text string.</returns>
         public static string Decrypt(string cipherText, string key)
         {
+            if (cipherText == null)
+                throw new ArgumentNullException(nameof(cipherText), "cipher Text cannot be null.");
+
+            if (key == null)
+                throw new ArgumentNullException(nameof(key), "Key cannot be null.");
+
             using (Aes aesAlg = Aes.Create())
             {
                 // Convert the key string into a UTF-8 byte array
