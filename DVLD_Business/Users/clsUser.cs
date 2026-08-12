@@ -179,7 +179,17 @@ namespace DVLD_Business.Users
             int UserID = -1;
             int PersonID = -1;
             bool IsActive = false;
-            string HashedPassord = clsCryptoHelper.ComputeHash(Password);
+            string HashedPassord = string.Empty;
+
+            try
+            {
+                HashedPassord = clsCryptoHelper.ComputeHash(Password);
+            }
+            catch (Exception ex)
+            {
+                clsLogger.LogException(ex,$"Error computing hash for password of person ID {PersonID} Username {UserName}");
+                return null;
+            }
 
             bool found = clsUserData.GetUserInfoByUsernameAndPassword(UserName,
               HashedPassord, ref UserID, ref PersonID, ref IsActive);
@@ -244,14 +254,31 @@ namespace DVLD_Business.Users
 
         public static bool ChangeUserCredentials(int UserID, string NewUserName, ref string NewPassword)
         {
-            NewPassword = clsCryptoHelper.ComputeHash(NewPassword);
+            try
+            {
+                NewPassword = clsCryptoHelper.ComputeHash(NewPassword);
+            }
+            catch (Exception ex)
+            {
+                clsLogger.LogException(ex, $"Error computing hash for new password of user ID {UserID} Username {NewUserName}");
+                return false;
+            }
 
             return clsUserData.ChangeUserCredentials(UserID, NewUserName, NewPassword);
         }
 
         public static bool ChangePassword(int UserID, string NewPassword)
         {
-            string HashedPassord = clsCryptoHelper.ComputeHash(NewPassword);
+            string HashedPassord = string.Empty;
+            try
+            {
+                HashedPassord = clsCryptoHelper.ComputeHash(NewPassword);
+            }
+            catch (Exception ex)
+            {
+                clsLogger.LogException(ex, $"Error computing hash for new password of user ID {UserID}");
+                return false;
+            }
 
             return clsUserData.ChangePassword(UserID, HashedPassord);
         }
@@ -282,8 +309,19 @@ namespace DVLD_Business.Users
             {
                 return null;
             }
-            string HashedPassord = clsCryptoHelper.ComputeHash(Password);
 
+            string HashedPassord = string.Empty;
+            try
+            {
+
+                HashedPassord = clsCryptoHelper.ComputeHash(Password);
+
+            }
+            catch (Exception ex)
+            {
+                clsLogger.LogException(ex,$"Error computing hash for password of person ID {PersonID} Username {UserName}");
+                return null;
+            }
             return new clsUser(PersonID, UserName, HashedPassord);
         }
 
