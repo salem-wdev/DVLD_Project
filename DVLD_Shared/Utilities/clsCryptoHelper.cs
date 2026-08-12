@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -104,6 +105,69 @@ namespace DVLD_Shared.Utilities
                     // Read all decrypted bytes from the stream and return as plain text
                     return srDecrypt.ReadToEnd();
                 }
+            }
+        }
+
+        public static (string publicKey, string privateKey) GenerateAsymmetricKeys()
+        {
+            string rsaPublicKey = null;
+            string rsaPrivateKey = null;
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+            {
+                // Get the public key
+                /*
+                 When exporting the public key, ToXmlString(false) is used with the argument set 
+                 to false to indicate that only the public parameters should be included in the XML string.
+                 */
+                rsaPublicKey = rsa.ToXmlString(false);
+
+
+                // Get the private key
+                rsaPrivateKey = rsa.ToXmlString(true);
+            }
+            return (rsaPublicKey, rsaPrivateKey);
+        }
+
+        public static string EncryptToAsymmetric(string plainText, string publicKey)
+        {
+            try
+            {
+                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+                {
+                    rsa.FromXmlString(publicKey);
+
+
+                    byte[] encryptedData = rsa.Encrypt(Encoding.UTF8.GetBytes(plainText), false);
+                    return Convert.ToBase64String(encryptedData);
+                }
+            }
+            catch (CryptographicException ex)
+            {
+                Console.WriteLine($"Encryption error: {ex.Message}");
+                throw; // Rethrow the exception to be caught in the Main method
+            }
+        }
+
+        public static string DecryptFromAsymmetric(string cipherText, string privateKey)
+        {
+            try
+            {
+                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+                {
+                    rsa.FromXmlString(privateKey);
+
+
+                    byte[] encryptedData = Convert.FromBase64String(cipherText);
+                    byte[] decryptedData = rsa.Decrypt(encryptedData, false);
+
+
+                    return Encoding.UTF8.GetString(decryptedData);
+                }
+            }
+            catch (CryptographicException ex)
+            {
+                Console.WriteLine($"Decryption error: {ex.Message}");
+                throw; // Rethrow the exception to be caught in the Main method
             }
         }
     }
