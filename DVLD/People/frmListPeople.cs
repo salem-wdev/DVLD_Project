@@ -31,7 +31,7 @@ namespace DVLD.People.Forms
                                                          "GendorCaption", "DateOfBirth", "CountryName",
                                                          "Phone", "Email");
 
-        private static DataTable _dtCountries = clsCountry.GetAllCountries();
+        private static DataTable _dtCountries;
 
         // Data
         /////////////////////////////////////////////////////////////////////
@@ -120,11 +120,11 @@ namespace DVLD.People.Forms
         /////////////////////////////////////////////////////////////////////
 
 
-        private void frmShowAllPeople_Load(object sender, EventArgs e)
+        private async void frmShowAllPeople_Load(object sender, EventArgs e)
         {
             _RefreshPeopleList();
             _FillcbFilterBy();
-
+            _dtCountries = await clsCountry.GetAllCountriesAsync();
             if (dgvPeople.Rows.Count > 0)
             {
 
