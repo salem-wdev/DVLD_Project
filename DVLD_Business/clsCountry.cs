@@ -27,16 +27,17 @@ namespace DVLD_Business
             this.CountryName = CountryName;
         }
 
-        public static DataTable GetAllCountries()
+        public static async Task<DataTable> GetAllCountriesAsync()
         {
-            return clsCountryData.GetAllCountries();
+            //await Task.Delay(5000); // Simulate a delay for demonstration purposes
+            return await clsCountryData.GetAllCountriesAsync();
         }
 
-        public static clsCountry Find(int CountryID)
+        public static async Task<clsCountry> FindAsync(int CountryID)
         {
             string CountryName = string.Empty;
-            bool IsFound = clsCountryData.GetCountryByID(CountryID, ref CountryName);
-            if (IsFound)
+            CountryName = await clsCountryData.GetCountryByIDAsync(CountryID);
+            if (!string.IsNullOrEmpty(CountryName))
             {
                 return new clsCountry(CountryID, CountryName);
             }
@@ -46,13 +47,12 @@ namespace DVLD_Business
             }
         }
 
-        public static clsCountry Find(string CountryName)
+        public static async Task<clsCountry> FindAsync(string CountryName)
         {
-            int CountryID = 0;
-            bool IsFound = clsCountryData.GetCountryByCountryName(CountryName, ref CountryID);
-            if (IsFound)
+            int? CountryID = await clsCountryData.GetCountryByCountryNameAsync(CountryName);
+            if (CountryID.HasValue)
             {
-                return new clsCountry(CountryID, CountryName);
+                return new clsCountry(CountryID.Value, CountryName);
             }
             else
             {
