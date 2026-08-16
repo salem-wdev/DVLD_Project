@@ -69,18 +69,18 @@ namespace DVLD.People.Forms
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-        private void _FillCountriesInComboBox()
+        private async Task _FillCountriesInComboBoxAsync()
         {
-            DataTable Countries = clsCountry.GetAllCountries();
+            DataTable Countries = await clsCountry.GetAllCountriesAsync();
             cmbNationality.DataSource = Countries;
             cmbNationality.DisplayMember = "CountryName";
             cmbNationality.ValueMember = "CountryID";
             cmbNationality.SelectedValue = 191;   // Default to Yemen
         }
 
-        private void _RestDefaultValues()
+        private async Task _RestDefaultValuesAsync()
         {
-            _FillCountriesInComboBox();
+            await _FillCountriesInComboBoxAsync();
 
             if (_Mode == enMode.AddNew)
             {
@@ -148,7 +148,7 @@ namespace DVLD.People.Forms
             return false;
         }
 
-        private void _FillPersonWithData()
+        private async Task _FillPersonWithData()
         {
             _Person.FirstName = txtFirstName.Text.Trim();
             _Person.SecondName = txtSecondName.Text.Trim();
@@ -160,7 +160,7 @@ namespace DVLD.People.Forms
             _Person.Address = txtAddress.Text.Trim();
             _Person.Phone = txtPhone.Text.Trim();
             _Person.Email = txtEmail.Text.Trim();
-            _Person.NationalityCountryID = clsCountry.Find(cmbNationality.Text).CountryID;
+            _Person.NationalityCountryID = (await clsCountry.FindAsync(cmbNationality.Text)).CountryID;
            
             if (!string.IsNullOrWhiteSpace(pbPersonPhoto.ImageLocation))
                 _Person.ImagePath = pbPersonPhoto.ImageLocation;
@@ -301,9 +301,9 @@ namespace DVLD.People.Forms
 
         //////////////////////////////////////////////////////////////
         /// </logic>
-        private void frmAddNewPerson_Load(object sender, EventArgs e)
+        private async void frmAddNewPerson_Load(object sender, EventArgs e)
         {
-            _RestDefaultValues();
+            await _RestDefaultValuesAsync();
             if (_Mode == enMode.Update)
             {
                 _LoadData();
