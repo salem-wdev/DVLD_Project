@@ -54,16 +54,13 @@ namespace DVLD_Business
         public int NationalityCountryID { get; set; }
 
         private clsCountry _Country = null;
-        clsCountry Country
+        public async Task<clsCountry> GetCountryAsync()
         {
-            get
+            if (_Country == null && NationalityCountryID != -1)
             {
-                if (_Country == null && NationalityCountryID != -1)
-                {
-                    _Country = clsCountry.Find(NationalityCountryID);
-                }
-                return _Country;
+                _Country = await clsCountry.FindAsync(NationalityCountryID);
             }
+            return _Country;
         }
         private bool _IsImagePathChanged = false;
 
