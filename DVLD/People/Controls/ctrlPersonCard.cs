@@ -90,7 +90,7 @@ namespace DVLD
 
         }
 
-        private void _FillPersonInfo()
+        private async Task _FillPersonInfo()
         {
             llEditPersonInfo.Enabled = true;
             _PersonID = _Person.PersonID.HasValue ? (int)_Person.PersonID : -1;
@@ -101,7 +101,7 @@ namespace DVLD
             lblEmail.Text = _Person.Email;
             lblPhone.Text = _Person.Phone;
             lblDateOfBirth.Text = _Person.DateOfBirth.ToShortDateString();
-            lblCountry.Text = clsCountry.Find(_Person.NationalityCountryID).CountryName;
+            lblCountry.Text = (await clsCountry.FindAsync(_Person.NationalityCountryID)).CountryName;
             lblAddress.Text = _Person.Address;
             _LoadPersonImage();
 
