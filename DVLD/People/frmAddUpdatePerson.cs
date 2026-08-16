@@ -40,6 +40,7 @@ namespace DVLD.People.Forms
             InitializeComponent();
             
             _Mode = enMode.AddNew;
+            btnSave.Enabled = false;
 
         }
 
@@ -49,6 +50,7 @@ namespace DVLD.People.Forms
             _Mode = enMode.Update;
             this._Person = Person;
             this._PersonID = Person.PersonID;
+            btnSave.Enabled = false;
         }
 
         public frmAddUpdatePerson(int PersonID)
@@ -57,6 +59,7 @@ namespace DVLD.People.Forms
             _Mode = enMode.Update;
             _PersonID = PersonID;
             _Person = clsPerson.Find(_PersonID);
+            btnSave.Enabled = false;
         }
 
 
@@ -303,7 +306,15 @@ namespace DVLD.People.Forms
         /// </logic>
         private async void frmAddNewPerson_Load(object sender, EventArgs e)
         {
-            await _RestDefaultValuesAsync();
+            try
+            {
+                await _RestDefaultValuesAsync();
+            }
+            finally
+            {
+                btnSave.Enabled = true;
+            }
+
             if (_Mode == enMode.Update)
             {
                 _LoadData();
