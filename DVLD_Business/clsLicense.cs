@@ -78,7 +78,7 @@ namespace DVLD_Business
             {
                 if (_DriverInfo == null && DriverID != -1)
                 {
-                    _DriverInfo = clsDriver.FindByDriverID(this.DriverID);
+                    _GetDriverInfo();
                 }
                 return _DriverInfo;
             }
@@ -211,6 +211,15 @@ namespace DVLD_Business
         ~clsLicense()
         {
             Dispose(false);
+        }
+
+        private async void _GetDriverInfo()
+        {
+            // Database query is deferred until this property is explicitly requested by the UI or other layers.
+            if (_DriverInfo == null && this.DriverID != -1)
+            {
+                _DriverInfo = await clsDriver.FindByDriverIDAsync(this.DriverID);
+            }
         }
 
         // TODO: Refactor date handling. 
@@ -476,7 +485,7 @@ namespace DVLD_Business
             }
         }
 
-        private static clsLicense _PrepareNewLicense(int LocalDrivingLicenseApplicationID, int CreatedByUserID, string Notes)
+        private static async Task<clsLicense> _PrepareNewLicenseAsync(int LocalDrivingLicenseApplicationID, int CreatedByUserID, string Notes)
         {
             if (LocalDrivingLicenseApplicationID < 0)
             {
@@ -517,9 +526,9 @@ namespace DVLD_Business
             NewLicense = new clsLicense(localDrivingLicenseApplication.ApplicationID, localDrivingLicenseApplication.LicenseClassID,
                 CreatedByUserID, Notes, PaidFees, enIssueReason.FirstTime);
 
-            if ((NewLicense._DriverInfo = clsDriver.FindByPersonID(localDrivingLicenseApplication.ApplicantPersonID)) == null)
+            if ((NewLicense._DriverInfo = await clsDriver.FindByPersonIDAsync(localDrivingLicenseApplication.ApplicantPersonID)) == null)
             {
-                NewLicense._DriverInfo = clsDriver.CreateNewDriver(localDrivingLicenseApplication.ApplicantPersonID, CreatedByUserID);
+                NewLicense._DriverInfo = await clsDriver.CreateNewDriverAsync(localDrivingLicenseApplication.ApplicantPersonID, CreatedByUserID);
             }
 
             NewLicense.DriverID = NewLicense._DriverInfo.DriverID;
@@ -650,9 +659,9 @@ namespace DVLD_Business
             return null;
         }
 
-        internal static clsLicense IssueFirstTimeLocalLicense(int LocalDrivingLicenseApplicationID, int CreatedByUserID, string Notes)
+        internal static async Task<clsLicense> IssueFirstTimeLocalLicenseAsync(int LocalDrivingLicenseApplicationID, int CreatedByUserID, string Notes)
         {
-            clsLicense license = _PrepareNewLicense(LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
+            clsLicense license = await _PrepareNewLicenseAsync(LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
 
             if (license != null)
             {
@@ -696,6 +705,7 @@ namespace DVLD_Business
             }
             return false;
         }
+
 
     }
 
