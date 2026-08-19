@@ -392,9 +392,9 @@ namespace DVLD_Business
             return HasActiveTestAppointment(this.LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
-        public clsLicense IssueFirstTimeLocalLicense(int CreatedByUserID, string Notes)
+        public async Task<clsLicense> IssueFirstTimeLocalLicenseAsync(int CreatedByUserID, string Notes)
         {
-            clsLicense license = clsLicense.IssueFirstTimeLocalLicense(this.LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
+            clsLicense license = await clsLicense.IssueFirstTimeLocalLicenseAsync(this.LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
             if (license != null)
             {
                 this.SetComplete();
