@@ -13,7 +13,7 @@ namespace DVLD_Business
     {
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode { private set; get; } = enMode.AddNew;
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         private clsPerson _PersonInfo = null;
         public clsPerson PersonInfo
@@ -41,10 +41,10 @@ namespace DVLD_Business
             this.CreatedByUserID = CreatedByUserID;
             this.CreatedDate = DateTime.Now;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewDriver},
-                {enMode.Update,_UpdateDriver}
+                {enMode.AddNew,_AddNewDriverAsync},
+                {enMode.Update,_UpdateDriverAsync}
             };
 
             Mode = enMode.AddNew;
@@ -59,20 +59,20 @@ namespace DVLD_Business
             this.CreatedByUserID = CreatedByUserID;
             this.CreatedDate = CreatedDate;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewDriver},
-                {enMode.Update,_UpdateDriver}
+                {enMode.AddNew,_AddNewDriverAsync},
+                {enMode.Update,_UpdateDriverAsync}
             };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewDriver()
+        private async Task<bool> _AddNewDriverAsync()
         {
             //call DataAccess Layer 
 
-            this.DriverID = clsDriverData.AddNewDriver(PersonID, CreatedByUserID);
+            this.DriverID = await clsDriverData.AddNewDriverAsync(PersonID, CreatedByUserID).ConfigureAwait(false);
             this.CreatedDate = clsUtilData.GetServerDate();
 
             if (this.DriverID != -1)
@@ -83,45 +83,42 @@ namespace DVLD_Business
             return false;
         }
 
-        private bool _UpdateDriver()
+        private async Task<bool> _UpdateDriverAsync()
         {
             //call DataAccess Layer 
 
-            return clsDriverData.UpdateDriver(this.DriverID, this.PersonID, this.CreatedByUserID);
+            return await clsDriverData.UpdateDriverAsync(this.DriverID, this.PersonID, this.CreatedByUserID);
         }
 
-        public static clsDriver FindByDriverID(int DriverID)
+        public static async Task<clsDriver> FindByDriverIDAsync(int DriverID)
         {
+            var driverInfo = await clsDriverData.GetDriverInfoByDriverIDAsync(DriverID).ConfigureAwait(false);
 
-            int PersonID = -1; int CreatedByUserID = -1; DateTime CreatedDate = DateTime.Now;
-
-            if (clsDriverData.GetDriverInfoByDriverID(DriverID, ref PersonID, ref CreatedByUserID, ref CreatedDate))
-
-                return new clsDriver(DriverID, PersonID, CreatedByUserID, CreatedDate);
+            if (driverInfo.IsFound)
+                return new clsDriver(DriverID, driverInfo.PersonID, driverInfo.CreatedByUserID, driverInfo.CreatedDate);
             else
                 return null;
-
         }
 
-        public static clsDriver FindByPersonID(int? PersonID)
+        public static async Task<clsDriver> FindByPersonIDAsync(int? PersonID)
         {
 
             if (PersonID == null || PersonID <= 0)
                 return null;
 
-            int DriverID = -1; int CreatedByUserID = -1; DateTime CreatedDate = DateTime.Now;
+            var DriverInfo = await clsDriverData.GetDriverInfoByPersonIDAsync(PersonID).ConfigureAwait(false);
 
-            if (clsDriverData.GetDriverInfoByPersonID(PersonID, ref DriverID, ref CreatedByUserID, ref CreatedDate))
+            if (DriverInfo.IsFound)
 
-                return new clsDriver(DriverID, PersonID, CreatedByUserID, CreatedDate);
+                return new clsDriver(DriverInfo.DriverID, PersonID, DriverInfo.CreatedByUserID, DriverInfo.CreatedDate);
             else
                 return null;
 
         }
 
-        public static DataTable GetAllDrivers()
+        public static async Task<DataTable> GetAllDriversAsync()
         {
-            return clsDriverData.GetAllDrivers();
+            return await clsDriverData.GetAllDriversAsync();
 
         }
 
@@ -135,29 +132,9 @@ namespace DVLD_Business
             return clsInternationalLicense.GetDriverInternationalLicenses(DriverID);
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            switch (Mode)
-            {
-                case enMode.AddNew:
-                    if (_AddNewDriver())
-                    {
-
-                        Mode = enMode.Update;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case enMode.Update:
-
-                    return _UpdateDriver();
-
-            }
-
-            return false;
+           return await _saveDictionary[Mode]().ConfigureAwait(false);
         }
 
         public static int GetLastLicenseID(int DriverID, int LicenseClassID)
@@ -172,7 +149,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            if (FindByPersonID(PersonID) != null)
+            if (FindByPersonIDAsync(PersonID) != null)
             {
                 return null;
             }
@@ -180,13 +157,13 @@ namespace DVLD_Business
             return new clsDriver(PersonID, CreatedByUserID);
         }
 
-        internal static clsDriver CreateNewDriver(int PersonID, int CreatedByUserID)
+        internal static async Task<clsDriver> CreateNewDriverAsync(int PersonID, int CreatedByUserID)
         {
             clsDriver driver = _PrepareDriver(PersonID, CreatedByUserID);
 
             if(driver != null)
             {
-                if(driver.Save())
+                if(await driver.SaveAsync().ConfigureAwait(false))
                 {
                     return driver;
                 }
