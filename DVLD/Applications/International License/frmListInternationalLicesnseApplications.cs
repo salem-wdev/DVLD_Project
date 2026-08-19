@@ -174,9 +174,9 @@ namespace DVLD.Applications.International_License
             clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvInternationalLicenses);
         }
 
-        private void PesonDetailsToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void PesonDetailsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            clsDriver driver = clsDriver.FindByDriverID(Convert.ToInt32(dgvInternationalLicenses.SelectedRows[0].Cells["DriverID"].Value));
+            clsDriver driver = await clsDriver.FindByDriverIDAsync(Convert.ToInt32(dgvInternationalLicenses.SelectedRows[0].Cells["DriverID"].Value));
             if (driver == null) 
             {
                 MessageBox.Show("Driver not found.");
@@ -193,9 +193,9 @@ namespace DVLD.Applications.International_License
             frm.ShowDialog();
         }
 
-        private void showPersonLicenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void showPersonLicenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            clsDriver driver = clsDriver.FindByDriverID(Convert.ToInt32(dgvInternationalLicenses.SelectedRows[0].Cells["DriverID"].Value));
+            clsDriver driver = await clsDriver.FindByDriverIDAsync(Convert.ToInt32(dgvInternationalLicenses.SelectedRows[0].Cells["DriverID"].Value));
             if (driver == null)
             {
                 MessageBox.Show("Driver not found.");

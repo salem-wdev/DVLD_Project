@@ -120,10 +120,10 @@ namespace DVLD.Licenses.Controls
             _ResetData();
         }
 
-        public void LoadInfo(int DriverID)
+        public async Task LoadInfo(int DriverID)
         {
             _DriverID = DriverID;
-            _Driver = clsDriver.FindByDriverID(_DriverID);
+            _Driver = await clsDriver.FindByDriverIDAsync(_DriverID);
 
             if (_Driver == null)
             {
@@ -133,7 +133,7 @@ namespace DVLD.Licenses.Controls
             _RefreshDataGrids();
         }
 
-        public void LoadInfoByPersonID(int? PersonID)
+        public async Task LoadInfoByPersonID(int? PersonID)
         {
 
             if (PersonID == null || PersonID <= 0)
@@ -142,7 +142,7 @@ namespace DVLD.Licenses.Controls
                 return;
             }
 
-            _Driver = clsDriver.FindByPersonID(PersonID);
+            _Driver = await clsDriver.FindByPersonIDAsync(PersonID);
             if (_Driver == null)
             {
                 MessageBox.Show("No driver information found for the provided PersonID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

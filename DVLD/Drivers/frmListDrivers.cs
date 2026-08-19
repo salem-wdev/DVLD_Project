@@ -29,16 +29,16 @@ namespace DVLD.Drivers
             lblRecordsCount.Text = dgvDrivers.Rows.Count.ToString();
         }
 
-        private void _RefreshTable()
+        private async Task _RefreshTableAsync()
         {
-            _dtAllDrivers = clsDriver.GetAllDrivers();
+            _dtAllDrivers = await clsDriver.GetAllDriversAsync();
             dgvDrivers.DataSource = _dtAllDrivers;
             _RefreshRecordsNumber();
         }
 
-        private void frmListDrivers_Load(object sender, EventArgs e)
+        private async void frmListDrivers_Load(object sender, EventArgs e)
         {
-            _RefreshTable();
+            await _RefreshTableAsync();
             cbFilterBy.SelectedIndex = 0;
 
             if (dgvDrivers.Rows.Count > 0)
