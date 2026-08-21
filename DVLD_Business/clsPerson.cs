@@ -15,7 +15,7 @@ namespace DVLD_Business
         public enum enMode { AddNew = 0, Update = 1 }
         public enMode Mode { get; private set; }
 
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         public Nullable<int> PersonID { get; private set; } = null;
         private bool _IsNationalNoChanged = false;
@@ -102,10 +102,10 @@ namespace DVLD_Business
             NationalityCountryID = 1;
             ImagePath = string.Empty;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewPerson},
-                {enMode.Update,_UpdatePerson}
+                {enMode.AddNew,_AddNewPersonAsync},
+                {enMode.Update,_UpdatePersonAsync}
             };
 
             Mode = enMode.AddNew;
@@ -130,10 +130,10 @@ namespace DVLD_Business
             this._ImagePath = ImagePath;
             this._OldImagePath = ImagePath;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewPerson},
-                {enMode.Update,_UpdatePerson}
+                {enMode.AddNew,_AddNewPersonAsync},
+                {enMode.Update,_UpdatePersonAsync}
             };
 
             Mode = enMode.AddNew;
@@ -161,16 +161,16 @@ namespace DVLD_Business
             this._ImagePath = ImagePath;
             this._OldImagePath = ImagePath;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewPerson},
-                {enMode.Update,_UpdatePerson}
+                {enMode.AddNew,_AddNewPersonAsync},
+                {enMode.Update,_UpdatePersonAsync}
             };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewPerson()
+        private async Task<bool> _AddNewPersonAsync()
         {
             if (!string.IsNullOrWhiteSpace(this._ImagePath))
             {
@@ -182,7 +182,7 @@ namespace DVLD_Business
                 this._ImagePath = sourceFilePath;
             }
             
-            this.PersonID = clsPersonData.AddNewPerson(this.FirstName,  this.SecondName,  this.ThirdName
+            this.PersonID = await clsPersonData.AddNewPersonAsync(this.FirstName,  this.SecondName,  this.ThirdName
                 , this.LastName,  this.NationalNo,  this.DateOfBirth,  (short)this.Gender,  this.Address,  this.Phone,  this.Email
                 , this.NationalityCountryID,  this.ImagePath);
 
@@ -205,14 +205,14 @@ namespace DVLD_Business
             return false;
         }
 
-        private bool _UpdatePerson()
+        private async Task<bool> _UpdatePersonAsync()
         {
             if (string.IsNullOrWhiteSpace(_NationalNo))
             {
                 return false;
             }
 
-            if (_IsNationalNoChanged && _IsNationalNoUsed(this.PersonID, NationalNo))
+            if (_IsNationalNoChanged && await _IsNationalNoUsedAsync(this.PersonID, NationalNo))
             {
                 return false;
             }
@@ -227,7 +227,7 @@ namespace DVLD_Business
                 this._ImagePath = sourceFilePath;
             }
 
-            if ( clsPersonData.UpdatePerson(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
+            if (await clsPersonData.UpdatePersonAsync(PersonID, NationalNo, FirstName, SecondName, ThirdName, LastName
                 , DateOfBirth, (short)Gender, Address, Phone, Email, NationalityCountryID, ImagePath))
             {
                 if (!string.IsNullOrEmpty(_OldImagePath) && this._IsImagePathChanged)
@@ -250,11 +250,11 @@ namespace DVLD_Business
                 return false;
         }
 
-        public static bool Delete(int PersonID)
+        public static async Task<bool> DeleteAsync(int PersonID)
         {
             string ImagePath = "";
-            ImagePath = Find(PersonID)?.ImagePath;
-            if ( clsPersonData.DeletePerson(PersonID))
+            ImagePath = (await FindAsync(PersonID).ConfigureAwait(false))?.ImagePath;
+            if (await clsPersonData.DeletePersonAsync(PersonID))
             {
                 if (!string.IsNullOrWhiteSpace(ImagePath))
                 {
@@ -265,34 +265,18 @@ namespace DVLD_Business
             return false;
         }
 
-        public static clsPerson Find(int? PersonID)
+        public static async Task<clsPerson> FindAsync(int? PersonID)
         {
-
             if (PersonID == null)
                 return null;
 
-            string FirstName = string.Empty;
-            string SecondName = string.Empty;
-            string ThirdName = string.Empty;
-            string LastName = string.Empty;
-            string NationalNo = string.Empty;
-            DateTime DateOfBirth = DateTime.Now;
-            short Gender = 0;
-            string Address = string.Empty;
-            string Phone = string.Empty;
-            string Email = string.Empty;
-            int NationalityCountryID = 1;
-            string ImagePath = string.Empty;
+            var PersonInfo = await clsPersonData.GetPersonInfoByIDAsync(PersonID).ConfigureAwait(false);
 
-            bool found = clsPersonData.GetPersonInfoByID(PersonID, ref NationalNo, ref FirstName
-                , ref SecondName, ref ThirdName, ref LastName,  ref DateOfBirth, ref Gender, ref Address
-                , ref Phone, ref Email, ref NationalityCountryID, ref ImagePath);
-
-            if (found)
+            if (PersonInfo.IsFound)
             {
-                return new clsPerson(PersonID, FirstName, SecondName, ThirdName, LastName
-                    , NationalNo, DateOfBirth, Gender, Address, Phone, Email
-                    , NationalityCountryID, ImagePath);
+                return new clsPerson(PersonID, PersonInfo.FirstName, PersonInfo.SecondName, PersonInfo.ThirdName, PersonInfo.LastName
+                    , PersonInfo.NationalNo, PersonInfo.DateOfBirth, PersonInfo.Gender, PersonInfo.Address, PersonInfo.Phone, PersonInfo.Email
+                    , PersonInfo.NationalityCountryID, PersonInfo.ImagePath);
             }
             else
             {
@@ -300,30 +284,15 @@ namespace DVLD_Business
             }
         }
 
-        public static clsPerson Find(string NationalNo)
+        public static async Task<clsPerson> FindAsync(string NationalNo)
         {
-            int? PersonID = null;
-            string FirstName = string.Empty;
-            string SecondName = string.Empty;
-            string ThirdName = string.Empty;
-            string LastName = string.Empty;
-            DateTime DateOfBirth = DateTime.Now;
-            short Gender = 0;
-            string Address = string.Empty;
-            string Phone = string.Empty;
-            string Email = string.Empty;
-            int NationalityCountryID = 1;
-            string ImagePath = string.Empty;
+            var PersonInfo = await clsPersonData.GetPersonInfoByNationalNoAsync(NationalNo);
 
-            bool found = clsPersonData.GetPersonInfoByNationalNo(NationalNo, ref PersonID, ref FirstName
-                , ref SecondName, ref ThirdName, ref LastName, ref DateOfBirth, ref Gender, ref Address
-                , ref Phone, ref Email, ref NationalityCountryID, ref ImagePath);
-
-            if (found)
+            if (PersonInfo.IsFound)
             {
-                return new clsPerson(PersonID, FirstName, SecondName, ThirdName, LastName
-                    , NationalNo, DateOfBirth, Gender, Address, Phone, Email
-                    , NationalityCountryID, ImagePath);
+                return new clsPerson(PersonInfo.PersonID, PersonInfo.FirstName, PersonInfo.SecondName, PersonInfo.ThirdName, PersonInfo.LastName
+                    , NationalNo, PersonInfo.DateOfBirth, PersonInfo.Gender, PersonInfo.Address, PersonInfo.Phone, PersonInfo.Email
+                    , PersonInfo.NationalityCountryID, PersonInfo.ImagePath);
             }
             else
             {
@@ -331,37 +300,37 @@ namespace DVLD_Business
             }
         }
 
-        public static bool IsPersonExists(int PersonID)
+        public static async Task<bool> IsPersonExistsAsync(int PersonID)
         {
-            return clsPersonData.IsPersonExists(PersonID);
+            return await clsPersonData.IsPersonExistsAsync(PersonID);
         }
 
-        public static bool IsPersonExists(string NationalNo)
+        public static async Task<bool> IsPersonExistsAsync(string NationalNo)
         {
-            return clsPersonData.IsPersonExists(NationalNo);
+            return await clsPersonData.IsPersonExistsAsync(NationalNo);
         }
 
-        private static bool _IsNationalNoUsed(int? PersonID, string NationalNo)
+        private static async Task<bool> _IsNationalNoUsedAsync(int? PersonID, string NationalNo)
         {
-            return clsPersonData.IsNationalNoUsed(PersonID, NationalNo);
+            return await clsPersonData.IsNationalNoUsedAsync(PersonID, NationalNo);
         }
 
-        public static DataTable GetAllPeople()
+        public static async Task<DataTable> GetAllPeopleAsync()
         {
-            return clsPersonData.GetAllPeople();
+            return await clsPersonData.GetAllPeopleAsync();
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
 
-        public static bool HasPeople()
+        public static async Task<bool> HasPeopleAsync()
         {
-            return clsPersonData.HasPeople();
+            return await clsPersonData.HasPeopleAsync();
         }
 
-        private static bool _IsValidInfo(string NationalNo, string FirstName, string SecondName,
+        private static async Task<bool> _IsValidInfoAsync(string NationalNo, string FirstName, string SecondName,
              string LastName, DateTime DateOfBirth,string Address,
             string Phone, int NationalityCountryID, string Email = "")
         {
@@ -386,7 +355,7 @@ namespace DVLD_Business
                 return false;
             }
 
-            if (IsPersonExists(NationalNo))
+            if (await IsPersonExistsAsync(NationalNo))
             {
                 return false;
             }
@@ -394,12 +363,12 @@ namespace DVLD_Business
             return true;
         }
 
-        private static clsPerson _GetReadyObj(string NationalNo, string FirstName, string SecondName,
+        private static async Task<clsPerson> _GetReadyObjAsync(string NationalNo, string FirstName, string SecondName,
              string LastName, DateTime DateOfBirth, enGenderType Gender, string Address,
             string Phone, int NationalityCountryID, string ThirdName = "", string Email = "", string ImagePath = "")
         {
 
-            if (!_IsValidInfo(NationalNo, FirstName, SecondName, LastName, DateOfBirth
+            if (!await _IsValidInfoAsync(NationalNo, FirstName, SecondName, LastName, DateOfBirth
                 , Address, Phone, NationalityCountryID, Email))
             {
                 return null;
@@ -409,15 +378,15 @@ namespace DVLD_Business
                 , Gender, Address, Phone, Email, NationalityCountryID, ImagePath);
         }
 
-        public static clsPerson CreateNewPerson(string NationalNo, string FirstName, string SecondName,
+        public static async Task<clsPerson> CreateNewPersonAsync(string NationalNo, string FirstName, string SecondName,
              string LastName, DateTime DateOfBirth, enGenderType Gender, string Address,
             string Phone, int NationalityCountryID, string ThirdName = "", string Email = "", string ImagePath = "")
         {
-            clsPerson NewPerson = _GetReadyObj(NationalNo, FirstName, SecondName, LastName, DateOfBirth, Gender
+            clsPerson NewPerson = await _GetReadyObjAsync(NationalNo, FirstName, SecondName, LastName, DateOfBirth, Gender
                 , Address, Phone, NationalityCountryID, ThirdName, Email, ImagePath);
             if(NewPerson != null)
             {
-                if(NewPerson.Save())
+                if(await NewPerson.SaveAsync())
                 {
                     return NewPerson;
                 }
