@@ -460,9 +460,9 @@ namespace DVLD_Business
             return -1;
         }
 
-        public static bool IsValidAge(int PersonID, int LicenseClassID)
+        public static async Task<bool> IsValidAgeAsync(int PersonID, int LicenseClassID)
         {
-            clsPerson person = clsPerson.Find(PersonID);
+            clsPerson person = await clsPerson.FindAsync(PersonID);
 
             DateTime DateOfBirth = DateTime.Today;
             DateTime today = clsBusinessSettings.GetServerDateTime();
@@ -501,7 +501,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            if (!IsValidAge(localDrivingLicenseApplication.ApplicantPersonID, localDrivingLicenseApplication.LicenseClassID))
+            if (!await IsValidAgeAsync(localDrivingLicenseApplication.ApplicantPersonID, localDrivingLicenseApplication.LicenseClassID))
             {
                 return null;
             }

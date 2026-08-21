@@ -73,7 +73,7 @@ namespace DVLD_Business
             {
                 if (_PersonInfo == null && ApplicantPersonID != -1)
                 {
-                    _PersonInfo = clsPerson.Find(ApplicantPersonID);
+                    _FindPerson();
                 }
                 return _PersonInfo;
             }
@@ -223,6 +223,11 @@ namespace DVLD_Business
 
             return clsApplicationData.UpdateApplication(this.ApplicationID,
                 this.PaidFees, this.CreatedByUserID);
+        }
+
+        private async void _FindPerson()
+        {
+            _PersonInfo = await clsPerson.FindAsync(ApplicantPersonID).ConfigureAwait(false);
         }
 
         public static bool Delete(int ApplicationID)

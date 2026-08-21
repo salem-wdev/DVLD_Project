@@ -22,7 +22,7 @@ namespace DVLD_Business
             {
                 if (_PersonInfo == null && this.PersonID != -1)
                 {
-                    _PersonInfo = clsPerson.Find(this.PersonID);
+                    _FindPerson();
                 }
                 return _PersonInfo;
             }
@@ -90,6 +90,12 @@ namespace DVLD_Business
             return await clsDriverData.UpdateDriverAsync(this.DriverID, this.PersonID, this.CreatedByUserID);
         }
 
+        private async void _FindPerson()
+        {
+            _PersonInfo = await clsPerson.FindAsync(PersonID).ConfigureAwait(false);
+        }
+
+
         public static async Task<clsDriver> FindByDriverIDAsync(int DriverID)
         {
             var driverInfo = await clsDriverData.GetDriverInfoByDriverIDAsync(DriverID).ConfigureAwait(false);
@@ -118,7 +124,7 @@ namespace DVLD_Business
 
         public static async Task<DataTable> GetAllDriversAsync()
         {
-            return await clsDriverData.GetAllDriversAsync();
+            return await clsDriverData.GetAllDriversAsync().ConfigureAwait(false);
 
         }
 
@@ -142,9 +148,9 @@ namespace DVLD_Business
             return clsLicenseData.GetLastLicenseIDByDriverID(DriverID,LicenseClassID);
         }
 
-        private static clsDriver _PrepareDriver(int PersonID, int CreatedByUserID)
+        private static async Task<clsDriver> _PrepareDriverAsync(int PersonID, int CreatedByUserID)
         {
-            if (!clsPerson.IsPersonExists(PersonID) || !clsUser.IsUserExists(CreatedByUserID))
+            if (!await clsPerson.IsPersonExistsAsync(PersonID) || !clsUser.IsUserExists(CreatedByUserID))
             {
                 return null;
             }
@@ -159,7 +165,7 @@ namespace DVLD_Business
 
         internal static async Task<clsDriver> CreateNewDriverAsync(int PersonID, int CreatedByUserID)
         {
-            clsDriver driver = _PrepareDriver(PersonID, CreatedByUserID);
+            clsDriver driver =await _PrepareDriverAsync(PersonID, CreatedByUserID);
 
             if(driver != null)
             {
