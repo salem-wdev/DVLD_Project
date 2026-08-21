@@ -1,26 +1,39 @@
+using DVLD_Infrastructure.Storage;
+using DVLD_Shared;
 using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using DVLD_Shared;
-using DVLD_Infrastructure.Storage;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Security.Policy;
+using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
     public class clsPersonData
     {
-        public static bool GetPersonInfoByID(int? PersonID, ref string NationalNo, ref string FirstName, ref string SecondName,
-            ref string ThirdName, ref string LastName, ref DateTime DateOfBirth,
-            ref short Gender, ref string Address, ref string Phone, ref string Email,
-            ref int NationalityCountryID, ref string ImagePath)
+        private static readonly string _connectionString =
+    ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+
+        public static async Task<(bool IsFound, string NationalNo, string FirstName, string SecondName,string ThirdName,
+            string LastName, DateTime DateOfBirth,short Gender, string Address, string Phone, string Email,
+            int NationalityCountryID, string ImagePath)> GetPersonInfoByIDAsync(int? PersonID)
         {
             bool IsFound = false;
+            string NationalNo = string.Empty, FirstName = string.Empty, SecondName = string.Empty,
+                ThirdName = string.Empty, LastName = string.Empty, Address = string.Empty,
+                Phone = string.Empty, Email = string.Empty, ImagePath = string.Empty;
+            DateTime DateOfBirth = DateTime.MinValue;
+            short Gender = -1;
+            int NationalityCountryID = -1;
 
             if (PersonID == null)
-                return false;
+                return (IsFound, NationalNo, FirstName, SecondName, ThirdName, LastName,
+                DateOfBirth, Gender, Address, Phone, Email, NationalityCountryID, ImagePath);
             try
             {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     string Query = "SELECT NationalNo, FirstName, SecondName, ThirdName, LastName, DateOfBirth, Gendor, Address, Phone, Email, NationalityCountryID, ImagePath FROM People WHERE PersonID = @PersonID;";
 
@@ -28,10 +41,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
 
                                 NationalNo = reader.GetString(0);
@@ -63,20 +76,29 @@ namespace DVLD_DataAccess
                 IsFound = false;
             }
 
-            return IsFound;
+            return (IsFound, NationalNo, FirstName, SecondName, ThirdName, LastName,
+                DateOfBirth, Gender, Address, Phone, Email, NationalityCountryID, ImagePath);
         }
 
-        public static bool GetPersonInfoByNationalNo(string NationalNo, ref int? PersonID, ref string FirstName, ref string SecondName,
-            ref string ThirdName, ref string LastName, ref DateTime DateOfBirth,
-            ref short Gender, ref string Address, ref string Phone, ref string Email,
-            ref int NationalityCountryID, ref string ImagePath)
+        public static async Task<(bool IsFound, int? PersonID, string FirstName, string SecondName, string ThirdName,
+            string LastName, DateTime DateOfBirth, short Gender, string Address, string Phone, string Email,
+            int NationalityCountryID, string ImagePath)> GetPersonInfoByNationalNoAsync(string NationalNo)
         {
             bool IsFound = false;
+            int? PersonID = null;
+            string FirstName = string.Empty, SecondName = string.Empty,
+                ThirdName = string.Empty, LastName = string.Empty, Address = string.Empty,
+                Phone = string.Empty, Email = string.Empty, ImagePath = string.Empty;
+            DateTime DateOfBirth = DateTime.MinValue;
+            short Gender = -1;
+            int NationalityCountryID = -1;
+
             if (string.IsNullOrWhiteSpace(NationalNo))
-                return false;
+                return (IsFound, PersonID, FirstName, SecondName, ThirdName, LastName,
+                DateOfBirth, Gender, Address, Phone, Email, NationalityCountryID, ImagePath);
             try
             {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     string Query = "SELECT PersonID, FirstName, SecondName, ThirdName, LastName, DateOfBirth, Gendor, Address, Phone, Email, NationalityCountryID, ImagePath FROM People WHERE NationalNo = @NationalNo;";
 
@@ -84,10 +106,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@NationalNo", SqlDbType.NVarChar).Value = NationalNo;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 PersonID = reader.GetInt32(0);
                                 FirstName = reader.GetString(1);
@@ -118,10 +140,11 @@ namespace DVLD_DataAccess
                 IsFound = false;
             }
 
-            return IsFound;
+            return (IsFound, PersonID, FirstName, SecondName, ThirdName, LastName,
+                DateOfBirth, Gender, Address, Phone, Email, NationalityCountryID, ImagePath);
         }
 
-        public static Nullable<int> AddNewPerson(string FirstName, string SecondName,
+        public static async Task<Nullable<int>> AddNewPersonAsync(string FirstName, string SecondName,
              string ThirdName, string LastName, string NationalNo, DateTime DateOfBirth,
              short Gender, string Address, string Phone, string Email,
              int NationalityCountryID, string ImagePath)
@@ -129,33 +152,38 @@ namespace DVLD_DataAccess
             int? PersonID = null;
             try
             {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    string Query = "INSERT INTO People (NationalNo, FirstName, SecondName, ThirdName, " +
-                        "LastName, DateOfBirth, Gendor, Address, Phone, Email, NationalityCountryID," +
-                        " ImagePath) VALUES (@NationalNo, @FirstName, @SecondName, @ThirdName, @LastName," +
-                        " @DateOfBirth, @Gendor, @Address, @Phone, @Email, @NationalityCountryID, @ImagePath);" +
-                        "SELECT SCOPE_IDENTITY();";
 
-                    using (SqlCommand command = new SqlCommand(Query, connection))
+                    using (SqlCommand command = new SqlCommand("SP_AddNewPerson", connection))
                     {
-                        command.Parameters.Add("@NationalNo", SqlDbType.NVarChar).Value = NationalNo;
-                        command.Parameters.Add("@FirstName", SqlDbType.NVarChar).Value = FirstName;
-                        command.Parameters.Add("@SecondName", SqlDbType.NVarChar).Value = SecondName;
-                        command.Parameters.Add("@ThirdName", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(ThirdName) ? (object)DBNull.Value : ThirdName;
-                        command.Parameters.Add("@LastName", SqlDbType.NVarChar).Value = LastName;
-                        command.Parameters.Add("@DateOfBirth", SqlDbType.DateTime).Value = DateOfBirth;
-                        command.Parameters.Add("@Gendor", SqlDbType.TinyInt).Value = Gender;
-                        command.Parameters.Add("@Address", SqlDbType.NVarChar).Value = Address;
-                        command.Parameters.Add("@Phone", SqlDbType.NVarChar).Value = Phone;
-                        command.Parameters.Add("@Email", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(Email) ? (object)DBNull.Value : Email;
-                        command.Parameters.Add("@NationalityCountryID", SqlDbType.Int).Value = NationalityCountryID;
-                        command.Parameters.Add("@ImagePath", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(ImagePath) ? (object)DBNull.Value : ImagePath;
+                        command.CommandType = CommandType.StoredProcedure;
 
-                        connection.Open();
-                        if (command.ExecuteScalar() is decimal newID)
+                        command.Parameters.Add("@NationalNo", SqlDbType.NVarChar, 20).Value = NationalNo;
+                        command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 20).Value = FirstName;
+                        command.Parameters.Add("@SecondName", SqlDbType.NVarChar, 20).Value = SecondName;
+                        command.Parameters.Add("@ThirdName", SqlDbType.NVarChar, 20).Value = (object)ThirdName ?? DBNull.Value;
+                        command.Parameters.Add("@LastName", SqlDbType.NVarChar, 20).Value = LastName;
+                        command.Parameters.Add("@DateOfBirth", SqlDbType.DateTime).Value = DateOfBirth;
+                        command.Parameters.Add("@Gendor", SqlDbType.TinyInt).Value = (byte)Gender;
+                        command.Parameters.Add("@Address", SqlDbType.NVarChar, 500).Value = Address;
+                        command.Parameters.Add("@Phone", SqlDbType.NVarChar, 20).Value = Phone;
+                        command.Parameters.Add("@Email", SqlDbType.NVarChar, 50).Value = (object)Email ?? DBNull.Value;
+                        command.Parameters.Add("@NationalityCountryID", SqlDbType.Int).Value = NationalityCountryID;
+                        command.Parameters.Add("@ImagePath", SqlDbType.NVarChar, 250).Value = (object)ImagePath ?? DBNull.Value;
+
+                        SqlParameter outputIdParam = new SqlParameter("@NewPersonID", SqlDbType.Int)
                         {
-                            PersonID = (int)newID;
+                            Direction = ParameterDirection.Output
+                        };
+
+                        command.Parameters.Add(outputIdParam);
+
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        if (outputIdParam.Value != null && outputIdParam.Value != DBNull.Value)
+                        {
+                            PersonID = (int?)outputIdParam.Value;
                         }
                     }
                 }
@@ -168,9 +196,8 @@ namespace DVLD_DataAccess
             return PersonID;
         }
 
-        public static bool UpdatePerson(int? PersonID, string NationalNo, string FirstName, string SecondName,
-            string ThirdName, string LastName, DateTime DateOfBirth,
-            short Gender, string Address, string Phone, string Email,
+        public static async Task<bool> UpdatePersonAsync(int? PersonID, string NationalNo, string FirstName, string SecondName,
+            string ThirdName, string LastName, DateTime DateOfBirth, short Gender, string Address, string Phone, string Email,
             int NationalityCountryID, string ImagePath)
         {
             int NumberOfEffectedRows = 0;
@@ -188,24 +215,24 @@ namespace DVLD_DataAccess
                         "[Email] = @Email,[NationalityCountryID] = @NationalityCountryID,[ImagePath] = @ImagePath" +
                         " WHERE [PersonID] = @PersonID";
 
-                    using (SqlCommand Command = new SqlCommand(Query, connection))
+                    using (SqlCommand command = new SqlCommand(Query, connection))
                     {
-                        Command.Parameters.Add("@NationalNo", SqlDbType.NVarChar).Value = NationalNo;
-                        Command.Parameters.Add("@FirstName", SqlDbType.NVarChar).Value = FirstName;
-                        Command.Parameters.Add("@SecondName", SqlDbType.NVarChar).Value = SecondName;
-                        Command.Parameters.Add("@ThirdName", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(ThirdName) ? (object)DBNull.Value : ThirdName;
-                        Command.Parameters.Add("@LastName", SqlDbType.NVarChar).Value = LastName;
-                        Command.Parameters.Add("@DateOfBirth", SqlDbType.DateTime).Value = DateOfBirth;
-                        Command.Parameters.Add("@Gendor", SqlDbType.TinyInt).Value = Gender;
-                        Command.Parameters.Add("@Address", SqlDbType.NVarChar).Value = Address;
-                        Command.Parameters.Add("@Phone", SqlDbType.NVarChar).Value = Phone;
-                        Command.Parameters.Add("@Email", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(Email) ? (object)DBNull.Value : Email;
-                        Command.Parameters.Add("@NationalityCountryID", SqlDbType.Int).Value = NationalityCountryID;
-                        Command.Parameters.Add("@ImagePath", SqlDbType.NVarChar).Value = string.IsNullOrEmpty(ImagePath) ? (object)DBNull.Value : ImagePath;
-                        Command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
+                        command.Parameters.Add("@NationalNo", SqlDbType.NVarChar, 20).Value = NationalNo;
+                        command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 20).Value = FirstName;
+                        command.Parameters.Add("@SecondName", SqlDbType.NVarChar, 20).Value = SecondName;
+                        command.Parameters.Add("@ThirdName", SqlDbType.NVarChar, 20).Value = (object)ThirdName ?? DBNull.Value;
+                        command.Parameters.Add("@LastName", SqlDbType.NVarChar, 20).Value = LastName;
+                        command.Parameters.Add("@DateOfBirth", SqlDbType.DateTime).Value = DateOfBirth;
+                        command.Parameters.Add("@Gendor", SqlDbType.TinyInt).Value = (byte)Gender;
+                        command.Parameters.Add("@Address", SqlDbType.NVarChar, 500).Value = Address;
+                        command.Parameters.Add("@Phone", SqlDbType.NVarChar, 20).Value = Phone;
+                        command.Parameters.Add("@Email", SqlDbType.NVarChar, 50).Value = (object)Email ?? DBNull.Value;
+                        command.Parameters.Add("@NationalityCountryID", SqlDbType.Int).Value = NationalityCountryID;
+                        command.Parameters.Add("@ImagePath", SqlDbType.NVarChar, 250).Value = (object)ImagePath ?? DBNull.Value; 
+                        command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
 
-                        connection.Open();
-                        NumberOfEffectedRows = Command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        NumberOfEffectedRows = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -217,7 +244,7 @@ namespace DVLD_DataAccess
             return NumberOfEffectedRows > 0;
         }
 
-        public static bool IsPersonExists(int? PersonID)
+        public static async Task<bool> IsPersonExistsAsync(int? PersonID)
         {
             bool IsExist = false;
 
@@ -234,8 +261,8 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
 
-                        connection.Open();
-                        IsExist = command.ExecuteScalar() != null;
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        IsExist = await command.ExecuteScalarAsync().ConfigureAwait(false) != null;
                     }
                 }
             }
@@ -248,7 +275,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool IsPersonExists(string NationalNo)
+        public static async Task<bool> IsPersonExistsAsync(string NationalNo)
         {
             bool IsExist = false;
             try
@@ -261,8 +288,8 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@NationalNo", SqlDbType.NVarChar).Value = NationalNo;
 
-                        connection.Open();
-                        IsExist = command.ExecuteScalar() != null;
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        IsExist = await command.ExecuteScalarAsync().ConfigureAwait(false) != null;
                     }
                 }
             }
@@ -275,7 +302,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool IsNationalNoUsed(int? PersonID, string NationalNo)
+        public static async Task<bool> IsNationalNoUsedAsync(int? PersonID, string NationalNo)
         {
             bool IsUsed = false;
 
@@ -294,8 +321,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@NationalNo", SqlDbType.NVarChar).Value = NationalNo;
                         command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
 
-                        connection.Open();
-                        IsUsed = command.ExecuteScalar() != null;
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        IsUsed = await command.ExecuteScalarAsync().ConfigureAwait(false) != null;
                     }
                 }
             }
@@ -308,8 +335,7 @@ namespace DVLD_DataAccess
 
         }
 
-
-        public static bool DeletePerson(int? PersonID)
+        public static async Task<bool> DeletePersonAsync(int? PersonID)
         {
             int NumberOfEffectedRows = 0;
 
@@ -326,8 +352,8 @@ namespace DVLD_DataAccess
                     {
                         Command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
 
-                        connection.Open();
-                        NumberOfEffectedRows = Command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        NumberOfEffectedRows = await Command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -339,9 +365,24 @@ namespace DVLD_DataAccess
             return NumberOfEffectedRows > 0;
         }
 
-        public static DataTable GetAllPeople()
+        public static async Task<DataTable> GetAllPeopleAsync()
         {
             DataTable Table = new DataTable();
+
+            Table.Columns.Add("PersonID", typeof(int));
+            Table.Columns.Add("NationalNo", typeof(string));
+            Table.Columns.Add("FirstName", typeof(string));
+            Table.Columns.Add("SecondName", typeof(string));
+            Table.Columns.Add("ThirdName", typeof(string));
+            Table.Columns.Add("LastName", typeof(string));
+            Table.Columns.Add("DateOfBirth", typeof(DateTime));
+            Table.Columns.Add("GendorCaption", typeof(string));
+            Table.Columns.Add("Address", typeof(string));
+            Table.Columns.Add("Phone", typeof(string));
+            Table.Columns.Add("Email", typeof(string));
+            Table.Columns.Add("CountryName", typeof(string));
+            Table.Columns.Add("ImagePath", typeof(string));
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -360,12 +401,26 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand Command = new SqlCommand(Query, connection))
                     {
-                        connection.Open();
-                        using (SqlDataReader reader = Command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await Command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
+                            while (await reader.ReadAsync().ConfigureAwait(false))
                             {
-                                Table.Load(reader);
+                                Table.Rows.Add(
+                                        reader.GetInt32(0),                                                 // PersonID
+                                        reader.GetString(1),                                                // NationalNo
+                                        reader.GetString(2),                                                // FirstName
+                                        reader.IsDBNull(3) ? (object)DBNull.Value : reader.GetString(3),    // SecondName
+                                        reader.IsDBNull(4) ? (object)DBNull.Value : reader.GetString(4),    // ThirdName
+                                        reader.GetString(5),                                                // LastName
+                                        reader.GetDateTime(6),                                              // DateOfBirth
+                                        reader.GetString(7),                                                // GendorCaption
+                                        reader.IsDBNull(8) ? (object)DBNull.Value : reader.GetString(8),    // Address
+                                        reader.IsDBNull(9) ? (object)DBNull.Value : reader.GetString(9),    // Phone
+                                        reader.IsDBNull(10) ? (object)DBNull.Value : reader.GetString(10),  // Email
+                                        reader.GetString(11),                                               // CountryName
+                                        reader.IsDBNull(12) ? (object)DBNull.Value : reader.GetString(12)   // ImagePath
+                                    );
                             }
                         }
                     }
@@ -380,7 +435,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool HasPeople()
+        public static async Task<bool> HasPeopleAsync()
         {
             bool isFound = false;
             try
@@ -391,8 +446,8 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
-                        isFound = command.ExecuteScalar() != null;
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        isFound = await command.ExecuteScalarAsync().ConfigureAwait(false) != null;
                     }
                 }
             }
