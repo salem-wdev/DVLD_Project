@@ -1,19 +1,24 @@
 using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using DVLD_Infrastructure.Storage;
 using System.Configuration;
+using System.Threading.Tasks;
 namespace DVLD_DataAccess
 {
     public class clsApplicationData
     {
-        public static bool GetApplicationInfoByApplicationID
-            (int ApplicationID, ref int ApplicantPersonID,
-            ref DateTime ApplicationDate, ref int ApplicationTypeID,
-            ref byte ApplicationStatus, ref DateTime LastStatusDate,
-            ref decimal PaidFees, ref int CreatedByUserID)
+        public static async Task<(bool IsFound, int ApplicantPersonID, DateTime ApplicationDate, int ApplicationTypeID, byte ApplicationStatus, DateTime LastStatusDate, decimal PaidFees, int CreatedByUserID)> GetApplicationInfoByApplicationIDAsync(int ApplicationID)
         {
             bool IsFound = false;
+            int ApplicantPersonID = 0;
+            DateTime ApplicationDate = default(DateTime);
+            int ApplicationTypeID = 0;
+            byte ApplicationStatus = 0;
+            DateTime LastStatusDate = default(DateTime);
+            decimal PaidFees = 0;
+            int CreatedByUserID = 0;
 
             try
             {
@@ -33,10 +38,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 ApplicantPersonID = Convert.ToInt32(reader["ApplicantPersonID"]);
                                 ApplicationDate = (DateTime)reader["ApplicationDate"];
@@ -61,16 +66,18 @@ namespace DVLD_DataAccess
                 // Log the exception (ex) as needed
 
             }
-            return IsFound;
+            return (IsFound, ApplicantPersonID, ApplicationDate, ApplicationTypeID, ApplicationStatus, LastStatusDate, PaidFees, CreatedByUserID);
         }
 
-        public static int AddNewApplication(int ApplicantPersonID,
-            ref DateTime ApplicationDate, int ApplicationTypeID,
-            ref byte ApplicationStatus, ref DateTime LastStatusDate,
+        public static async Task<(int ApplicationID, DateTime ApplicationDate, byte ApplicationStatus, DateTime LastStatusDate)> AddNewApplicationAsync(int ApplicantPersonID,
+            int ApplicationTypeID,
             decimal PaidFees, int CreatedByUserID)
         {
 
             int ApplicationID = -1;
+            DateTime ApplicationDate = default(DateTime);
+            byte ApplicationStatus = 0;
+            DateTime LastStatusDate = default(DateTime);
 
             try
             {
@@ -93,10 +100,10 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 ApplicationID = Convert.ToInt32(reader["ApplicationID"]);
                                 ApplicationDate = (DateTime)reader["ApplicationDate"];
@@ -118,11 +125,11 @@ namespace DVLD_DataAccess
 
             }
 
-            return ApplicationID;
+            return (ApplicationID, ApplicationDate, ApplicationStatus, LastStatusDate);
 
         }
 
-        public static bool UpdateApplication(int ApplicationID,
+        public static async Task<bool> UpdateApplicationAsync(int ApplicationID,
             decimal PaidFees, int CreatedByUserID)
         {
             int NumberOfEffectedRows = 0;
@@ -145,8 +152,8 @@ namespace DVLD_DataAccess
 
 
 
-                        connection.Open();
-                        NumberOfEffectedRows = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        NumberOfEffectedRows = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
                
@@ -161,9 +168,18 @@ namespace DVLD_DataAccess
         }
 
 
-        public static DataTable GetApplicationsPersonList(int ApplicantPersonID)
+        public static async Task<DataTable> GetApplicationsPersonListAsync(int ApplicantPersonID)
         {
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("ApplicationID", typeof(int));
+            dt.Columns.Add("ApplicationDate", typeof(DateTime));
+            dt.Columns.Add("ApplicationTypeID", typeof(int));
+            dt.Columns.Add("ApplicationStatus", typeof(byte));
+            dt.Columns.Add("LastStatusDate", typeof(DateTime));
+            dt.Columns.Add("PaidFees", typeof(decimal));
+            dt.Columns.Add("CreatedByUserID", typeof(int));
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -181,10 +197,14 @@ namespace DVLD_DataAccess
                     using (SqlCommand command = new SqlCommand(Query, connection))
                     {
                         command.Parameters.AddWithValue("@ApplicantPersonID", ApplicantPersonID);
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            dt.Load(reader);
+                            while (await reader.ReadAsync().ConfigureAwait(false))
+                            {
+                                dt.Rows.Add(reader.GetInt32(0), reader.GetDateTime(1), reader.GetInt32(2), reader.GetByte(3),
+                                    reader.GetDateTime(4), reader.GetDecimal(5), reader.GetInt32(6));
+                            }
                         }
                     }
                 }
@@ -200,9 +220,18 @@ namespace DVLD_DataAccess
 
         }
 
-        public static DataTable GetApplicationsCreatedByUserList(int CreatedByUserID)
+        public static async Task<DataTable> GetApplicationsCreatedByUserListAsync(int CreatedByUserID)
         {
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("ApplicationID", typeof(int));
+            dt.Columns.Add("ApplicantPersonID", typeof(int));
+            dt.Columns.Add("ApplicationDate", typeof(DateTime));
+            dt.Columns.Add("ApplicationTypeID", typeof(int));
+            dt.Columns.Add("ApplicationStatus", typeof(byte));
+            dt.Columns.Add("LastStatusDate", typeof(DateTime));
+            dt.Columns.Add("PaidFees", typeof(decimal));
+
             try
             {
 
@@ -225,10 +254,14 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            dt.Load(reader);
+                            while (await reader.ReadAsync().ConfigureAwait(false))
+                            {
+                                dt.Rows.Add(reader.GetInt32(0), reader.GetInt32(1), reader.GetDateTime(2), reader.GetInt32(3), reader.GetByte(4),
+                                    reader.GetDateTime(5), reader.GetDecimal(6));
+                            }
                         }
                     }
                 }
@@ -242,7 +275,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool IsApplicationExist(int ApplicationID)
+        public static async Task<bool> IsApplicationExistAsync(int ApplicationID)
         {
             bool IsFound = false;
             try
@@ -259,8 +292,8 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
 
-                        connection.Open();
-                        object Scalar = command.ExecuteScalar();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        object Scalar = await command.ExecuteScalarAsync().ConfigureAwait(false);
                         IsFound = (Scalar != null); 
                     }
                 }
@@ -272,14 +305,14 @@ namespace DVLD_DataAccess
             return IsFound;
         }
 
-        public static bool DoesPersonHaveActiveApplication(int PersonID, int ApplicationTypeID)
+        public static async Task<bool> DoesPersonHaveActiveApplicationAsync(int PersonID, int ApplicationTypeID)
         {
 
             //incase the ActiveApplication ID !=-1 return true.
-            return (GetActiveApplicationID(PersonID, ApplicationTypeID) != -1);
+            return (await GetActiveApplicationIDAsync(PersonID, ApplicationTypeID).ConfigureAwait(false) != -1);
         }
 
-        public static int GetActiveApplicationID(int PersonID, int ApplicationTypeID)
+        public static async Task<int> GetActiveApplicationIDAsync(int PersonID, int ApplicationTypeID)
         {
             int ActiveApplicationID = -1;
             try
@@ -296,8 +329,8 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
 
 
-                        connection.Open();
-                        object result = command.ExecuteScalar();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
 
                         if (result != null && int.TryParse(result.ToString(), out int AppID))
@@ -315,7 +348,7 @@ namespace DVLD_DataAccess
             return ActiveApplicationID;
         }
 
-        public static int GetActiveApplicationIDForLicenseClass(int PersonID, int ApplicationTypeID, int LicenseClassID)
+        public static async Task<int> GetActiveApplicationIDForLicenseClassAsync(int PersonID, int ApplicationTypeID, int LicenseClassID)
         {
             int ActiveApplicationID = -1;
             try
@@ -340,8 +373,8 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
                         command.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
 
-                        connection.Open();
-                        object result = command.ExecuteScalar();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
 
                         if (result != null && int.TryParse(result.ToString(), out int AppID))
@@ -360,7 +393,7 @@ namespace DVLD_DataAccess
             return ActiveApplicationID;
         }
 
-        public static bool DeleteApplication(int ApplicationID)
+        public static async Task<bool> DeleteApplicationAsync(int ApplicationID)
         {
             int NumberOfEffectedRows = 0;
             try
@@ -375,8 +408,8 @@ namespace DVLD_DataAccess
                         Command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
 
-                        connection.Open();
-                        NumberOfEffectedRows = Command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        NumberOfEffectedRows = await Command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -387,7 +420,7 @@ namespace DVLD_DataAccess
             return NumberOfEffectedRows > 0;
         }
 
-        public static DataTable GetAllApplications()
+        public static async Task<DataTable> GetAllApplicationsAsync()
         {
             DataTable Table = new DataTable();
 
@@ -399,11 +432,10 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand Command = new SqlCommand(Query, connection))
                     {
-                        connection.Open();
-                        using (SqlDataReader reader = Command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await Command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
                             Table.Load(reader);
-                            reader.Close();
                         }
                     }
                 }
@@ -414,7 +446,7 @@ namespace DVLD_DataAccess
             return Table;
         }
 
-        public static bool UpdateStatus(int ApplicationID, short NewStatus, DateTime LastStatusDate)
+        public static async Task<bool> UpdateStatusAsync(int ApplicationID, short NewStatus, DateTime LastStatusDate)
         {
 
             int rowsAffected = 0;
@@ -438,8 +470,8 @@ namespace DVLD_DataAccess
 
 
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
                     }
 
@@ -453,7 +485,7 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
-        public static bool CanApplicationBeEdited(int ApplicationID)
+        public static async Task<bool> CanApplicationBeEditedAsync(int ApplicationID)
         {
             bool Result = false;
             try
@@ -469,8 +501,8 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
-                        connection.Open();
-                        object result = command.ExecuteScalar();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         Result = result != null; 
                     }
@@ -486,7 +518,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static int GetApplicationTypeID(int ApplicationID)
+        public static async Task<int> GetApplicationTypeIDAsync(int ApplicationID)
         {
             int ApplicationTypeID = -1;
 
@@ -504,8 +536,8 @@ namespace DVLD_DataAccess
 
                         command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
-                        connection.Open();
-                        object result = command.ExecuteScalar();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
 
                         if (result != null && int.TryParse(result.ToString(), out int AppTypeID))
@@ -523,7 +555,7 @@ namespace DVLD_DataAccess
             return ApplicationTypeID;
         }
 
-        public static int GetApplicationStatus(int ApplicationID)
+        public static async Task<int> GetApplicationStatusAsync(int ApplicationID)
         {
             int ActiveApplicationID = -1;
             try
@@ -541,8 +573,8 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
 
-                        connection.Open();
-                        object result = command.ExecuteScalar();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
 
                         if (result != null && int.TryParse(result.ToString(), out int AppID))
