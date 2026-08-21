@@ -40,6 +40,7 @@ namespace DVLD.People.Forms
             InitializeComponent();
             
             _Mode = enMode.AddNew;
+            btnSave.Enabled = false;
 
         }
 
@@ -49,6 +50,7 @@ namespace DVLD.People.Forms
             _Mode = enMode.Update;
             this._Person = Person;
             this._PersonID = Person.PersonID;
+            btnSave.Enabled = false;
         }
 
         public frmAddUpdatePerson(int PersonID)
@@ -56,7 +58,13 @@ namespace DVLD.People.Forms
             InitializeComponent();
             _Mode = enMode.Update;
             _PersonID = PersonID;
-            _Person = clsPerson.Find(_PersonID);
+            _FindPerson();
+            btnSave.Enabled = false;
+        }
+
+        private async void _FindPerson()
+        {
+            _Person = await clsPerson.FindAsync(_PersonID).ConfigureAwait(false);
         }
 
 
@@ -69,18 +77,18 @@ namespace DVLD.People.Forms
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-        private void _FillCountriesInComboBox()
+        private async Task _FillCountriesInComboBoxAsync()
         {
-            DataTable Countries = clsCountry.GetAllCountries();
+            DataTable Countries = await clsCountry.GetAllCountriesAsync();
             cmbNationality.DataSource = Countries;
             cmbNationality.DisplayMember = "CountryName";
             cmbNationality.ValueMember = "CountryID";
             cmbNationality.SelectedValue = 191;   // Default to Yemen
         }
 
-        private void _RestDefaultValues()
+        private async Task _RestDefaultValuesAsync()
         {
-            _FillCountriesInComboBox();
+            await _FillCountriesInComboBoxAsync();
 
             if (_Mode == enMode.AddNew)
             {
@@ -120,7 +128,7 @@ namespace DVLD.People.Forms
 
         }
 
-        private bool _SavePerson()
+        private async Task<bool> _SavePersonAsync()
         {
 
             if (_Mode == enMode.AddNew)
@@ -128,7 +136,7 @@ namespace DVLD.People.Forms
                 clsPerson.enGenderType Gender = rbMale.Checked ? clsPerson.enGenderType.Male
                     : clsPerson.enGenderType.Female;
 
-                _Person = clsPerson.CreateNewPerson(txtNationalNo.Text, txtFirstName.Text, txtSecondName.Text,
+                _Person = await clsPerson.CreateNewPersonAsync(txtNationalNo.Text, txtFirstName.Text, txtSecondName.Text,
                     txtLastName.Text, dtpDateOfBirth.Value, Gender, txtAddress.Text, txtPhone.Text
                     , (int)cmbNationality.SelectedValue, txtThirdName.Text, txtEmail.Text, pbPersonPhoto.ImageLocation);
                 if (_Person != null)
@@ -142,13 +150,13 @@ namespace DVLD.People.Forms
 
             if (_Mode == enMode.Update)
             {
-                return _Person.Save();
+                return await _Person.SaveAsync();
             }
 
             return false;
         }
 
-        private void _FillPersonWithData()
+        private async Task _FillPersonWithData()
         {
             _Person.FirstName = txtFirstName.Text.Trim();
             _Person.SecondName = txtSecondName.Text.Trim();
@@ -160,7 +168,7 @@ namespace DVLD.People.Forms
             _Person.Address = txtAddress.Text.Trim();
             _Person.Phone = txtPhone.Text.Trim();
             _Person.Email = txtEmail.Text.Trim();
-            _Person.NationalityCountryID = clsCountry.Find(cmbNationality.Text).CountryID;
+            _Person.NationalityCountryID = (await clsCountry.FindAsync(cmbNationality.Text)).CountryID;
            
             if (!string.IsNullOrWhiteSpace(pbPersonPhoto.ImageLocation))
                 _Person.ImagePath = pbPersonPhoto.ImageLocation;
@@ -301,9 +309,17 @@ namespace DVLD.People.Forms
 
         //////////////////////////////////////////////////////////////
         /// </logic>
-        private void frmAddNewPerson_Load(object sender, EventArgs e)
+        private async void frmAddNewPerson_Load(object sender, EventArgs e)
         {
-            _RestDefaultValues();
+            try
+            {
+                await _RestDefaultValuesAsync();
+            }
+            finally
+            {
+                btnSave.Enabled = true;
+            }
+
             if (_Mode == enMode.Update)
             {
                 _LoadData();
@@ -340,7 +356,7 @@ namespace DVLD.People.Forms
             }
         }
 
-        private void txtNationalNo_Validating(object sender, CancelEventArgs e)
+        private async void txtNationalNo_Validating(object sender, CancelEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtNationalNo.Text))
             {
@@ -349,14 +365,14 @@ namespace DVLD.People.Forms
                 return;
             }
             
-            if (_Mode == enMode.Update && txtNationalNo.Text.Trim() != _Person.NationalNo && clsPerson.IsPersonExists(txtNationalNo.Text.Trim()))
+            if (_Mode == enMode.Update && txtNationalNo.Text.Trim() != _Person.NationalNo && await clsPerson.IsPersonExistsAsync(txtNationalNo.Text.Trim()))
             {
                 errorProvider1.SetError(txtNationalNo, "Invalid National No.");
                 e.Cancel = true;
                 return;
             }
 
-            if (_Mode == enMode.AddNew && clsPerson.IsPersonExists(txtNationalNo.Text.Trim()))
+            if (_Mode == enMode.AddNew && await clsPerson.IsPersonExistsAsync(txtNationalNo.Text.Trim()))
             {
                 errorProvider1.SetError(txtNationalNo, "Invalid National No.");
                 e.Cancel = true;
@@ -387,7 +403,7 @@ namespace DVLD.People.Forms
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// </Validating>
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
             if (!this.ValidateChildren())
             {
@@ -398,7 +414,7 @@ namespace DVLD.People.Forms
                 _FillPersonWithData();
 
 
-            if (_SavePerson())
+            if (await _SavePersonAsync())
             {
                 MessageBox.Show("Saved Successfully", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
                 lblPersonID.Text = _Person.PersonID.ToString();

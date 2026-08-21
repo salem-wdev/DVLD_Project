@@ -1,7 +1,9 @@
 using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 using DVLD_Infrastructure.Storage;
 
 namespace DVLD_DataAccess
@@ -9,10 +11,11 @@ namespace DVLD_DataAccess
     public class clsApplicationTypeData
     {
 
-        public static bool GetApplicationTypeInfoByID(int ApplicationTypeID,
-        ref string ApplicationTypeTitle, ref decimal ApplicationFees)
+        public static async Task<(bool IsFound, string ApplicationTypeTitle, decimal ApplicationFees)> GetApplicationTypeInfoByIDAsync(int ApplicationTypeID)
         {
             bool IsFound = false;
+            string ApplicationTypeTitle = string.Empty;
+            decimal ApplicationFees = 0;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -25,10 +28,10 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
 
                                 ApplicationTypeTitle = reader["ApplicationTypeTitle"].ToString();
@@ -48,11 +51,11 @@ namespace DVLD_DataAccess
             {
             }
 
-            return IsFound;
+            return (IsFound, ApplicationTypeTitle, ApplicationFees);
         }
 
 
-        public static int AddNewApplicationType(string ApplicationTypeTitle,
+        public static async Task<int> AddNewApplicationTypeAsync(string ApplicationTypeTitle,
             decimal ApplicationFees)
         {
 
@@ -72,8 +75,8 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@ApplicationTypeTitle", ApplicationTypeTitle);
                         command.Parameters.AddWithValue("@ApplicationFees", ApplicationFees);
 
-                        connection.Open();
-                        object newApplicationTypeID = command.ExecuteScalar();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        object newApplicationTypeID = await command.ExecuteScalarAsync().ConfigureAwait(false);
                         if (int.TryParse(newApplicationTypeID.ToString(), out int NewID))
                         {
                             ApplicationTypeID = NewID;
@@ -91,7 +94,7 @@ namespace DVLD_DataAccess
             return ApplicationTypeID;
         }
 
-        public static bool UpdateApplicationType(int ApplicationTypeID,
+        public static async Task<bool> UpdateApplicationTypeAsync(int ApplicationTypeID,
         string ApplicationTypeTitle, decimal ApplicationFees)
         {
             int NumberOfEffectedRows = 0;
@@ -111,8 +114,8 @@ namespace DVLD_DataAccess
                         Command.Parameters.AddWithValue("@ApplicationFees", ApplicationFees);
                         Command.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
 
-                        connection.Open();
-                        NumberOfEffectedRows = Command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        NumberOfEffectedRows = await Command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -122,9 +125,13 @@ namespace DVLD_DataAccess
             return NumberOfEffectedRows > 0;
         }
 
-        public static DataTable GetAllApplicationTypes()
+        public static async Task<DataTable> GetAllApplicationTypesAsync()
         {
             DataTable Table = new DataTable();
+
+            Table.Columns.Add("ApplicationTypeID", typeof(int));
+            Table.Columns.Add("ApplicationTypeTitle", typeof(string));
+            Table.Columns.Add("ApplicationFees", typeof(decimal));
 
             try
             {
@@ -137,10 +144,13 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand Command = new SqlCommand(Query, connection))
                     {
-                        connection.Open();
-                        using (SqlDataReader reader = Command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await Command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            Table.Load(reader);
+                            while (await reader.ReadAsync().ConfigureAwait(false))
+                            {
+                                Table.Rows.Add(reader.GetInt32(0), reader.GetString(1), reader.GetDecimal(2));
+                            }
                         }
                     }
                 }

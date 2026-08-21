@@ -336,7 +336,7 @@ namespace DVLD_Business
             return DoesPassAllTests(this.LocalDrivingLicenseApplicationID);
         }
 
-        public static clsLocalDrivingLicenseApplication GetNewLocalDrivingLicenseApp(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        public static async Task<clsLocalDrivingLicenseApplication> GetNewLocalDrivingLicenseAppAsync(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
             // if the application type is not new driving license
             // we should not allow to create new application.
@@ -347,7 +347,7 @@ namespace DVLD_Business
             }
 
             // check if the user and person exist
-            if (clsUser.IsUserExists(CreatedByUserID) && clsPerson.IsPersonExists(ApplicantPersonID))
+            if (clsUser.IsUserExists(CreatedByUserID) && await clsPerson.IsPersonExistsAsync(ApplicantPersonID))
             {
 
                 // TODO: if there is active application for the same person
@@ -392,9 +392,9 @@ namespace DVLD_Business
             return HasActiveTestAppointment(this.LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
-        public clsLicense IssueFirstTimeLocalLicense(int CreatedByUserID, string Notes)
+        public async Task<clsLicense> IssueFirstTimeLocalLicenseAsync(int CreatedByUserID, string Notes)
         {
-            clsLicense license = clsLicense.IssueFirstTimeLocalLicense(this.LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
+            clsLicense license = await clsLicense.IssueFirstTimeLocalLicenseAsync(this.LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
             if (license != null)
             {
                 this.SetComplete();

@@ -51,7 +51,7 @@ namespace DVLD_Business
                 // Database query is deferred until this property is explicitly requested by the UI or other layers.
                 if (_DriverInfo == null && this.DriverID != -1)
                 {
-                    _DriverInfo = clsDriver.FindByDriverID(this.DriverID);
+                    _GetDriverInfo();
                 }
                 return _DriverInfo;
             }
@@ -350,5 +350,13 @@ namespace DVLD_Business
             InternationalLicenseUpdated?.Invoke(this, e);
         }
 
+        private async void _GetDriverInfo()
+        {
+            // Database query is deferred until this property is explicitly requested by the UI or other layers.
+            if (_DriverInfo == null && this.DriverID != -1)
+            {
+                _DriverInfo = await clsDriver.FindByDriverIDAsync(this.DriverID);
+            }
+        }
     }
 }

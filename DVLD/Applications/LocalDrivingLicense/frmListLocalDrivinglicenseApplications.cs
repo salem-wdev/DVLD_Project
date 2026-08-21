@@ -399,9 +399,9 @@ namespace DVLD.Applications.LocalDrivingLicense
             frm.ShowDialog();
         }
 
-        private void showPersonLicenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void showPersonLicenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            clsPerson person = clsPerson.Find(dgvLocalDrivingLicenseApplications.CurrentRow.Cells[2].Value.ToString());
+            clsPerson person = await clsPerson.FindAsync(dgvLocalDrivingLicenseApplications.CurrentRow.Cells[2].Value.ToString());
             frmShowPersonLicenseHistory frm = new frmShowPersonLicenseHistory(person.PersonID);
             frm.ShowDialog();
         }

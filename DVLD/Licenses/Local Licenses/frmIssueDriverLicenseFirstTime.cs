@@ -2,6 +2,7 @@
 using DVLD_Business;
 using DVLD_Business.Global_Classes;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DVLD.Licenses.Local_Licenses
@@ -43,9 +44,9 @@ namespace DVLD.Licenses.Local_Licenses
             
         }
 
-        private void btnIssueLicense_Click(object sender, EventArgs e)
+        private async void btnIssueLicense_Click(object sender, EventArgs e)
         {
-            _License = _LocalDrivingLicenseApplication.IssueFirstTimeLocalLicense(clsGlobal.CurrentUser.UserID, txtNotes.Text);
+            _License = await _LocalDrivingLicenseApplication.IssueFirstTimeLocalLicenseAsync(clsGlobal.CurrentUser.UserID, txtNotes.Text);
 
             if (_License != null)
             {

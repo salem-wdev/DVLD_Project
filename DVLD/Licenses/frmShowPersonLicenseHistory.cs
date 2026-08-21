@@ -47,7 +47,7 @@ namespace DVLD.Licenses.Local_Licenses
             ctrlPersonCardWithFilter1.FilterFocus();
         }
 
-        private void ctrlPersonCardWithFilter1_PersonSelected(object sender, People.Controls.ctrlPersonCardWithFilter.PersonSelectedEventArgs e)
+        private async void ctrlPersonCardWithFilter1_PersonSelected(object sender, People.Controls.ctrlPersonCardWithFilter.PersonSelectedEventArgs e)
         {
             _PersonID = e.PersonID;
             if (_PersonID < 0)
@@ -56,7 +56,7 @@ namespace DVLD.Licenses.Local_Licenses
                 return;
             }
 
-            clsDriver driver = clsDriver.FindByPersonID(_PersonID);
+            clsDriver driver = await clsDriver.FindByPersonIDAsync(_PersonID);
             ctrlDriverLicenses1.ResetData();
             if (driver == null)
             {

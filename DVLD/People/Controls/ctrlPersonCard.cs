@@ -42,18 +42,18 @@ namespace DVLD
             }
         }
 
-        public bool LoadData(int? PersonID)
+        public async Task<bool> LoadDataAsync(int? PersonID)
         {
             if (!PersonID.HasValue || PersonID <= 0)
                 return false;
 
-            _Person = clsPerson.Find(PersonID);
+            _Person = await clsPerson.FindAsync(PersonID);
             return LoadData(_Person);
         }
 
-        public bool LoadData(string NationalNo)
+        public async Task<bool> LoadDataAsync(string NationalNo)
         {
-            _Person = clsPerson.Find(NationalNo);
+            _Person = await clsPerson.FindAsync(NationalNo);
             return LoadData(_Person);
         }
 
@@ -90,7 +90,7 @@ namespace DVLD
 
         }
 
-        private void _FillPersonInfo()
+        private async Task _FillPersonInfo()
         {
             llEditPersonInfo.Enabled = true;
             _PersonID = _Person.PersonID.HasValue ? (int)_Person.PersonID : -1;
@@ -101,7 +101,7 @@ namespace DVLD
             lblEmail.Text = _Person.Email;
             lblPhone.Text = _Person.Phone;
             lblDateOfBirth.Text = _Person.DateOfBirth.ToShortDateString();
-            lblCountry.Text = clsCountry.Find(_Person.NationalityCountryID).CountryName;
+            lblCountry.Text = (await clsCountry.FindAsync(_Person.NationalityCountryID)).CountryName;
             lblAddress.Text = _Person.Address;
             _LoadPersonImage();
 
@@ -133,7 +133,7 @@ namespace DVLD
         {
             if (!personID.HasValue || personID <= 0)
                 return;
-            LoadData(personID);
+            LoadDataAsync(personID);
         }
 
         private void llEditPersonInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

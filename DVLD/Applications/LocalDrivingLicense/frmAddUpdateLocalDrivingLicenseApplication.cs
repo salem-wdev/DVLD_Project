@@ -165,13 +165,13 @@ namespace DVLD.Applications.Local_Driving_License
             Close();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
 
             if (_Mode == enMode.AddNew)
             {
                 _LocalLicenseApplication =
-                clsLocalDrivingLicenseApplication.GetNewLocalDrivingLicenseApp
+                await clsLocalDrivingLicenseApplication.GetNewLocalDrivingLicenseAppAsync
                 ((int)cbLicenseClass.SelectedValue, clsGlobal.CurrentUser.UserID,
                 ctrlPersonCardWithFilter1.ctrlPersonCard1.PersonID,
                 clsApplication.enApplicationType.NewDrivingLicense);

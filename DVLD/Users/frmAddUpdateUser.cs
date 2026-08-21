@@ -194,7 +194,7 @@ namespace DVLD.Users
             btnSave.Enabled = _IsbtnSaveReadyToEnable();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
             if(!this.ValidateChildren())
             {
@@ -219,7 +219,7 @@ namespace DVLD.Users
             }
             if (_Mode == enMode.AddNew)
             {
-                _User = clsUser.CreateNewUser(ctrlPersonCardWithFilter1.PersonID, txtUserName.Text.Trim(), txtPassword.Text.Trim());
+                _User = await clsUser.CreateNewUserAsync(ctrlPersonCardWithFilter1.PersonID, txtUserName.Text.Trim(), txtPassword.Text.Trim());
                 _User.IsActive = chkIsActive.Checked;
 
                 if (_User.Save())

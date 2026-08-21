@@ -29,7 +29,7 @@ namespace DVLD_Business.Users
             {
                 if (_Person == null && PersonID != -1)
                 {
-                    _Person = clsPerson.Find(this.PersonID);
+                    _FindPerson();
                 }
                 return _Person;
             }
@@ -103,6 +103,11 @@ namespace DVLD_Business.Users
 
             return clsUserData.UpdateUser(this.UserID, this.UserName,
         this.Password, this.IsActive);
+        }
+
+        private async void _FindPerson()
+        {
+            _Person = await clsPerson.FindAsync(PersonID).ConfigureAwait(false);
         }
 
         public static bool Delete(int UserID)
@@ -293,9 +298,9 @@ namespace DVLD_Business.Users
             return clsUserData.ChangeUserActivity(UserID, IsActive);
         }
 
-        public static clsUser CreateNewUser(int PersonID, string UserName, string Password)
+        public static async Task<clsUser> CreateNewUserAsync(int PersonID, string UserName, string Password)
         {
-            if (!clsPerson.IsPersonExists(PersonID) || clsUser.IsUserExistsForPersonID(PersonID))
+            if (!await clsPerson.IsPersonExistsAsync(PersonID) || clsUser.IsUserExistsForPersonID(PersonID))
             {
                 return null;
             }

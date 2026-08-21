@@ -95,16 +95,16 @@ namespace DVLD.People.Controls
             InitializeComponent();
         }
 
-        private void _FindNow()
+        private async Task _FindNowAsync()
         {
             switch (cbFilterBy.SelectedItem.ToString())
             {
                 case "Person ID":
-                    ctrlPersonCard1.LoadData(int.Parse(txtFilterValue.Text.ToString()));
+                    await ctrlPersonCard1.LoadDataAsync(int.Parse(txtFilterValue.Text.ToString()));
                     break;
 
                 case "National No.":
-                    ctrlPersonCard1.LoadData(txtFilterValue.Text.ToString());
+                    await ctrlPersonCard1.LoadDataAsync(txtFilterValue.Text.ToString());
                     break;
 
                 default:
@@ -142,7 +142,7 @@ namespace DVLD.People.Controls
 
             cbFilterBy.SelectedIndex = 0;
             txtFilterValue.Text = personID.ToString();
-            _FindNow();
+            _FindNowAsync();
         }
 
         private void btnFind_Click(object sender, EventArgs e)
@@ -152,7 +152,7 @@ namespace DVLD.People.Controls
                 MessageBox.Show("enter a valid value to filter by.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-                _FindNow();
+                _FindNowAsync();
         }
 
         private void ctrlPersonCardWithFilter_Load(object sender, EventArgs e)

@@ -2,40 +2,43 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 using DVLD_Infrastructure.Storage;
 
 namespace DVLD_DataAccess
 {
     public class clsDriverData
     {
-        public static bool GetDriverInfoByDriverID(int DriverID,
-            ref int PersonID, ref int CreatedByUserID, ref DateTime CreatedDate)
+        public static async Task<(bool IsFound, int PersonID, int CreatedByUserID, DateTime CreatedDate)> GetDriverInfoByDriverIDAsync(int DriverID)
         {
+            int PersonID = -1, CreatedByUserID = -1;
+            DateTime CreatedDate = DateTime.Now;
+
             bool isFound = false;
             try
             {
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
-                    string query = "SELECT * FROM Drivers WHERE DriverID = @DriverID";
+                    string query = "SELECT PersonID, CreatedByUserID, CreatedDate FROM Drivers WHERE DriverID = @DriverID";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@DriverID", DriverID);
+                        command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
 
                                 // The record was found
                                 isFound = true;
 
-                                PersonID = (int)reader["PersonID"];
-                                CreatedByUserID = (int)reader["CreatedByUserID"];
-                                CreatedDate = (DateTime)reader["CreatedDate"];
+                                PersonID = reader.GetInt32(0);
+                                CreatedByUserID = reader.GetInt32(1);
+                                CreatedDate = reader.GetDateTime(2);
 
 
                             }
@@ -50,38 +53,41 @@ namespace DVLD_DataAccess
             }
             catch (Exception ex)
             {
+                clsLogger.LogException(ex, $"Failed to get driver info for DriverID: {DriverID}");
             }
-            return isFound;
+            return (isFound, PersonID, CreatedByUserID, CreatedDate);
         }
 
-        public static bool GetDriverInfoByPersonID(int? PersonID, ref int DriverID,
-            ref int CreatedByUserID, ref DateTime CreatedDate)
+        public static async Task<(bool IsFound, int DriverID, int CreatedByUserID, DateTime CreatedDate)> GetDriverInfoByPersonIDAsync(int? PersonID)
         {
             bool isFound = false;
+            int DriverID = -1;
+            int CreatedByUserID = -1;
+            DateTime CreatedDate = DateTime.MinValue;
             try
             {
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
-                    string query = "SELECT * FROM Drivers WHERE PersonID = @PersonID";
+                    string query = "SELECT DriverID, CreatedByUserID, CreatedDate FROM Drivers WHERE PersonID = @PersonID";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@PersonID", PersonID);
+                        command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
 
                                 // The record was found
                                 isFound = true;
 
-                                DriverID = (int)reader["DriverID"];
-                                CreatedByUserID = (int)reader["CreatedByUserID"];
-                                CreatedDate = (DateTime)reader["CreatedDate"];
+                                DriverID = reader.GetInt32(0);
+                                CreatedByUserID = reader.GetInt32(1);
+                                CreatedDate = reader.GetDateTime(2);
 
                             }
                             else
@@ -95,40 +101,46 @@ namespace DVLD_DataAccess
             }
             catch (Exception ex)
             {
+                clsLogger.LogException(ex, $"Failed to get driver info for PersonID: {PersonID}");
             }
-            return isFound;
+            return (isFound, DriverID, CreatedByUserID, CreatedDate);
         }
 
-        public static DataTable GetAllDrivers()
+        public static async Task<DataTable> GetAllDriversAsync()
         {
-
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("DriverID", typeof(int));
+            dt.Columns.Add("PersonID", typeof(int));
+            dt.Columns.Add("CreatedByUserID", typeof(int));
+            dt.Columns.Add("CreatedDate", typeof(DateTime));
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
-                    string query = "SELECT * FROM Drivers_View order by FullName";
+                    string query = "SELECT DriverID, PersonID, CreatedByUserID, CreatedDate FROM Drivers_View order by FullName";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
-                            {
-                                dt.Load(reader);
-                            }
+                           while (await reader.ReadAsync().ConfigureAwait(false))
+                           {
+                               dt.Rows.Add(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2), reader.GetDateTime(3));
+                           }
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
+                clsLogger.LogException(ex, "Failed to get all drivers");
             }
             return dt;
-
         }
 
-        public static int AddNewDriver(int? PersonID, int CreatedByUserID)
+        public static async Task<int> AddNewDriverAsync(int? PersonID, int CreatedByUserID)
         {
             int DriverID = -1;
             try
@@ -142,29 +154,31 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@PersonID", PersonID);
-                        command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
+                        command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID.HasValue ? PersonID.Value : (object)DBNull.Value;
+                        command.Parameters.Add("@CreatedByUserID", SqlDbType.Int).Value = CreatedByUserID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
-
-                        if (result != null && int.TryParse(result.ToString(), out int insertedID))
-                        {
-                            DriverID = insertedID;
-                        }
+                       using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
+                       {
+                           if (await reader.ReadAsync().ConfigureAwait(false))
+                           {
+                               DriverID = reader.GetInt32(0);
+                           }
+                       }
                     }
                 }
             }
             catch (Exception ex)
             {
+                clsLogger.LogException(ex, $"Failed to add new driver for PersonID: {PersonID}, CreatedByUserID: {CreatedByUserID}");
             }
 
             return DriverID;
 
         }
 
-        public static bool UpdateDriver(int DriverID, int? PersonID, int CreatedByUserID)
+        public static async Task<bool> UpdateDriverAsync(int DriverID, int? PersonID, int CreatedByUserID)
         {
 
             int rowsAffected = 0;
@@ -180,18 +194,19 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@DriverID", DriverID);
-                        command.Parameters.AddWithValue("@PersonID", PersonID);
-                        command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
+                        command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
+                        command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID.HasValue ? PersonID.Value : (object)DBNull.Value;
+                        command.Parameters.Add("@CreatedByUserID", SqlDbType.Int).Value = CreatedByUserID;
 
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
             catch (Exception ex)
             {
+                clsLogger.LogException(ex, $"Failed to update driver with DriverID: {DriverID}, PersonID: {PersonID}, CreatedByUserID: {CreatedByUserID}");
             }
 
             return (rowsAffected > 0);
