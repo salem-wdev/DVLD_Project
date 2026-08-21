@@ -16,7 +16,7 @@ namespace DVLD
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static async Task Main()
         {
             if (!clsLicense.DeactivateExpiredLicenses())
             {
@@ -43,7 +43,7 @@ namespace DVLD
             {
                 //this.Hide();
 
-                while (!clsPerson.HasPeople())
+                while (! await clsPerson.HasPeopleAsync())
                 {
 
                     if (MessageBox.Show("Ther is no People in the system.\nDo you want to add person?"

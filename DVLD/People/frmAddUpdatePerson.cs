@@ -58,8 +58,13 @@ namespace DVLD.People.Forms
             InitializeComponent();
             _Mode = enMode.Update;
             _PersonID = PersonID;
-            _Person = clsPerson.Find(_PersonID);
+            _FindPerson();
             btnSave.Enabled = false;
+        }
+
+        private async void _FindPerson()
+        {
+            _Person = await clsPerson.FindAsync(_PersonID).ConfigureAwait(false);
         }
 
 
@@ -123,7 +128,7 @@ namespace DVLD.People.Forms
 
         }
 
-        private bool _SavePerson()
+        private async Task<bool> _SavePersonAsync()
         {
 
             if (_Mode == enMode.AddNew)
@@ -131,7 +136,7 @@ namespace DVLD.People.Forms
                 clsPerson.enGenderType Gender = rbMale.Checked ? clsPerson.enGenderType.Male
                     : clsPerson.enGenderType.Female;
 
-                _Person = clsPerson.CreateNewPerson(txtNationalNo.Text, txtFirstName.Text, txtSecondName.Text,
+                _Person = await clsPerson.CreateNewPersonAsync(txtNationalNo.Text, txtFirstName.Text, txtSecondName.Text,
                     txtLastName.Text, dtpDateOfBirth.Value, Gender, txtAddress.Text, txtPhone.Text
                     , (int)cmbNationality.SelectedValue, txtThirdName.Text, txtEmail.Text, pbPersonPhoto.ImageLocation);
                 if (_Person != null)
@@ -145,7 +150,7 @@ namespace DVLD.People.Forms
 
             if (_Mode == enMode.Update)
             {
-                return _Person.Save();
+                return await _Person.SaveAsync();
             }
 
             return false;
@@ -351,7 +356,7 @@ namespace DVLD.People.Forms
             }
         }
 
-        private void txtNationalNo_Validating(object sender, CancelEventArgs e)
+        private async void txtNationalNo_Validating(object sender, CancelEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtNationalNo.Text))
             {
@@ -360,14 +365,14 @@ namespace DVLD.People.Forms
                 return;
             }
             
-            if (_Mode == enMode.Update && txtNationalNo.Text.Trim() != _Person.NationalNo && clsPerson.IsPersonExists(txtNationalNo.Text.Trim()))
+            if (_Mode == enMode.Update && txtNationalNo.Text.Trim() != _Person.NationalNo && await clsPerson.IsPersonExistsAsync(txtNationalNo.Text.Trim()))
             {
                 errorProvider1.SetError(txtNationalNo, "Invalid National No.");
                 e.Cancel = true;
                 return;
             }
 
-            if (_Mode == enMode.AddNew && clsPerson.IsPersonExists(txtNationalNo.Text.Trim()))
+            if (_Mode == enMode.AddNew && await clsPerson.IsPersonExistsAsync(txtNationalNo.Text.Trim()))
             {
                 errorProvider1.SetError(txtNationalNo, "Invalid National No.");
                 e.Cancel = true;
@@ -398,7 +403,7 @@ namespace DVLD.People.Forms
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// </Validating>
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
             if (!this.ValidateChildren())
             {
@@ -409,7 +414,7 @@ namespace DVLD.People.Forms
                 _FillPersonWithData();
 
 
-            if (_SavePerson())
+            if (await _SavePersonAsync())
             {
                 MessageBox.Show("Saved Successfully", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
                 lblPersonID.Text = _Person.PersonID.ToString();

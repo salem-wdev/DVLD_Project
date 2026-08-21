@@ -23,7 +23,7 @@ namespace DVLD.People.Forms
         /////////////////////////////////////////////////////////////////////
         // Data
 
-        private static DataTable _dtAllPeople = clsPerson.GetAllPeople();
+        private static DataTable _dtAllPeople;
 
         //only select the columns that you want to show in the grid
         private DataTable _dtPeople = _dtAllPeople.DefaultView.ToTable(false, "PersonID", "NationalNo",
@@ -44,9 +44,9 @@ namespace DVLD.People.Forms
             lblRecords.Text = dgvPeople.Rows.Count.ToString();
         }
 
-        private void _RefreshPeopleList()
+        private async Task _RefreshPeopleListAsync()
         {
-            _dtAllPeople = clsPerson.GetAllPeople();
+            _dtAllPeople = await clsPerson.GetAllPeopleAsync();
             _dtPeople = _dtAllPeople.DefaultView.ToTable(false, "PersonID", "NationalNo",
                                                        "FirstName", "SecondName", "ThirdName", "LastName",
                                                        "GendorCaption", "DateOfBirth", "CountryName",
@@ -117,10 +117,9 @@ namespace DVLD.People.Forms
         // Logic
         /////////////////////////////////////////////////////////////////////
 
-
         private async void frmShowAllPeople_Load(object sender, EventArgs e)
         {
-            _RefreshPeopleList();
+            await _RefreshPeopleListAsync();
             _FillcbFilterBy();
             if (dgvPeople.Rows.Count > 0)
             {
@@ -182,7 +181,7 @@ namespace DVLD.People.Forms
             frmAddUpdatePerson frm = new frmAddUpdatePerson();
             frm.ShowDialog();
             frm.Close();
-            _RefreshPeopleList();
+            _RefreshPeopleListAsync();
         }
 
         private void editeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -190,19 +189,19 @@ namespace DVLD.People.Forms
             frmAddUpdatePerson frm = new frmAddUpdatePerson(int.Parse(dgvPeople.CurrentRow.Cells[0].Value.ToString()));
             frm.ShowDialog();
             frm.Close();
-            _RefreshPeopleList();
+            _RefreshPeopleListAsync();
             
         }
 
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int PersonID = int.Parse(dgvPeople.CurrentRow.Cells[0].Value.ToString());
             if (MessageBox.Show("Are you sure you want to delete this person?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
-                if (clsPerson.Delete(PersonID))
+                if (await clsPerson.DeleteAsync(PersonID))
                 {
                     MessageBox.Show($"Person with ID {PersonID} deleted successfully.", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    _RefreshPeopleList();
+                    _RefreshPeopleListAsync();
                 }
                 else
                 {
@@ -242,7 +241,7 @@ namespace DVLD.People.Forms
             frmAddUpdatePerson frm = new frmAddUpdatePerson();
             frm.ShowDialog();
             frm.Close();
-            _RefreshPeopleList();
+            _RefreshPeopleListAsync();
 
 
         }

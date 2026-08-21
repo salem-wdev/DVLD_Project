@@ -27,14 +27,14 @@ namespace DVLD.People.Forms
         {
             InitializeComponent();
 
-            ctrlShowPersonInfo1.LoadData(PersonID);
+            ctrlShowPersonInfo1.LoadDataAsync(PersonID);
         }
 
         public frmShowPersonInfo(string NationalNo)
         {
             InitializeComponent();
 
-            ctrlShowPersonInfo1.LoadData(NationalNo);
+            _LoadPersonDataAsync(NationalNo);
         }
 
         public frmShowPersonInfo(clsPerson Person)
@@ -43,6 +43,16 @@ namespace DVLD.People.Forms
 
             ctrlShowPersonInfo1.LoadData(Person);
 
+        }
+
+        private async void _LoadPersonDataAsync(string NationalNo)
+        {
+            await ctrlShowPersonInfo1.LoadDataAsync(NationalNo);
+        }
+
+        private async void _LoadPersonDataAsync(int? PersonID)
+        {
+            await ctrlShowPersonInfo1.LoadDataAsync(PersonID);
         }
 
         private void btnClose_Click(object sender, EventArgs e)

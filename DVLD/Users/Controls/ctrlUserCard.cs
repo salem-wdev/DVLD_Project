@@ -57,7 +57,7 @@ namespace DVLD.Users.Controls
 
         private void _FillUserInfo()
         {
-            ctrlPersonCard1.LoadData(_User.PersonID);
+            ctrlPersonCard1.LoadDataAsync(_User.PersonID);
             lblUserID.Text = _User.UserID.ToString();
             lblUserName.Text = _User.UserName;
             lblIsActive.Text = (_User.IsActive) ? "Active" : "Inactive";
