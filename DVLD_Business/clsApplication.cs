@@ -14,7 +14,7 @@ namespace DVLD_Business
 
 
         public enum enMode { AddNew = 0, Update = 1 }
-        protected readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        protected readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         public enum enApplicationStatus : sbyte
         {
@@ -62,7 +62,7 @@ namespace DVLD_Business
             {
                 if (_ApplicationTypeInfo == null && (int)ApplicationTypeID > 0)
                 {
-                    _ApplicationTypeInfo = clsApplicationType.Find((int)ApplicationTypeID);
+                    _GetApplicationTypeInfo();
                 }
                 return _ApplicationTypeInfo;
             }
@@ -112,10 +112,10 @@ namespace DVLD_Business
             this.PaidFees = 0;
             this.CreatedByUserID = CreatedByUserID;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewApplication},
-                {enMode.Update,_UpdateApplication}
+                {enMode.AddNew,_AddNewApplicationAsync},
+                {enMode.Update,_UpdateApplicationAsync}
             };
 
             Mode = enMode.AddNew;
@@ -133,10 +133,10 @@ namespace DVLD_Business
             this.PaidFees = 0;
             this.CreatedByUserID = -1;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewApplication},
-                {enMode.Update,_UpdateApplication}
+                {enMode.AddNew,_AddNewApplicationAsync},
+                {enMode.Update,_UpdateApplicationAsync}
             };
 
             Mode = enMode.AddNew;
@@ -158,10 +158,10 @@ namespace DVLD_Business
             this.PaidFees = PaidFees;
             this.CreatedByUserID = CreatedByUserID;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewApplication},
-                {enMode.Update,_UpdateApplication}
+                {enMode.AddNew,_AddNewApplicationAsync},
+                {enMode.Update,_UpdateApplicationAsync}
             };
 
             Mode = enMode.Update;
@@ -178,50 +178,54 @@ namespace DVLD_Business
             this.PaidFees = BaseApplication.PaidFees;
             this.CreatedByUserID = BaseApplication.CreatedByUserID;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewApplication},
-                {enMode.Update,_UpdateApplication}
+                {enMode.AddNew,_AddNewApplicationAsync},
+                {enMode.Update,_UpdateApplicationAsync}
             };
 
             Mode = enMode.Update;
         }
 
-        protected bool _AddNewApplication()
+        private async void _GetApplicationTypeInfo()
+        {
+            _ApplicationTypeInfo = await clsApplicationType.FindAsync((int)ApplicationTypeID).ConfigureAwait(false);
+        }
+
+        protected async Task<bool> _AddNewApplicationAsync()
         {
             //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
             //{
             //    return false;
             //}
 
-            byte applicationStatus = 0;
+            var ApplicationInfo = await clsApplicationData.AddNewApplicationAsync(this.ApplicantPersonID, (int)this.ApplicationTypeID,
+                this.PaidFees, this.CreatedByUserID);
 
-            this.ApplicationID = clsApplicationData.AddNewApplication(this.ApplicantPersonID,
-                ref this._ApplicationDate, (int)this.ApplicationTypeID, ref applicationStatus,
-                ref this._LastStatusDate, this.PaidFees, this.CreatedByUserID);
-
-            this._ApplicationStatus = (enApplicationStatus)applicationStatus;
-
-            if (ApplicationID != -1)
+            if (ApplicationInfo.IsSucceeded)
             {
+                this.ApplicationID = ApplicationInfo.ApplicationID;
+                this._ApplicationDate = ApplicationInfo.ApplicationDate;
+                this._ApplicationStatus = (enApplicationStatus)ApplicationInfo.ApplicationStatus;
+                this._LastStatusDate = ApplicationInfo.LastStatusDate;
+
                 Mode = enMode.Update;
                 return true;
             }
             return false;
         }
 
-        protected bool _UpdateApplication()
+        protected async Task<bool> _UpdateApplicationAsync()
         {
             //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
             //{
             //    return false;
             //}
 
-            if (!CanBeEdited())
+            if (!await CanBeEditedAsync())
                 return false;
 
-
-            return clsApplicationData.UpdateApplication(this.ApplicationID,
+            return await clsApplicationData.UpdateApplicationAsync(this.ApplicationID,
                 this.PaidFees, this.CreatedByUserID);
         }
 
@@ -230,42 +234,32 @@ namespace DVLD_Business
             _PersonInfo = await clsPerson.FindAsync(ApplicantPersonID).ConfigureAwait(false);
         }
 
-        public static bool Delete(int ApplicationID)
+        public static async Task<bool> DeleteAsync(int ApplicationID)
         {
-            if (!CanBeEdited(ApplicationID))
+            if (!await CanBeEditedAsync(ApplicationID))
                 return false;
 
-            return clsApplicationData.DeleteApplication(ApplicationID);
+            return await clsApplicationData.DeleteApplicationAsync(ApplicationID);
         }
 
-        public virtual bool Delete()
+        public virtual async Task<bool> DeleteAsync()
         {
-            if (!CanBeEdited())
+            if (!await CanBeEditedAsync())
                 return false;
 
-            return clsApplicationData.DeleteApplication(this.ApplicationID);
+            return await clsApplicationData.DeleteApplicationAsync(this.ApplicationID);
         }
 
-        public static clsApplication Find(int ApplicationID)
+        public static async Task<clsApplication> FindAsync(int ApplicationID)
         {
-            int ApplicantPersonID = -1;
-            DateTime ApplicationDate = DateTime.Now;
-            int ApplicationTypeID = -1;
-            byte ApplicationStatus = 0;
-            DateTime LastStatusDate = DateTime.Now;
-            decimal PaidFees = 0.0m;
-            int CreatedByUserID = -1;
+           
+            var ApplicationInfo = await clsApplicationData.GetApplicationInfoByApplicationIDAsync(ApplicationID);
 
-            bool found = clsApplicationData.GetApplicationInfoByApplicationID(ApplicationID, ref ApplicantPersonID,
-                ref ApplicationDate, ref ApplicationTypeID, ref ApplicationStatus,
-                ref LastStatusDate, ref PaidFees, ref CreatedByUserID);
-
-
-            if (found)
+            if (ApplicationInfo.IsFound)
             {
-                return new clsApplication(ApplicationID, ApplicantPersonID,
-                ApplicationDate, (enApplicationType)ApplicationTypeID, (enApplicationStatus)ApplicationStatus,
-                LastStatusDate, PaidFees, CreatedByUserID);
+                return new clsApplication(ApplicationID, ApplicationInfo.ApplicantPersonID,
+                ApplicationInfo.ApplicationDate, (enApplicationType)ApplicationInfo.ApplicationTypeID, (enApplicationStatus)ApplicationInfo.ApplicationStatus,
+                ApplicationInfo.LastStatusDate, ApplicationInfo.PaidFees, ApplicationInfo.CreatedByUserID);
 
             }
             else
@@ -274,32 +268,32 @@ namespace DVLD_Business
             }
         }
 
-        public static DataTable GetApplicationsPersonList(int ApplicantPersonID)
+        public static async Task<DataTable> GetApplicationsPersonListAsync(int ApplicantPersonID)
         {
-            return clsApplicationData.GetApplicationsPersonList(ApplicantPersonID);
+            return await clsApplicationData.GetApplicationsPersonListAsync(ApplicantPersonID);
         }
 
-        public static DataTable GetApplicationsCreatedByUserList(int CreatedByUserID)
+        public static async Task<DataTable> GetApplicationsCreatedByUserListAsync(int CreatedByUserID)
         {
-            return clsApplicationData.GetApplicationsCreatedByUserList(CreatedByUserID);
+            return await clsApplicationData.GetApplicationsCreatedByUserListAsync(CreatedByUserID);
         }
 
-        public static bool IsApplicationExists(int ApplicationID)
+        public static async Task<bool> IsApplicationExistsAsync(int ApplicationID)
         {
-            return clsApplicationData.IsApplicationExist(ApplicationID);
+            return await clsApplicationData.IsApplicationExistAsync(ApplicationID);
         }
 
-        public static DataTable GetAllApplications()
+        public static async Task<DataTable> GetAllApplicationsAsync()
         {
-            return clsApplicationData.GetAllApplications();
+            return await clsApplicationData.GetAllApplicationsAsync();
         }
 
-        public bool Cancel()
+        public async Task<bool> CancelAsync()
         {
-            if (!CanBeEdited())
+            if (!await CanBeEditedAsync())
                 return false;
 
-            if (clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Cancelled, clsBusinessSettings.GetServerDateTime()))
+            if (await clsApplicationData.UpdateStatusAsync(ApplicationID, (byte)enApplicationStatus.Cancelled, clsBusinessSettings.GetServerDateTime()))
             {
                 this._ApplicationStatus = enApplicationStatus.Cancelled;
                 return true;
@@ -307,9 +301,9 @@ namespace DVLD_Business
             return false;
         }
 
-        internal bool SetComplete()
+        internal async Task<bool> SetCompleteAsync()
         {
-            if (SetComplete(ApplicationID))
+            if (await SetCompleteAsync(ApplicationID))
             {
                 this._ApplicationStatus = enApplicationStatus.Completed;
                 return true;
@@ -317,70 +311,70 @@ namespace DVLD_Business
             return false;
         }
 
-        internal static bool SetComplete(int ApplicationID)
+        internal static async Task<bool> SetCompleteAsync(int ApplicationID)
         {
-            if (!CanBeEdited(ApplicationID))
+            if (!await CanBeEditedAsync(ApplicationID))
                 return false;
 
-            return clsApplicationData.UpdateStatus(ApplicationID, (byte)enApplicationStatus.Completed, clsBusinessSettings.GetServerDateTime());
+            return await clsApplicationData.UpdateStatusAsync(ApplicationID, (byte)enApplicationStatus.Completed, clsBusinessSettings.GetServerDateTime());
         }
 
-        public virtual bool Save()
+        public virtual async Task<bool> SaveAsync()
         {
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
 
-        public static bool DoesPersonHaveActiveApplication(int PersonID, int ApplicationTypeID)
+        public static async Task<bool> DoesPersonHaveActiveApplicationAsync(int PersonID, int ApplicationTypeID)
         {
-            return clsApplicationData.DoesPersonHaveActiveApplication(PersonID, ApplicationTypeID);
+            return await clsApplicationData.DoesPersonHaveActiveApplicationAsync(PersonID, ApplicationTypeID);
         }
 
-        public bool DoesPersonHaveActiveApplication(int ApplicationTypeID)
+        public async Task<bool> DoesPersonHaveActiveApplicationAsync(int ApplicationTypeID)
         {
-            return DoesPersonHaveActiveApplication(this.ApplicantPersonID, ApplicationTypeID);
+            return await DoesPersonHaveActiveApplicationAsync(this.ApplicantPersonID, ApplicationTypeID);
         }
 
-        public static int GetActiveApplicationID(int PersonID, clsApplication.enApplicationType ApplicationTypeID)
+        public static async Task<int> GetActiveApplicationIDAsync(int PersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
-            return clsApplicationData.GetActiveApplicationID(PersonID, (int)ApplicationTypeID);
+            return await clsApplicationData.GetActiveApplicationIDAsync(PersonID, (int)ApplicationTypeID);
         }
 
-        public static int GetActiveApplicationIDForLicenseClass(int PersonID, clsApplication.enApplicationType ApplicationTypeID, int LicenseClassID)
+        public static async Task<int> GetActiveApplicationIDForLicenseClassAsync(int PersonID, clsApplication.enApplicationType ApplicationTypeID, int LicenseClassID)
         {
-            return clsApplicationData.GetActiveApplicationIDForLicenseClass(PersonID, (int)ApplicationTypeID, LicenseClassID);
+            return await clsApplicationData.GetActiveApplicationIDForLicenseClassAsync(PersonID, (int)ApplicationTypeID, LicenseClassID);
         }
 
-        public int GetActiveApplicationID(clsApplication.enApplicationType ApplicationTypeID)
+        public async Task<int> GetActiveApplicationIDAsync(clsApplication.enApplicationType ApplicationTypeID)
         {
-            return GetActiveApplicationID(this.ApplicantPersonID, ApplicationTypeID);
+            return await GetActiveApplicationIDAsync(this.ApplicantPersonID, ApplicationTypeID);
         }
 
-        public bool CanBeEdited()
+        public async Task<bool> CanBeEditedAsync()
         {
-            return CanBeEdited(this.ApplicationID);
+            return await CanBeEditedAsync(this.ApplicationID);
         }
 
-        public static bool CanBeEdited(int ApplicationID)
+        public static async Task<bool> CanBeEditedAsync(int ApplicationID)
         {
-            return clsApplicationData.CanApplicationBeEdited(ApplicationID);
+            return await clsApplicationData.CanApplicationBeEditedAsync(ApplicationID);
         }
 
-        public static enApplicationType GetApplicationTypeID(int ApplicationID)
+        public static async Task<enApplicationType> GetApplicationTypeIDAsync(int ApplicationID)
         {
-            return (enApplicationType)clsApplicationData.GetApplicationTypeID(ApplicationID);
+            return (enApplicationType)await clsApplicationData.GetApplicationTypeIDAsync(ApplicationID);
         }
 
-        public static enApplicationStatus GetApplicationStatus(int ApplicationID)
+        public static async Task<enApplicationStatus> GetApplicationStatusAsync(int ApplicationID)
         {
-            return (enApplicationStatus)clsApplicationData.GetApplicationStatus(ApplicationID);
+            return (enApplicationStatus)await clsApplicationData.GetApplicationStatusAsync(ApplicationID);
         }
 
-        protected static clsApplication GetNewApplicationobject(int CreatedByUserID, int? ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        protected static async Task<clsApplication> GetNewApplicationobjectAsync(int CreatedByUserID, int? ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
             if (!ApplicantPersonID.HasValue || ApplicantPersonID <= 0)
                 return null;
 
-            if (DoesPersonHaveActiveApplication((int)ApplicantPersonID, (int)ApplicationTypeID))
+            if (await DoesPersonHaveActiveApplicationAsync((int)ApplicantPersonID, (int)ApplicationTypeID))
             {
                 return null;
             }
@@ -389,16 +383,16 @@ namespace DVLD_Business
             return application;
         }
 
-        internal static clsApplication GetNewApplication(int CreatedByUserID, int? ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
+        internal static async Task<clsApplication> GetNewApplicationAsync(int CreatedByUserID, int? ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
         {
 
             if (!ApplicantPersonID.HasValue || ApplicantPersonID <= 0)
                 return null;
 
-            clsApplication application = GetNewApplicationobject(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
+            clsApplication application = await GetNewApplicationobjectAsync(CreatedByUserID, ApplicantPersonID, ApplicationTypeID);
             if (application != null)
             {
-                if (application.Save())
+                if (await application.SaveAsync())
                 {
                     return application;
                 }
