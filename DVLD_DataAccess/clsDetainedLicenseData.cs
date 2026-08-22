@@ -4,17 +4,22 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace DVLD_Business
 {
     public class clsDetainedLicenseData
     {
-        public static bool GetDetainedLicenseInfoByID(int DetainID,
-            ref int LicenseID, ref DateTime DetainDate,
-            ref float FineFees, ref int CreatedByUserID,
-            ref bool IsReleased, ref DateTime ReleaseDate,
-            ref int ReleasedByUserID, ref int ReleaseApplicationID)
+        public static async Task<(bool IsFound, int LicenseID, DateTime DetainDate, float FineFees, int CreatedByUserID, bool IsReleased, DateTime ReleaseDate, int ReleasedByUserID, int ReleaseApplicationID)> GetDetainedLicenseInfoByIDAsync(int DetainID)
         {
+            int LicenseID = -1;
+            DateTime DetainDate = DateTime.MinValue;
+            float FineFees = 0;
+            int CreatedByUserID = -1;
+            bool IsReleased = false;
+            DateTime ReleaseDate = DateTime.MaxValue;
+            int ReleasedByUserID = -1;
+            int ReleaseApplicationID = -1;
             bool isFound = false;
             try
             {
@@ -28,10 +33,10 @@ namespace DVLD_Business
                         command.Parameters.AddWithValue("@DetainID", DetainID);
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
 
                                 // The record was found
@@ -75,16 +80,20 @@ namespace DVLD_Business
             }
 
 
-            return isFound;
+            return (isFound, LicenseID, DetainDate, FineFees, CreatedByUserID, IsReleased, ReleaseDate, ReleasedByUserID, ReleaseApplicationID);
         }
 
 
-        public static bool GetDetainedLicenseInfoByLicenseID(int LicenseID,
-         ref int DetainID, ref DateTime DetainDate,
-         ref float FineFees, ref int CreatedByUserID,
-         ref bool IsReleased, ref DateTime ReleaseDate,
-         ref int ReleasedByUserID, ref int ReleaseApplicationID)
+        public static async Task<(bool IsFound, int DetainID, DateTime DetainDate, float FineFees, int CreatedByUserID, bool IsReleased, DateTime ReleaseDate, int ReleasedByUserID, int ReleaseApplicationID)> GetDetainedLicenseInfoByLicenseIDAsync(int LicenseID)
         {
+            int DetainID = -1;
+            DateTime DetainDate = DateTime.MinValue;
+            float FineFees = 0;
+            int CreatedByUserID = -1;
+            bool IsReleased = false;
+            DateTime ReleaseDate = DateTime.MaxValue;
+            int ReleasedByUserID = -1;
+            int ReleaseApplicationID = -1;
             bool isFound = false;
             try
             {
@@ -98,11 +107,11 @@ namespace DVLD_Business
                         command.Parameters.AddWithValue("@LicenseID", LicenseID);
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
 
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
 
                                 // The record was found
@@ -148,30 +157,53 @@ namespace DVLD_Business
             {
 
             }
-            return isFound;
+            return (isFound, DetainID, DetainDate, FineFees, CreatedByUserID, IsReleased, ReleaseDate, ReleasedByUserID, ReleaseApplicationID);
         }
 
-        public static DataTable GetAllDetainedLicenses()
+        public static async Task<DataTable> GetAllDetainedLicensesAsync()
         {
 
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("DetainID", typeof(int));
+            dt.Columns.Add("LicenseID", typeof(int));
+            dt.Columns.Add("DetainDate", typeof(DateTime));
+            dt.Columns.Add("IsReleased", typeof(bool));
+            dt.Columns.Add("FineFees", typeof(decimal));
+            dt.Columns.Add("ReleaseDate", typeof(DateTime));
+            dt.Columns.Add("NationalNo", typeof(string));
+            dt.Columns.Add("FullName", typeof(string));
+            dt.Columns.Add("ReleaseApplicationID", typeof(int));
+
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
-                    string query = "select * from detainedLicenses_View order by IsReleased ,DetainID;";
+                    string query = @"select DetainID, LicenseID, DetainDate, IsReleased, FineFees,
+                                        ReleaseDate, NationalNo, FullName, ReleaseApplicationID
+                                        from detainedLicenses_View order by IsReleased ,DetainID;";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
-
+                            while (await reader.ReadAsync().ConfigureAwait(false))
                             {
-                                dt.Load(reader);
+                                dt.Rows.Add(
+                                    reader.GetInt32(0),
+                                    reader.GetInt32(1),
+                                    reader.GetDateTime(2),
+                                    reader.GetBoolean(3),
+                                    reader.GetDecimal(4),
+                                    reader.IsDBNull(5) ? (DateTime?)null : reader.GetDateTime(5),
+                                    reader.GetString(6),
+                                    reader.GetString(7),
+                                    reader.IsDBNull(8) ? (int?)null : reader.GetInt32(8)
+                                );
                             }
                         }
                     }
@@ -179,14 +211,14 @@ namespace DVLD_Business
             }
             catch (Exception ex)
             {
-
+                clsLogger.LogException(ex, $"Error occurred while retrieving all detained licenses.");
             }
 
             return dt;
 
         }
 
-        public static int AddNewDetainedLicense(
+        public static async Task<int> AddNewDetainedLicenseAsync(
             int LicenseID, DateTime DetainDate,
             float FineFees, int CreatedByUserID)
         {
@@ -221,9 +253,9 @@ namespace DVLD_Business
                         command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
 
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (result != null && int.TryParse(result.ToString(), out int insertedID))
                         {
@@ -242,7 +274,7 @@ namespace DVLD_Business
 
         }
 
-        public static bool UpdateDetainedLicense(int DetainID,
+        public static async Task<bool> UpdateDetainedLicenseAsync(int DetainID,
             int LicenseID, DateTime DetainDate,
             float FineFees, int CreatedByUserID)
         {
@@ -269,8 +301,8 @@ namespace DVLD_Business
 
 
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -282,7 +314,7 @@ namespace DVLD_Business
         }
 
 
-        public static bool ReleaseDetainedLicense(int DetainID,
+        public static async Task<bool> ReleaseDetainedLicenseAsync(int DetainID,
                  DateTime ReleaseDate, int ReleasedByUserID, int ReleaseApplicationID)
         {
 
@@ -305,8 +337,8 @@ namespace DVLD_Business
                         command.Parameters.AddWithValue("@ReleaseApplicationID", ReleaseApplicationID);
                         command.Parameters.AddWithValue("@ReleaseDate", ReleaseDate);
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -318,7 +350,7 @@ namespace DVLD_Business
             return (rowsAffected > 0);
         }
 
-        public static bool IsLicenseDetained(int LicenseID)
+        public static async Task<bool> IsLicenseDetainedAsync(int LicenseID)
         {
             bool IsDetained = false;
             try
@@ -337,9 +369,9 @@ namespace DVLD_Business
                         command.Parameters.AddWithValue("@LicenseID", LicenseID);
 
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (result != null)
                         {
