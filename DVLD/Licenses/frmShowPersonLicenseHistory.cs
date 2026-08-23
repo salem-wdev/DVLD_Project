@@ -26,14 +26,14 @@ namespace DVLD.Licenses.Local_Licenses
             _PersonID = personID;
         }
 
-        private void frmShowPersonLicenseHistory_Load(object sender, EventArgs e)
+        private async void frmShowPersonLicenseHistory_Load(object sender, EventArgs e)
         {
             if (_PersonID == null || _PersonID <= 0)
 
             {
                 ctrlPersonCardWithFilter1.FilterEnabled = false;
-                ctrlPersonCardWithFilter1.LoadPersonInfo(_PersonID);
-                ctrlDriverLicenses1.LoadInfoByPersonID(_PersonID);
+                await ctrlPersonCardWithFilter1.LoadPersonInfoAsync(_PersonID);
+                await ctrlDriverLicenses1.LoadInfoByPersonID(_PersonID);
             }
             else
             {
@@ -67,7 +67,7 @@ namespace DVLD.Licenses.Local_Licenses
 
             if (_PersonID > 0)
             {
-                ctrlDriverLicenses1.LoadInfoByPersonID(_PersonID);
+                await ctrlDriverLicenses1.LoadInfoByPersonID(_PersonID);
             }
             else
             {
