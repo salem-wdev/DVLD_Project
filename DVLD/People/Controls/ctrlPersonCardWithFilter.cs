@@ -125,16 +125,16 @@ namespace DVLD.People.Controls
             txtFilterValue.Focus();
         }
 
-        public void LoadPersonInfo(int? PersonID)
+        public async Task LoadPersonInfoAsync(int? PersonID)
         {
 
             if (PersonID == null || PersonID <= 0)
                 return;
 
-            DataBackEvent(this, PersonID);
+            await DataBackEventAsync(this, PersonID);
         }
 
-        private void DataBackEvent(object sender, int? personID)
+        private async Task DataBackEventAsync(object sender, int? personID)
         {
 
             if (personID == null || personID <= 0)
@@ -142,17 +142,17 @@ namespace DVLD.People.Controls
 
             cbFilterBy.SelectedIndex = 0;
             txtFilterValue.Text = personID.ToString();
-            _FindNowAsync();
+            await _FindNowAsync();
         }
 
-        private void btnFind_Click(object sender, EventArgs e)
+        private async void btnFind_Click(object sender, EventArgs e)
         {
             if (!this.ValidateChildren())
             {
                 MessageBox.Show("enter a valid value to filter by.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-                _FindNowAsync();
+                await _FindNowAsync();
         }
 
         private void ctrlPersonCardWithFilter_Load(object sender, EventArgs e)
@@ -164,7 +164,7 @@ namespace DVLD.People.Controls
         private void btnAddNewPerson_Click(object sender, EventArgs e)
         {
             frmAddUpdatePerson frm = new frmAddUpdatePerson();
-            frm.SendPersonIDBack += DataBackEvent; // subscribe to the event
+            frm.SendPersonIDBack += DataBackEventAsync; // subscribe to the event
             frm.ShowDialog();
         }
 
