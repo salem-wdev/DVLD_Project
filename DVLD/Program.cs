@@ -24,7 +24,7 @@ namespace DVLD
                 //return;
             }
 
-            if (!clsInternationalLicense.DeactvateExpiredLicenses())
+            if (!await clsInternationalLicense.DeactvateExpiredLicensesAsync())
             {
                 //MessageBox.Show("An error occurred while deactivating expired international licenses. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 //return;
