@@ -16,7 +16,7 @@ namespace DVLD_Business
         public new enum enMode { AddNew = 0, Update = 1 }
 
         public new enMode Mode { get; protected set; } = enMode.AddNew;
-        private new readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private new readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         public int LocalDrivingLicenseApplicationID { private set; get; }
 
@@ -73,18 +73,18 @@ namespace DVLD_Business
             this.LocalDrivingLicenseApplicationID = -1;
             this.LicenseClassID = -1;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>()
             {
-                [enMode.AddNew] = () =>
+                [enMode.AddNew] = async () =>
                 {
                     base.Mode = clsApplication.enMode.AddNew;
-                    return base._AddNewApplication() && this._AddNewLocalDrivingLicenseApplication();
+                    return await base._AddNewApplicationAsync() && await this._AddNewLocalDrivingLicenseApplicationAsync();
                 },
 
-                [enMode.Update] = () =>
+                [enMode.Update] = async () =>
                 {
                     base.Mode = clsApplication.enMode.Update;
-                    return base._UpdateApplication() && this._UpdateLocalDrivingLicenseApplication();
+                    return await base._UpdateApplicationAsync() && await this._UpdateLocalDrivingLicenseApplicationAsync();
                 }
             };
 
@@ -101,18 +101,18 @@ namespace DVLD_Business
             this.ApplicantPersonID = ApplicantPersonID;
             this.ApplicationTypeID = ApplicationTypeID;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>()
             {
-                [enMode.AddNew] = () =>
+                [enMode.AddNew] = async () =>
                 {
                     base.Mode = clsApplication.enMode.AddNew;
-                    return base._AddNewApplication() && this._AddNewLocalDrivingLicenseApplication();
+                    return await base._AddNewApplicationAsync() && await this._AddNewLocalDrivingLicenseApplicationAsync();
                 },
 
-                [enMode.Update] = () =>
+                [enMode.Update] = async () =>
                 {
                     base.Mode = clsApplication.enMode.Update;
-                    return base._UpdateApplication() && this._UpdateLocalDrivingLicenseApplication();
+                    return await base._UpdateApplicationAsync() && await this._UpdateLocalDrivingLicenseApplicationAsync();
                 }
             };
 
@@ -128,18 +128,18 @@ namespace DVLD_Business
             this.LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID; ;
             this.LicenseClassID = LicenseClassID;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>()
             {
-                [enMode.AddNew] = () =>
+                [enMode.AddNew] = async () =>
                 {
                     base.Mode = clsApplication.enMode.AddNew;
-                    return base._AddNewApplication() && this._AddNewLocalDrivingLicenseApplication();
+                    return await base._AddNewApplicationAsync() && await this._AddNewLocalDrivingLicenseApplicationAsync();
                 },
 
-                [enMode.Update] = () =>
+                [enMode.Update] = async () =>
                 {
                     base.Mode = clsApplication.enMode.Update;
-                    return base._UpdateApplication() && this._UpdateLocalDrivingLicenseApplication();
+                    return await base._UpdateApplicationAsync() && await this._UpdateLocalDrivingLicenseApplicationAsync();
                 }
             };
 
@@ -147,7 +147,7 @@ namespace DVLD_Business
             Mode = enMode.Update;
         }
 
-        private bool _AddNewLocalDrivingLicenseApplication()
+        private async Task<bool> _AddNewLocalDrivingLicenseApplicationAsync()
         {
             if (clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID) != -1)
             {
@@ -156,9 +156,8 @@ namespace DVLD_Business
 
             //call DataAccess Layer 
 
-            this.LocalDrivingLicenseApplicationID = clsLocalDrivingLicenseApplicationData.AddNewLocalDrivingLicenseApplication
-                (
-                this.ApplicationID, this.LicenseClassID);
+            this.LocalDrivingLicenseApplicationID = await clsLocalDrivingLicenseApplicationData.AddNewLocalDrivingLicenseApplicationAsync
+                (this.ApplicationID, this.LicenseClassID);
 
             if (this.LocalDrivingLicenseApplicationID != -1)
             {
@@ -168,33 +167,30 @@ namespace DVLD_Business
             return false;
         }
 
-        private bool _UpdateLocalDrivingLicenseApplication()
+        private async Task<bool> _UpdateLocalDrivingLicenseApplicationAsync()
         {
             //call DataAccess Layer 
 
-            return clsLocalDrivingLicenseApplicationData.UpdateLocalDrivingLicenseApplication
-                (
-                this.LocalDrivingLicenseApplicationID, this.ApplicationID, this.LicenseClassID);
+            return await clsLocalDrivingLicenseApplicationData.UpdateLocalDrivingLicenseApplicationAsync
+                (this.LocalDrivingLicenseApplicationID, this.ApplicationID, this.LicenseClassID);
 
         }
 
-        public static clsLocalDrivingLicenseApplication FindByLocalDrivingAppLicenseID(int LocalDrivingLicenseApplicationID)
+        public static async Task<clsLocalDrivingLicenseApplication> FindByLocalDrivingAppLicenseIDAsync(int LocalDrivingLicenseApplicationID)
         {
             // 
-            int ApplicationID = -1, LicenseClassID = -1;
 
-            bool IsFound = clsLocalDrivingLicenseApplicationData.GetLocalDrivingLicenseApplicationInfoByID
-                (LocalDrivingLicenseApplicationID, ref ApplicationID, ref LicenseClassID);
+            var LocalDrivingLicenseApplicationInfo = await clsLocalDrivingLicenseApplicationData.GetLocalDrivingLicenseApplicationInfoByIDAsync(LocalDrivingLicenseApplicationID);
 
 
-            if (IsFound)
+            if (LocalDrivingLicenseApplicationInfo.IsFound)
             {
                 //now we find the base application
-                clsApplication BaseApplication = clsApplication.Find(ApplicationID);
+                clsApplication BaseApplication = await clsApplication.FindAsync(LocalDrivingLicenseApplicationInfo.ApplicationID);
 
                 //we return new object of that person with the right data
                 return new clsLocalDrivingLicenseApplication(
-                    LocalDrivingLicenseApplicationID, LicenseClassID, BaseApplication);
+                    LocalDrivingLicenseApplicationID, LocalDrivingLicenseApplicationInfo.LicenseClassID, BaseApplication);
             }
             else
                 return null;
@@ -202,23 +198,21 @@ namespace DVLD_Business
 
         }
 
-        public static clsLocalDrivingLicenseApplication FindByApplicationID(int ApplicationID)
+        public static async Task<clsLocalDrivingLicenseApplication> FindByApplicationID(int ApplicationID)
         {
             // 
-            int LocalDrivingLicenseApplicationID = -1, LicenseClassID = -1;
 
-            bool IsFound = clsLocalDrivingLicenseApplicationData.GetLocalDrivingLicenseApplicationInfoByApplicationID
-                (ApplicationID, ref LocalDrivingLicenseApplicationID, ref LicenseClassID);
+            var LocalDrivingLicenseApplicationInfo = await clsLocalDrivingLicenseApplicationData.GetLocalDrivingLicenseApplicationInfoByApplicationIDAsync(ApplicationID);
 
 
-            if (IsFound)
+            if (LocalDrivingLicenseApplicationInfo.IsFound)
             {
                 //now we find the base application
-                clsApplication BaseApplication = clsApplication.Find(ApplicationID);
+                clsApplication BaseApplication = await clsApplication.FindAsync(ApplicationID);
 
                 //we return new object of that person with the right data
                 return new clsLocalDrivingLicenseApplication(
-                    LocalDrivingLicenseApplicationID, LicenseClassID, BaseApplication);
+                    LocalDrivingLicenseApplicationInfo.LocalDrivingLicenseApplicationID, LocalDrivingLicenseApplicationInfo.LicenseClassID, BaseApplication);
             }
             else
                 return null;
@@ -226,30 +220,30 @@ namespace DVLD_Business
 
         }
 
-        public override bool Save()
+        public override async Task<bool> SaveAsync()
         {
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
 
-        public static DataTable GetAllLocalDrivingLicenseApplications()
+        public static async Task<DataTable> GetAllLocalDrivingLicenseApplications()
         {
-            return clsLocalDrivingLicenseApplicationData.GetAllLocalDrivingLicenseApplications();
+            return await clsLocalDrivingLicenseApplicationData.GetAllLocalDrivingLicenseApplicationsAsync();
         }
 
-        public override bool Delete()
+        public override async Task<bool> DeleteAsync()
         {
-            if (!CanBeEdited())
+            if (!await CanBeEditedAsync())
                 return false;
 
             bool IsLocalDrivingApplicationDeleted = false;
             bool IsBaseApplicationDeleted = false;
             //First we delete the Local Driving License Application
-            IsLocalDrivingApplicationDeleted = clsLocalDrivingLicenseApplicationData.DeleteLocalDrivingLicenseApplication(this.LocalDrivingLicenseApplicationID);
+            IsLocalDrivingApplicationDeleted = await clsLocalDrivingLicenseApplicationData.DeleteLocalDrivingLicenseApplicationAsync(this.LocalDrivingLicenseApplicationID);
 
             if (!IsLocalDrivingApplicationDeleted)
                 return false;
             //Then we delete the base Application
-            IsBaseApplicationDeleted = base.Delete();
+            IsBaseApplicationDeleted = await base.DeleteAsync();
             return IsBaseApplicationDeleted;
 
         }
@@ -282,16 +276,16 @@ namespace DVLD_Business
             return clsLicense.GetLicenseIDByApplicationID(this.ApplicationID);
         }
 
-        public byte TotalTrialsPerTest(clsTestType.enTestType TestTypeID)
+        public async Task<byte> TotalTrialsPerTest(clsTestType.enTestType TestTypeID)
         {
-            return clsLocalDrivingLicenseApplicationData.TotalTrialsPerTest(this.LocalDrivingLicenseApplicationID, (int)TestTypeID);
+            return await clsLocalDrivingLicenseApplicationData.TotalTrialsPerTestAsync(this.LocalDrivingLicenseApplicationID, (int)TestTypeID);
         }
 
-        public bool DosPassTest(clsTestType.enTestType TestTypeID)
+        public async Task<bool> DosPassTestAsync(clsTestType.enTestType TestTypeID)
         {
 
 
-            return clsLocalDrivingLicenseApplication.DosPassTest(this.LocalDrivingLicenseApplicationID, TestTypeID);
+            return await clsLocalDrivingLicenseApplication.DosPassTestAsync(this.LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
         //public bool DosPassPreviousTest(clsTestType.enTestType CurrentTestType)
@@ -299,7 +293,7 @@ namespace DVLD_Business
         //    return DosPassTest(this.Tes);
         //}
 
-        public static bool DosPassPreviousTest(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<bool> DosPassPreviousTestAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             if (TestTypeID == clsTestType.enTestType.None)
             {
@@ -311,11 +305,11 @@ namespace DVLD_Business
                 return true;
             }
 
-            return clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID - 1);
+            return await clsLocalDrivingLicenseApplication.DosPassTestAsync(LocalDrivingLicenseApplicationID, TestTypeID - 1);
 
         }
 
-        public static bool DosPassTest(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<bool> DosPassTestAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             if (!clsTestAppointment.IsTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID))
             {
@@ -323,17 +317,17 @@ namespace DVLD_Business
             }
 
 
-            return clsLocalDrivingLicenseApplicationData.DoesPassTestType(LocalDrivingLicenseApplicationID, (int)TestTypeID);
+            return await clsLocalDrivingLicenseApplicationData.DoesPassTestTypeAsync(LocalDrivingLicenseApplicationID, (int)TestTypeID);
         }
 
-        public static bool DoesPassAllTests(int LocalDrivingLicenseApplicationID)
+        public static async Task<bool> DoesPassAllTestsAsync(int LocalDrivingLicenseApplicationID)
         {
-            return clsLocalDrivingLicenseApplicationData.DoesPassAllTests(LocalDrivingLicenseApplicationID);
+            return await clsLocalDrivingLicenseApplicationData.DoesPassAllTestsAsync(LocalDrivingLicenseApplicationID);
         }
 
-        public bool DoesPassAllTests()
+        public async Task<bool> DoesPassAllTestsAsync()
         {
-            return DoesPassAllTests(this.LocalDrivingLicenseApplicationID);
+            return await DoesPassAllTestsAsync(this.LocalDrivingLicenseApplicationID);
         }
 
         public static async Task<clsLocalDrivingLicenseApplication> GetNewLocalDrivingLicenseAppAsync(int LicenseClassID, int CreatedByUserID, int ApplicantPersonID, clsApplication.enApplicationType ApplicationTypeID)
@@ -353,7 +347,7 @@ namespace DVLD_Business
                 // TODO: if there is active application for the same person
                 // and license class we should not allow to create new application.
                 if (clsLicense.GetActiveLicenseIDByPersonID(ApplicantPersonID, LicenseClassID) != -1
-                    || clsApplication.GetActiveApplicationIDForLicenseClass(ApplicantPersonID, ApplicationTypeID, LicenseClassID) != -1)
+                    || await clsApplication.GetActiveApplicationIDForLicenseClassAsync(ApplicantPersonID, ApplicationTypeID, LicenseClassID) != -1)
                 {
                     return null;
                 }
@@ -364,7 +358,7 @@ namespace DVLD_Business
             }
 
             decimal ApplicationTypeFees = 0;
-            ApplicationTypeFees = clsApplicationType.Find((int)ApplicationTypeID)?.ApplicationTypeFees ?? 0;
+            ApplicationTypeFees = (await clsApplicationType.FindAsync((int)ApplicationTypeID))?.ApplicationTypeFees ?? 0;
 
             return new clsLocalDrivingLicenseApplication(LicenseClassID, CreatedByUserID, ApplicantPersonID, ApplicationTypeID)
             {
@@ -372,24 +366,24 @@ namespace DVLD_Business
             };
         }
 
-        public static bool IsLocalDrivingLicenseApplicationHasLicense(int LocalDrivingLicenseApplicationID, int LicenseClassID)
+        public static async Task<bool> IsLocalDrivingLicenseApplicationHasLicenseAsync(int LocalDrivingLicenseApplicationID, int LicenseClassID)
         {
-            return clsLocalDrivingLicenseApplicationData.GetIsLocalDrivingLicenseApplicationHasLicense(LocalDrivingLicenseApplicationID, LicenseClassID);
+            return await clsLocalDrivingLicenseApplicationData.GetIsLocalDrivingLicenseApplicationHasLicenseAsync(LocalDrivingLicenseApplicationID, LicenseClassID);
         }
 
-        public bool HasLicense()
+        public async Task<bool> HasLicenseAsync()
         {
-            return IsLocalDrivingLicenseApplicationHasLicense(this.LocalDrivingLicenseApplicationID, this.LicenseClassID);
+            return await IsLocalDrivingLicenseApplicationHasLicenseAsync(this.LocalDrivingLicenseApplicationID, this.LicenseClassID);
         }
 
-        public static bool HasActiveTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<bool> HasActiveTestAppointmentAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            return clsLocalDrivingLicenseApplicationData.IsLocalDrivingLicenseApplicationHasActiveTestAppointment(LocalDrivingLicenseApplicationID, (int)TestTypeID);
+            return await clsLocalDrivingLicenseApplicationData.IsLocalDrivingLicenseApplicationHasActiveTestAppointmentAsync(LocalDrivingLicenseApplicationID, (int)TestTypeID);
         }
 
-        public bool HasActiveTestAppointment(clsTestType.enTestType TestTypeID)
+        public async Task<bool> HasActiveTestAppointmentAsync(clsTestType.enTestType TestTypeID)
         {
-            return HasActiveTestAppointment(this.LocalDrivingLicenseApplicationID, TestTypeID);
+            return await HasActiveTestAppointmentAsync(this.LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
         public async Task<clsLicense> IssueFirstTimeLocalLicenseAsync(int CreatedByUserID, string Notes)
@@ -397,16 +391,16 @@ namespace DVLD_Business
             clsLicense license = await clsLicense.IssueFirstTimeLocalLicenseAsync(this.LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
             if (license != null)
             {
-                this.SetComplete();
+                this.SetCompleteAsync();
                 return license;
             }
             return null;
         }
 
-        public static new enApplicationStatus GetApplicationStatus(int LocalDrivingLicenseApplicationID)
+        public static new async Task<enApplicationStatus> GetApplicationStatusAsync(int LocalDrivingLicenseApplicationID)
         {
             // Retrieve the integer status value from the Data Access Layer
-            int statusValue = clsLocalDrivingLicenseApplicationData.GetApplicationStatus(LocalDrivingLicenseApplicationID);
+            int statusValue = await clsLocalDrivingLicenseApplicationData.GetApplicationStatusAsync(LocalDrivingLicenseApplicationID);
 
             // Try to safely parse the integer value into the corresponding enum constant
             if (Enum.TryParse(statusValue.ToString(), out enApplicationStatus status))
@@ -418,14 +412,14 @@ namespace DVLD_Business
             return enApplicationStatus.None;
         }
 
-        public static bool DoesAttendTestType(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<bool> DoesAttendTestTypeAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            return clsLocalDrivingLicenseApplicationData.DoesAttendTestType(LocalDrivingLicenseApplicationID, (int)TestTypeID);
+            return await clsLocalDrivingLicenseApplicationData.DoesAttendTestTypeAsync(LocalDrivingLicenseApplicationID, (int)TestTypeID);
         }
 
-        public bool DoesAttendTestType(clsTestType.enTestType TestTypeID)
+        public async Task<bool> DoesAttendTestTypeAsync(clsTestType.enTestType TestTypeID)
         {
-            return DoesAttendTestType(this.LocalDrivingLicenseApplicationID, TestTypeID);
+            return await DoesAttendTestTypeAsync(this.LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
 

@@ -4,15 +4,17 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
     public class clsLocalDrivingLicenseApplicationData
     {
-        public static bool GetLocalDrivingLicenseApplicationInfoByID(
-            int LocalDrivingLicenseApplicationID, ref int ApplicationID,
-            ref int LicenseClassID)
+        public static async Task<(bool IsFound, int ApplicationID, int LicenseClassID)> GetLocalDrivingLicenseApplicationInfoByIDAsync(
+            int LocalDrivingLicenseApplicationID)
         {
+            int ApplicationID = -1;
+            int LicenseClassID = -1;
             bool isFound = false;
             try
             {
@@ -24,10 +26,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 isFound = true;
                                 ApplicationID = reader.GetInt32(0);
@@ -47,13 +49,14 @@ namespace DVLD_DataAccess
                 isFound = false;
             }
 
-            return isFound;
+            return (isFound, ApplicationID, LicenseClassID);
         }
 
-        public static bool GetLocalDrivingLicenseApplicationInfoByApplicationID(
-         int ApplicationID, ref int LocalDrivingLicenseApplicationID,
-         ref int LicenseClassID)
+        public static async Task<(bool IsFound, int LocalDrivingLicenseApplicationID, int LicenseClassID)> GetLocalDrivingLicenseApplicationInfoByApplicationIDAsync(
+         int ApplicationID)
         {
+            int LocalDrivingLicenseApplicationID = -1;
+            int LicenseClassID = -1;
             bool isFound = false;
             try
             {
@@ -65,10 +68,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@ApplicationID", SqlDbType.Int).Value = ApplicationID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 isFound = true;
                                 LocalDrivingLicenseApplicationID = reader.GetInt32(0);
@@ -88,29 +91,52 @@ namespace DVLD_DataAccess
                 isFound = false;
             }
 
-            return isFound;
+            return (isFound, LocalDrivingLicenseApplicationID, LicenseClassID);
         }
 
-        public static DataTable GetAllLocalDrivingLicenseApplications()
+        public static async Task<DataTable> GetAllLocalDrivingLicenseApplicationsAsync()
         {
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("LocalDrivingLicenseApplicationID", typeof(int));
+            dt.Columns.Add("ClassName", typeof(string));
+            dt.Columns.Add("NationalNo", typeof(string));
+            dt.Columns.Add("FullName", typeof(string));
+            dt.Columns.Add("ApplicationDate", typeof(DateTime));
+            dt.Columns.Add("PassedTestCount", typeof(int));
+            dt.Columns.Add("Status", typeof(string));
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
-                    string query = @"SELECT *
-                              FROM LocalDrivingLicenseApplications_View
-                              order by ApplicationDate Desc";
+                    string query = @"SELECT LocalDrivingLicenseApplicationID
+                                        ,ClassName
+                                        ,NationalNo
+                                        ,FullName
+                                        ,ApplicationDate
+                                        ,PassedTestCount
+                                        ,Status
+                                     FROM LocalDrivingLicenseApplications_View
+                                     order by ApplicationDate Desc";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
+                            while (await reader.ReadAsync().ConfigureAwait(false))
                             {
-                                dt.Load(reader);
+                                dt.Rows.Add(
+                                    reader.GetInt32(0), // LocalDrivingLicenseApplicationID
+                                    reader.GetString(1), // ClassName
+                                    reader.GetString(2), // NationalNo
+                                    reader.GetString(3), // FullName
+                                    reader.GetDateTime(4), // ApplicationDate
+                                    reader.GetInt32(5), // PassedTestCount
+                                    reader.GetString(6)  // Status
+                                );
                             }
                         }
                     }
@@ -124,7 +150,7 @@ namespace DVLD_DataAccess
             return dt;
         }
 
-        public static int AddNewLocalDrivingLicenseApplication(
+        public static async Task<int> AddNewLocalDrivingLicenseApplicationAsync(
             int ApplicationID, int LicenseClassID)
         {
             int LocalDrivingLicenseApplicationID = -1;
@@ -142,9 +168,11 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@ApplicationID", SqlDbType.Int).Value = ApplicationID;
                         command.Parameters.Add("@LicenseClassID", SqlDbType.Int).Value = LicenseClassID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is int insertedID)
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        if (result is int insertedID)
                         {
                             LocalDrivingLicenseApplicationID = insertedID;
                         }
@@ -159,7 +187,7 @@ namespace DVLD_DataAccess
             return LocalDrivingLicenseApplicationID;
         }
 
-        public static bool UpdateLocalDrivingLicenseApplication(
+        public static async Task<bool> UpdateLocalDrivingLicenseApplicationAsync(
             int LocalDrivingLicenseApplicationID, int ApplicationID, int LicenseClassID)
         {
             int rowsAffected = 0;
@@ -178,8 +206,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@ApplicationID", SqlDbType.Int).Value = ApplicationID;
                         command.Parameters.Add("@LicenseClassID", SqlDbType.Int).Value = LicenseClassID;
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -192,7 +220,7 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
-        public static bool DeleteLocalDrivingLicenseApplication(int LocalDrivingLicenseApplicationID)
+        public static async Task<bool> DeleteLocalDrivingLicenseApplicationAsync(int LocalDrivingLicenseApplicationID)
         {
             int rowsAffected = 0;
             try
@@ -206,8 +234,8 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -219,7 +247,7 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
-        public static byte TotalTrialsPerTest(int LocalDrivingLicenseApplicationID, int TestTypeID)
+        public static async Task<byte> TotalTrialsPerTestAsync(int LocalDrivingLicenseApplicationID, int TestTypeID)
 
         {
             byte TotalTrialsPerTest = 0;
@@ -241,9 +269,11 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is byte trials)
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        if (result is byte trials)
                         {
                             TotalTrialsPerTest = trials;
                         }
@@ -259,7 +289,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool DoesPassTestType(int LocalDrivingLicenseApplicationID, int TestTypeID)
+        public static async Task<bool> DoesPassTestTypeAsync(int LocalDrivingLicenseApplicationID, int TestTypeID)
 
         {
             bool Result = false;
@@ -281,9 +311,11 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is bool returnedResult)
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        if (result is bool returnedResult)
                         {
                             Result = returnedResult;
                         }
@@ -299,7 +331,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool DoesPassAllTests(int LocalDrivingLicenseApplicationID)
+        public static async Task<bool> DoesPassAllTestsAsync(int LocalDrivingLicenseApplicationID)
         {
             bool Result = false;
             try
@@ -318,9 +350,11 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is bool returnedResult)
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        if (result is bool returnedResult)
                         {
                             Result = returnedResult;
                         }
@@ -336,7 +370,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool GetIsLocalDrivingLicenseApplicationHasLicense(int LocalDrivingLicenseApplicationID, int LicenseClassID)
+        public static async Task<bool> GetIsLocalDrivingLicenseApplicationHasLicenseAsync(int LocalDrivingLicenseApplicationID, int LicenseClassID)
         {
             bool HasLicense = false;
             try
@@ -355,9 +389,11 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@LicenseClassID", SqlDbType.Int).Value = LicenseClassID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        HasLicense = command.ExecuteScalar() is bool;
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        HasLicense = result is bool;
                     }
                 }
             }
@@ -369,7 +405,7 @@ namespace DVLD_DataAccess
             return HasLicense;
         }
 
-        public static bool IsLocalDrivingLicenseApplicationHasActiveTestAppointment(int LocalDrivingLicenseApplicationID, int TestTypeID)
+        public static async Task<bool> IsLocalDrivingLicenseApplicationHasActiveTestAppointmentAsync(int LocalDrivingLicenseApplicationID, int TestTypeID)
         {
             bool HasActiveAppointment = false;
             try
@@ -390,9 +426,11 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is bool hasActiveAppointment)
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        if (result is bool hasActiveAppointment)
                         {
                             HasActiveAppointment = hasActiveAppointment;
                         }
@@ -407,7 +445,7 @@ namespace DVLD_DataAccess
             return HasActiveAppointment;
         }
 
-        public static int GetApplicationStatus(int LocalDrivingLicenseApplicationID)
+        public static async Task<int> GetApplicationStatusAsync(int LocalDrivingLicenseApplicationID)
         {
             int ApplicationStatus = -1;
             try
@@ -423,9 +461,11 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is byte AppID)
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        if (result is byte AppID)
                         {
                             ApplicationStatus = AppID;
                         }
@@ -440,7 +480,7 @@ namespace DVLD_DataAccess
             return ApplicationStatus;
         }
 
-        public static bool DoesAttendTestType(int LocalDrivingLicenseApplicationID, int TestTypeID)
+        public static async Task<bool> DoesAttendTestTypeAsync(int LocalDrivingLicenseApplicationID, int TestTypeID)
 
         {
             bool IsFound = false;
@@ -462,9 +502,11 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is bool found)
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        if (result is bool found)
                         {
                             IsFound = found;
                         }

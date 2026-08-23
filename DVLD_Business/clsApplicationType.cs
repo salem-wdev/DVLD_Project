@@ -14,7 +14,7 @@ namespace DVLD_Business
 
         public enum enMode { AddNew = 0, Update = 1 }
         public enMode Mode { get; private set; }
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         public int ApplicationTypeID { get; private set; }
         public string ApplicationTypeTitle { get; set; }
@@ -26,10 +26,10 @@ namespace DVLD_Business
             ApplicationTypeFees = 0.0m;
             ApplicationTypeTitle = string.Empty;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                 {enMode.AddNew,_AddNewApplicationType},
-                 {enMode.Update,_UpdateApplicationType}
+                 {enMode.AddNew,_AddNewApplicationTypeAsync},
+                 {enMode.Update,_UpdateApplicationTypeAsync}
             };
 
             Mode = enMode.AddNew;
@@ -43,18 +43,18 @@ namespace DVLD_Business
             this.ApplicationTypeTitle = ApplicationTypeTitle;
             this.ApplicationTypeFees = ApplicationTypeFees;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                 {enMode.AddNew,_AddNewApplicationType},
-                 {enMode.Update,_UpdateApplicationType}
+                 {enMode.AddNew,_AddNewApplicationTypeAsync},
+                 {enMode.Update,_UpdateApplicationTypeAsync}
             };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewApplicationType()
+        private async Task<bool> _AddNewApplicationTypeAsync()
         {
-            this.ApplicationTypeID = clsApplicationTypeData.AddNewApplicationType(ApplicationTypeTitle, ApplicationTypeFees);
+            this.ApplicationTypeID = await clsApplicationTypeData.AddNewApplicationTypeAsync(ApplicationTypeTitle, ApplicationTypeFees);
 
             if (ApplicationTypeID != -1)
             {
@@ -64,21 +64,18 @@ namespace DVLD_Business
             return false;
         }
 
-        private bool _UpdateApplicationType()
+        private async Task<bool> _UpdateApplicationTypeAsync()
         {
-            return clsApplicationTypeData.UpdateApplicationType(ApplicationTypeID, ApplicationTypeTitle, ApplicationTypeFees);
+            return await clsApplicationTypeData.UpdateApplicationTypeAsync(ApplicationTypeID, ApplicationTypeTitle, ApplicationTypeFees);
         }
 
-        public static clsApplicationType Find(int ApplicationTypeID)
+        public static async Task<clsApplicationType> FindAsync(int ApplicationTypeID)
         {
-            string ApplicationTypeTitle = string.Empty;
-            decimal ApplicationTypeFees = 0.0m;
+            var ApplicationTypeInfo = await clsApplicationTypeData.GetApplicationTypeInfoByIDAsync(ApplicationTypeID);
 
-            bool found = clsApplicationTypeData.GetApplicationTypeInfoByID(ApplicationTypeID, ref ApplicationTypeTitle, ref ApplicationTypeFees);
-
-            if (found)
+            if (ApplicationTypeInfo.IsFound)
             {
-                return new clsApplicationType(ApplicationTypeID, ApplicationTypeTitle, ApplicationTypeFees);
+                return new clsApplicationType(ApplicationTypeID, ApplicationTypeInfo.ApplicationTypeTitle, ApplicationTypeInfo.ApplicationFees);
             }
             else
             {
@@ -86,14 +83,14 @@ namespace DVLD_Business
             }
         }
 
-        public static DataTable GetAllApplicationTypes()
+        public static async Task<DataTable> GetAllApplicationTypesAsync()
         {
-            return clsApplicationTypeData.GetAllApplicationTypes();
+            return await clsApplicationTypeData.GetAllApplicationTypesAsync();
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
 
     }

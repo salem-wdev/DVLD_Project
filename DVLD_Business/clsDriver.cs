@@ -133,9 +133,9 @@ namespace DVLD_Business
             return clsLicenseData.GetDriverLicenses(DriverID);
         }
 
-        public static DataTable GetInternationalLicenses(int DriverID)
+        public static async Task<DataTable> GetInternationalLicensesAsync(int DriverID)
         {
-            return clsInternationalLicense.GetDriverInternationalLicenses(DriverID);
+            return await clsInternationalLicense.GetDriverInternationalLicensesAsync(DriverID);
         }
 
         public async Task<bool> SaveAsync()

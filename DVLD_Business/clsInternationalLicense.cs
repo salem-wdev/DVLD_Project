@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.Eventing.Reader;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace DVLD_Business
@@ -39,7 +40,7 @@ namespace DVLD_Business
 
         public new enum enMode { AddNew = 0, Update = 1 };
         public new enMode Mode { get; protected set; } = enMode.AddNew;
-        private new readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private new readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         // Holds the cached driver information; backing field for the lazy-loaded DriverInfo property.
         private clsDriver _DriverInfo = null;
@@ -82,18 +83,18 @@ namespace DVLD_Business
            
             this.IsActive = IsActive;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>()
             {
-                [enMode.AddNew] = () =>
+                [enMode.AddNew] = async () =>
                 {
                     base.Mode = clsApplication.enMode.AddNew;
-                    return base._AddNewApplication() && this._AddNewInternationalLicense();
+                    return await base._AddNewApplicationAsync() && await this._AddNewInternationalLicenseAsync();
                 },
 
-                [enMode.Update] = () =>
+                [enMode.Update] = async () =>
                 {
                     base.Mode = clsApplication.enMode.Update;
-                    return base._UpdateApplication() && this._UpdateInternationalLicense();
+                    return await base._UpdateApplicationAsync() && await this._UpdateInternationalLicenseAsync();
                 }
             };
 
@@ -114,32 +115,32 @@ namespace DVLD_Business
             this.ExpirationDate = ExpirationDate;
             this.IsActive = IsActive;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>()
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>()
             {
-                [enMode.AddNew] = () =>
+                [enMode.AddNew] = async () =>
                 {
                     base.Mode = clsApplication.enMode.AddNew;
-                    return base._AddNewApplication() && this._AddNewInternationalLicense();
+                    return await base._AddNewApplicationAsync() && await this._AddNewInternationalLicenseAsync();
                 },
 
-                [enMode.Update] = () =>
+                [enMode.Update] = async () =>
                 {
                     base.Mode = clsApplication.enMode.Update;
-                    return base._UpdateApplication() && this._UpdateInternationalLicense();
+                    return await base._UpdateApplicationAsync() && await this._UpdateInternationalLicenseAsync();
                 }
             }; 
             
             Mode = enMode.Update;
         }
 
-        private bool _AddNewInternationalLicense()
+        private async Task<bool> _AddNewInternationalLicenseAsync()
         {
 
            
             //call DataAccess Layer 
 
             this.InternationalLicenseID = 
-                clsInternationalLicenseData.AddNewInternationalLicense(this.ApplicationID, this.DriverID, this.IssuedUsingLocalLicenseID,
+               await clsInternationalLicenseData.AddNewInternationalLicenseAsync(this.ApplicationID, this.DriverID, this.IssuedUsingLocalLicenseID,
                this.IssueDate, this.ExpirationDate, 
                this.IsActive, this.CreatedByUserID);
 
@@ -149,11 +150,11 @@ namespace DVLD_Business
                 Mode = enMode.Update;
                 return true;
             }
-            clsApplication.Delete(this.ApplicationID);
+            clsApplication.DeleteAsync(this.ApplicationID);
             return false;
         }
 
-        private bool _UpdateInternationalLicense()
+        private async Task<bool> _UpdateInternationalLicenseAsync()
         {
             //call DataAccess Layer 
 
@@ -161,13 +162,13 @@ namespace DVLD_Business
 
             if (license == null || license.ExpirationDate < clsUtilData.GetServerDate()
                 || license.IsActive == false
-                || clsDetainedLicense.IsLicenseDetained(IssuedUsingLocalLicenseID))
+                || await clsDetainedLicense.IsLicenseDetainedAsync(IssuedUsingLocalLicenseID))
             {
                 IsActive = false;
                 return false;
             }
 
-            if (clsInternationalLicenseData.UpdateInternationalLicense(
+            if (await clsInternationalLicenseData.UpdateInternationalLicenseAsync(
                 this.InternationalLicenseID,this.ApplicationID, this.DriverID, this.IssuedUsingLocalLicenseID,
                this.IssueDate, this.ExpirationDate, 
                this.IsActive, this.CreatedByUserID))
@@ -178,7 +179,7 @@ namespace DVLD_Business
             return true;
         }
 
-        public static clsInternationalLicense FindByInternationalLicenseID(int InternationalLicenseID)
+        public static async Task<clsInternationalLicense> FindByInternationalLicenseIDAsync(int InternationalLicenseID)
         {
             if (InternationalLicenseID <= 0) return null; // To prevent unnessasry database connection.
 
@@ -187,9 +188,8 @@ namespace DVLD_Business
             DateTime IssueDate = DateTime.Now; DateTime ExpirationDate = DateTime.Now;
              bool IsActive = true; int CreatedByUserID = 1;
 
-            if (clsInternationalLicenseData.GetInternationalLicenseInfoByID(InternationalLicenseID,ref ApplicationID, ref DriverID, 
-                ref IssuedUsingLocalLicenseID,
-            ref IssueDate, ref ExpirationDate, ref IsActive, ref CreatedByUserID))
+           var result = await clsInternationalLicenseData.GetInternationalLicenseInfoByIDAsync(InternationalLicenseID);
+            if (result.IsFound)
             {
                 if (ExpirationDate < clsUtilData.GetServerDate())
                 {
@@ -197,7 +197,7 @@ namespace DVLD_Business
                 }
 
                 //now we find the base application
-                clsApplication Application = clsApplication.Find(ApplicationID);
+                clsApplication Application = await clsApplication.FindAsync(ApplicationID);
 
 
                 return new clsInternationalLicense(InternationalLicenseID, DriverID,
@@ -211,80 +211,81 @@ namespace DVLD_Business
 
         }
 
-        public static DataTable GetAllInternationalLicenses()
+        public static async Task<DataTable> GetAllInternationalLicensesAsync()
         {
-            return clsInternationalLicenseData.GetAllInternationalLicenses();
+            return await clsInternationalLicenseData.GetAllInternationalLicensesAsync();
 
         }
 
-        public override bool Save()
+        public override async Task<bool> SaveAsync()
         {
 
-            if(GetApplicationStatus(this.ApplicationID)!= enApplicationStatus.New)
+            if(await GetApplicationStatusAsync(this.ApplicationID)!= enApplicationStatus.New)
             {
                 return false;
             }
 
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
 
-        public static int GetActiveInternationalLicenseIDByDriverID(int DriverID)
+        public static async Task<int> GetActiveInternationalLicenseIDByDriverIDAsync(int DriverID)
         {
             if (DriverID <= 0) return -1; // To prevent unnessasry database connection.
 
-            return clsInternationalLicenseData.GetActiveInternationalLicenseIDByDriverID(DriverID);
+            return await clsInternationalLicenseData.GetActiveInternationalLicenseIDByDriverIDAsync(DriverID);
 
         }
 
-        public static DataTable GetDriverInternationalLicenses(int DriverID)
+        public static async Task<DataTable> GetDriverInternationalLicensesAsync(int DriverID)
         {
             if (DriverID <= 0) return null; // To prevent unnessasry database connection.
 
-            return clsInternationalLicenseData.GetDriverInternationalLicenses(DriverID);
+            return await clsInternationalLicenseData.GetDriverInternationalLicensesAsync(DriverID);
         }
 
-        private static bool _IsDriverEligibleForInternationalLicense(int DriverID,out int LocalLicenseID)
+        private static async Task<(bool IsSucceeded, int LocalLicenseID)> _IsDriverEligibleForInternationalLicenseAsync(int DriverID, int LocalLicenseID)
         {
             LocalLicenseID = -1;
-            if (DriverID <= 0) return false; // To prevent unnessasry database connection.
+            if (DriverID <= 0) return (false, LocalLicenseID); // To prevent unnessasry database connection.
 
             LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
             if (LocalLicenseID == -1)
             {
-                return false;
+                return (false, LocalLicenseID);
             }
 
-            if (clsDetainedLicense.IsLicenseDetained(LocalLicenseID))
+            if (await clsDetainedLicense.IsLicenseDetainedAsync(LocalLicenseID))
             {
-                return false;
+                return (false, LocalLicenseID);
             }
 
-            int InternationalLicenseID = clsInternationalLicense.GetActiveInternationalLicenseIDByDriverID(DriverID);
+            int InternationalLicenseID = await clsInternationalLicense.GetActiveInternationalLicenseIDByDriverIDAsync(DriverID);
             if (InternationalLicenseID != -1)
             {
-                return false;
+                return (false, LocalLicenseID);
             }
 
-            return true;
+            return (true, LocalLicenseID);
         }
 
-        public static bool IsDriverEligibleForInternationalLicense(int DriverID)
+        public static async Task<bool> IsDriverEligibleForInternationalLicenseAsync(int DriverID)
         {
             if (DriverID <= 0) return false; // To prevent unnessasry database connection.
 
-            int LocalLicenseID;
-            return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
+            
+            var result = await _IsDriverEligibleForInternationalLicenseAsync(DriverID, -1);
+            return result.IsSucceeded;
         }
 
-        public static bool IsDriverEligibleForInternationalLicense(int DriverID, out int LocalLicenseID)
+        public static async Task<(bool IsSucceeded, int LocalLicenseID)> IsDriverEligibleForInternationalLicenseAsync(int DriverID, int LocalLicenseID)
         {
             LocalLicenseID = -1;
-            if (DriverID <= 0) return false; // To prevent unnessasry database connection.
+            if (DriverID <= 0) return (false, LocalLicenseID); // To prevent unnessasry database connection.
 
-            return _IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID);
+            return await _IsDriverEligibleForInternationalLicenseAsync(DriverID, LocalLicenseID);
         }
 
-        private static clsInternationalLicense _GetNewInternationalLicense(int DriverID, int CreatedByUser)
+        private static async Task<clsInternationalLicense> _GetNewInternationalLicenseAsync(int DriverID, int CreatedByUser)
         {
 
             clsInternationalLicense InternationalLicense = null;
@@ -292,7 +293,8 @@ namespace DVLD_Business
             int LocalLicenseID = -1;
             if (DriverID <= 0) return null; // To prevent unnessasry database connection.
 
-            if (!IsDriverEligibleForInternationalLicense(DriverID, out LocalLicenseID))
+            var result = await IsDriverEligibleForInternationalLicenseAsync(DriverID, LocalLicenseID);
+            if (!result.IsSucceeded)
             {
                 return null;
             }
@@ -306,7 +308,7 @@ namespace DVLD_Business
 
             DateTime IssueDate = clsBusinessSettings.GetServerDateTime();
 
-            clsApplication application = GetNewApplicationobject(CreatedByUser,
+            clsApplication application = await GetNewApplicationobjectAsync(CreatedByUser,
                 LocalLicense.DriverInfo.PersonID, enApplicationType.NewInternationalLicense);
 
             if(application == null)
@@ -314,7 +316,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            if (!application.Save())
+            if (!await application.SaveAsync())
             {
                 return null;
             }
@@ -325,14 +327,14 @@ namespace DVLD_Business
             return InternationalLicense;
         }
 
-        public static clsInternationalLicense IssueNewInternationalLicense(int DriverID, int CreatedByUser)
+        public static async Task<clsInternationalLicense> IssueNewInternationalLicenseAsync(int DriverID, int CreatedByUser)
         {
             if (DriverID <= 0) return null; // To prevent unnessasry database connection.
 
-            clsInternationalLicense InternationalLicense = _GetNewInternationalLicense(DriverID, CreatedByUser);
+            clsInternationalLicense InternationalLicense = await _GetNewInternationalLicenseAsync(DriverID, CreatedByUser);
             if (InternationalLicense != null)
             {
-                if (InternationalLicense.Save())
+                if (await InternationalLicense.SaveAsync())
                 {
                     return InternationalLicense;
                 }
@@ -340,9 +342,9 @@ namespace DVLD_Business
             return null;
         }
 
-        public static bool DeactvateExpiredLicenses()
+        public static async Task<bool> DeactvateExpiredLicensesAsync()
         {
-            return clsInternationalLicenseData.DeactvateInternationalLicensesforExpiredLocalLicenses();
+            return await clsInternationalLicenseData.DeactvateInternationalLicensesforExpiredLocalLicensesAsync();
         }
 
         protected virtual void OnInternationalLicenseUpdated(InternationalLicenseUpdatedEventArgs e)

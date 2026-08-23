@@ -2,6 +2,7 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 using DVLD_Infrastructure.Storage;
 
 namespace DVLD_DataAccess
@@ -9,11 +10,15 @@ namespace DVLD_DataAccess
     public class clsInternationalLicenseData
     {
 
-        public static bool GetInternationalLicenseInfoByID(int InternationalLicenseID,
-            ref int ApplicationID,
-            ref int DriverID, ref int IssuedUsingLocalLicenseID,
-            ref DateTime IssueDate, ref DateTime ExpirationDate, ref bool IsActive, ref int CreatedByUserID)
+        public static async Task<(bool IsFound, int ApplicationID, int DriverID, int IssuedUsingLocalLicenseID, DateTime IssueDate, DateTime ExpirationDate, bool IsActive, int CreatedByUserID)> GetInternationalLicenseInfoByIDAsync(int InternationalLicenseID)
         {
+            int ApplicationID = -1;
+            int DriverID = -1;
+            int IssuedUsingLocalLicenseID = -1;
+            DateTime IssueDate = DateTime.MinValue;
+            DateTime ExpirationDate = DateTime.MinValue;
+            bool IsActive = false;
+            int CreatedByUserID = -1;
             bool isFound = false;
             try
             {
@@ -27,10 +32,10 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@InternationalLicenseID", InternationalLicenseID);
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
 
                                 // The record was found
@@ -54,13 +59,22 @@ namespace DVLD_DataAccess
             {
             }
 
-            return isFound;
+            return (isFound, ApplicationID, DriverID, IssuedUsingLocalLicenseID, IssueDate, ExpirationDate, IsActive, CreatedByUserID);
         }
 
-        public static DataTable GetAllInternationalLicenses()
+        public static async Task<DataTable> GetAllInternationalLicensesAsync()
         {
 
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("InternationalLicenseID", typeof(int));
+            dt.Columns.Add("ApplicationID", typeof(int));
+            dt.Columns.Add("DriverID", typeof(int));
+            dt.Columns.Add("IssuedUsingLocalLicenseID", typeof(int));
+            dt.Columns.Add("IssueDate", typeof(DateTime));
+            dt.Columns.Add("ExpirationDate", typeof(DateTime));
+            dt.Columns.Add("IsActive", typeof(bool));
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -74,14 +88,21 @@ namespace DVLD_DataAccess
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
-
+                            while (await reader.ReadAsync().ConfigureAwait(false))
                             {
-                                dt.Load(reader);
+                                dt.Rows.Add(
+                                    reader.GetInt32(0),
+                                    reader.GetInt32(1),
+                                    reader.GetInt32(2),
+                                    reader.GetInt32(3),
+                                    reader.GetDateTime(4),
+                                    reader.GetDateTime(5),
+                                    reader.GetBoolean(6)
+                                );
                             }
                         }
                     }
@@ -96,10 +117,18 @@ namespace DVLD_DataAccess
 
         }
 
-        public static DataTable GetDriverInternationalLicenses(int DriverID)
+        public static async Task<DataTable> GetDriverInternationalLicensesAsync(int DriverID)
         {
 
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("InternationalLicenseID", typeof(int));
+            dt.Columns.Add("ApplicationID", typeof(int));
+            dt.Columns.Add("IssuedUsingLocalLicenseID", typeof(int));
+            dt.Columns.Add("IssueDate", typeof(DateTime));
+            dt.Columns.Add("ExpirationDate", typeof(DateTime));
+            dt.Columns.Add("IsActive", typeof(bool));
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -114,13 +143,20 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.AddWithValue("@DriverID", DriverID);
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
+                            while (await reader.ReadAsync().ConfigureAwait(false))
                             {
-                                dt.Load(reader);
+                                dt.Rows.Add(
+                                    reader.GetInt32(0),
+                                    reader.GetInt32(1),
+                                    reader.GetInt32(2),
+                                    reader.GetDateTime(3),
+                                    reader.GetDateTime(4),
+                                    reader.GetBoolean(5)
+                                );
                             }
                         }
                     }
@@ -136,7 +172,7 @@ namespace DVLD_DataAccess
         }
 
 
-        public static int AddNewInternationalLicense(int ApplicationID,
+        public static async Task<int> AddNewInternationalLicenseAsync(int ApplicationID,
              int DriverID, int IssuedUsingLocalLicenseID,
              DateTime IssueDate, DateTime ExpirationDate, bool IsActive, int CreatedByUserID)
         {
@@ -181,9 +217,9 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@IsActive", IsActive);
                         command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (result != null && int.TryParse(result.ToString(), out int insertedID))
                         {
@@ -203,7 +239,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateInternationalLicense(
+        public static async Task<bool> UpdateInternationalLicenseAsync(
               int InternationalLicenseID, int ApplicationID,
              int DriverID, int IssuedUsingLocalLicenseID,
              DateTime IssueDate, DateTime ExpirationDate, bool IsActive, int CreatedByUserID)
@@ -238,8 +274,8 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
 
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -250,7 +286,7 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
-        public static int GetActiveInternationalLicenseIDByDriverID(int DriverID)
+        public static async Task<int> GetActiveInternationalLicenseIDByDriverIDAsync(int DriverID)
         {
             int InternationalLicenseID = -1;
             try
@@ -266,9 +302,9 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.AddWithValue("@DriverID", DriverID);
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (result != null && int.TryParse(result.ToString(), out int insertedID))
                         {
@@ -285,7 +321,7 @@ namespace DVLD_DataAccess
             return InternationalLicenseID;
         }
 
-        public static bool DeactvateInternationalLicensesforExpiredLocalLicenses()
+        public static async Task<bool> DeactvateInternationalLicensesforExpiredLocalLicensesAsync()
         {
 
             int rowsAffected = 0;
@@ -299,8 +335,8 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
 

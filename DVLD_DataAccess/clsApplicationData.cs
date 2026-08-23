@@ -69,7 +69,7 @@ namespace DVLD_DataAccess
             return (IsFound, ApplicantPersonID, ApplicationDate, ApplicationTypeID, ApplicationStatus, LastStatusDate, PaidFees, CreatedByUserID);
         }
 
-        public static async Task<(int ApplicationID, DateTime ApplicationDate, byte ApplicationStatus, DateTime LastStatusDate)> AddNewApplicationAsync(int ApplicantPersonID,
+        public static async Task<(bool IsSucceeded, int ApplicationID, DateTime ApplicationDate, byte ApplicationStatus, DateTime LastStatusDate)> AddNewApplicationAsync(int ApplicantPersonID,
             int ApplicationTypeID,
             decimal PaidFees, int CreatedByUserID)
         {
@@ -125,7 +125,7 @@ namespace DVLD_DataAccess
 
             }
 
-            return (ApplicationID, ApplicationDate, ApplicationStatus, LastStatusDate);
+            return (ApplicationID > 0, ApplicationID, ApplicationDate, ApplicationStatus, LastStatusDate);
 
         }
 
