@@ -97,13 +97,28 @@ namespace DVLD_DataAccess
         public static async Task<DataTable> GetAllLocalDrivingLicenseApplicationsAsync()
         {
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("LocalDrivingLicenseApplicationID", typeof(int));
+            dt.Columns.Add("ClassName", typeof(string));
+            dt.Columns.Add("NationalNo", typeof(string));
+            dt.Columns.Add("FullName", typeof(string));
+            dt.Columns.Add("ApplicationDate", typeof(DateTime));
+            dt.Columns.Add("PassedTestCount", typeof(int));
+            dt.Columns.Add("Status", typeof(string));
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
-                    string query = @"SELECT *
-                              FROM LocalDrivingLicenseApplications_View
-                              order by ApplicationDate Desc";
+                    string query = @"SELECT LocalDrivingLicenseApplicationID
+                                        ,ClassName
+                                        ,NationalNo
+                                        ,FullName
+                                        ,ApplicationDate
+                                        ,PassedTestCount
+                                        ,Status
+                                     FROM LocalDrivingLicenseApplications_View
+                                     order by ApplicationDate Desc";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
@@ -111,9 +126,17 @@ namespace DVLD_DataAccess
 
                         using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
+                            while (await reader.ReadAsync().ConfigureAwait(false))
                             {
-                                dt.Load(reader);
+                                dt.Rows.Add(
+                                    reader.GetInt32(0), // LocalDrivingLicenseApplicationID
+                                    reader.GetString(1), // ClassName
+                                    reader.GetString(2), // NationalNo
+                                    reader.GetString(3), // FullName
+                                    reader.GetDateTime(4), // ApplicationDate
+                                    reader.GetInt32(5), // PassedTestCount
+                                    reader.GetString(6)  // Status
+                                );
                             }
                         }
                     }
