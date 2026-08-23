@@ -22,10 +22,10 @@ namespace DVLD.Licenses.Local_Licenses
             _LocalDriverLicenseAppID = LocalDriverLicenseAppID;
         }
 
-        private void frmIssueDriverLicenseFirstTime_Load(object sender, EventArgs e)
+        private async void frmIssueDriverLicenseFirstTime_Load(object sender, EventArgs e)
         {
-            ctrlDrivingLicenseApplicationInfo1.LoadData(_LocalDriverLicenseAppID);
-            _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(_LocalDriverLicenseAppID);
+            await ctrlDrivingLicenseApplicationInfo1.LoadDataAsync(_LocalDriverLicenseAppID);
+            _LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(_LocalDriverLicenseAppID);
             if (_LocalDrivingLicenseApplication != null)
             {
                 if (clsLicense.GetActiveLicenseIDByPersonID(_LocalDrivingLicenseApplication.ApplicantPersonID, _LocalDrivingLicenseApplication.LicenseClassID) != -1)
