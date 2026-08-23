@@ -82,28 +82,27 @@ namespace DVLD.Tests
             }
         }
 
-        private void _FillFormWithData()
+        private async Task _FillFormWithDataAsync()
         {
 
             _LoadTestTypeImageAndTitle();
 
-            ctrlDrivingLicenseApplicationInfo1.LoadData(_LocalDrivingLicenseApplicationID);
+            await ctrlDrivingLicenseApplicationInfo1.LoadDataAsync(_LocalDrivingLicenseApplicationID);
 
             _RefreshData();
 
         }
 
-        private void frmListTestAppointments_Load(object sender, EventArgs e)
+        private async void frmListTestAppointments_Load(object sender, EventArgs e)
         {
             bool IsPassedPreviousTest = false;
 
-            _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(_LocalDrivingLicenseApplicationID);
-
-            IsPassedPreviousTest = clsLocalDrivingLicenseApplication.DosPassPreviousTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
+            _LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(_LocalDrivingLicenseApplicationID);
+            IsPassedPreviousTest = await clsLocalDrivingLicenseApplication.DosPassPreviousTestAsync(_LocalDrivingLicenseApplicationID, _TestTypeID);
 
             if (_LocalDrivingLicenseApplication != null && IsPassedPreviousTest)
             {
-                _FillFormWithData();
+                await _FillFormWithDataAsync();
             }
             else
             {
@@ -112,9 +111,9 @@ namespace DVLD.Tests
             }
         }
 
-        private void btnAddNewAppointment_Click(object sender, EventArgs e)
+        private async void btnAddNewAppointment_Click(object sender, EventArgs e)
         {
-            if(clsLocalDrivingLicenseApplication.HasActiveTestAppointment(_LocalDrivingLicenseApplicationID,_TestTypeID))
+            if(await clsLocalDrivingLicenseApplication.HasActiveTestAppointmentAsync(_LocalDrivingLicenseApplicationID,_TestTypeID))
             {
                 MessageBox.Show("Person cannot book a new appointment because they already have an active appointment for this test.",
                     "Error",
