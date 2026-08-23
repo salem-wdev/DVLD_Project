@@ -24,7 +24,7 @@ namespace DVLD.Applications.International_License
             InitializeComponent();
         }
 
-        private void frmNewInternationalLicenseApplication_Load(object sender, EventArgs e)
+        private async void frmNewInternationalLicenseApplication_Load(object sender, EventArgs e)
         {
             //ctrlDriverLicenseInfoWithFilter1.OnLicenseSelected += CtrlDriverLicenseInfoWithFilter1_OnLicenseSelected;
 
@@ -33,8 +33,8 @@ namespace DVLD.Applications.International_License
             lblApplicationDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
             lblIssueDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
             lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
-            lblFees.Text = clsApplicationType.Find
-                ((int)clsApplication.enApplicationType.NewInternationalLicense)
+            lblFees.Text = (await clsApplicationType.FindAsync
+                ((int)clsApplication.enApplicationType.NewInternationalLicense))
                 .ApplicationTypeFees.ToString("0.##");
         }
 
@@ -48,9 +48,9 @@ namespace DVLD.Applications.International_License
             ctrlDriverLicenseInfoWithFilter1.txtLicenseIDFocus();
         }
 
-        private void btnIssueLicense_Click(object sender, EventArgs e)
+        private async void btnIssueLicense_Click(object sender, EventArgs e)
         {
-            _NewInternationalLicense = clsInternationalLicense.IssueNewInternationalLicense(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DriverID, clsGlobal.CurrentUser.UserID);
+            _NewInternationalLicense = await clsInternationalLicense.IssueNewInternationalLicenseAsync(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DriverID, clsGlobal.CurrentUser.UserID);
             if (_NewInternationalLicense == null)
             {
                 llShowLicenseInfo.Enabled = false;
@@ -81,7 +81,7 @@ namespace DVLD.Applications.International_License
             frm.ShowDialog();
         }
 
-        private void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
+        private async void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
         {
             int licenseID = e.LicenseID;
             llShowLicenseHistory.Enabled = false;
@@ -109,8 +109,8 @@ namespace DVLD.Applications.International_License
                     return;
                 }
 
-                int InternationalLicenseID = clsInternationalLicense
-                    .GetActiveInternationalLicenseIDByDriverID(DriverID);
+                int InternationalLicenseID = await clsInternationalLicense
+                    .GetActiveInternationalLicenseIDByDriverIDAsync(DriverID);
                 if (InternationalLicenseID > 0)
                 {
                     MessageBox.Show("This Driver already has an Active International License with ID = " + InternationalLicenseID.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
