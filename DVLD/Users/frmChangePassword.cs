@@ -60,7 +60,7 @@ namespace DVLD.Users
             return true;
         }
 
-        private void frmChangePassword_Load(object sender, EventArgs e)
+        private async void frmChangePassword_Load(object sender, EventArgs e)
         {
             _ResetDefualtValues();
 
@@ -73,7 +73,7 @@ namespace DVLD.Users
                 return;
             }
 
-            ctrlUserCard1.LoadUserInfo(_UserID);
+            await ctrlUserCard1.LoadUserInfoAsync(_UserID);
         }
 
         private void Password_TextChanged(object sender, EventArgs e)
