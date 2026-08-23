@@ -25,7 +25,7 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
             InitializeComponent();
         }
 
-        private void SetReason()
+        private async Task SetReasonAsync()
         {
             if (rbDamagedLicense.Checked)
             {
@@ -42,16 +42,16 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
                 this.Text = lblTitle.Text;
             }
 
-            lblApplicationFees.Text = clsApplicationType.Find
-                    ((int)_ReplaceReason).ApplicationTypeFees.ToString("0.##");
+            lblApplicationFees.Text = (await clsApplicationType.FindAsync
+                    ((int)_ReplaceReason)).ApplicationTypeFees.ToString("0.##");
 
         }
 
-        private void frmReplaceLostOrDamagedLicenseApplication_Load(object sender, EventArgs e)
+        private async void frmReplaceLostOrDamagedLicenseApplication_Load(object sender, EventArgs e)
         {
             lblApplicationDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
             lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
-            SetReason();
+            await SetReasonAsync();
 
             AcceptButton = ctrlDriverLicenseInfoWithFilter1.AcceptButton;
         }
@@ -61,9 +61,9 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
             ctrlDriverLicenseInfoWithFilter1.txtLicenseIDFocus();
         }
 
-        private void rbReplaceLicenseReason_CheckedChanged(object sender, EventArgs e)
+        private async void rbReplaceLicenseReason_CheckedChanged(object sender, EventArgs e)
         {
-            SetReason();
+            await SetReasonAsync();
         }
 
         private void llShowLicenseHistory_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -92,9 +92,9 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
             }
         }
 
-        private void btnIssueReplacement_Click(object sender, EventArgs e)
+        private async void btnIssueReplacement_Click(object sender, EventArgs e)
         {
-            _ReplacedLicense = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Replace
+            _ReplacedLicense = await ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.ReplaceAsync
                 (clsGlobal.CurrentUser.UserID, _IssueReason);
 
             if( _ReplacedLicense == null)
@@ -115,7 +115,7 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
 
         }
 
-        private void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
+        private async void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
         {
             int licenseID = e.LicenseID;
             if (licenseID > 0)
@@ -128,7 +128,7 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
                     return;
                 }
 
-                SetReason();
+                await SetReasonAsync();
 
                 _ReplacedLicenseID = -1;
                 _ReplacedLicense = null;
