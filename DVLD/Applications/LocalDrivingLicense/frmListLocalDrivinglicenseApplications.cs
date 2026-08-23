@@ -6,6 +6,7 @@ using DVLD_Business;
 using System;
 using System.ComponentModel;
 using System.Data;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static DVLD_Business.clsApplication;
 
@@ -20,9 +21,9 @@ namespace DVLD.Applications.LocalDrivingLicense
             InitializeComponent();
         }
 
-        private void _RefreshData()
+        private async Task _RefreshDataAsync()
         {
-            _dtAllLocalApplications = clsLocalDrivingLicenseApplication.GetAllLocalDrivingLicenseApplications();
+            _dtAllLocalApplications = await clsLocalDrivingLicenseApplication.GetAllLocalDrivingLicenseApplications();
             dgvLocalDrivingLicenseApplications.DataSource = _dtAllLocalApplications;
             lblRecordsCount.Text = _dtAllLocalApplications.Rows.Count.ToString();
         }
@@ -33,9 +34,9 @@ namespace DVLD.Applications.LocalDrivingLicense
             frm.ShowDialog();
         }
 
-        private void frmListLocalDrivingLicesnseApplications_Load(object sender, EventArgs e)
+        private async void frmListLocalDrivingLicesnseApplications_Load(object sender, EventArgs e)
         {
-            _RefreshData();
+            await _RefreshDataAsync();
 
             if (dgvLocalDrivingLicenseApplications.Rows.Count > 0)
             {
@@ -69,14 +70,14 @@ namespace DVLD.Applications.LocalDrivingLicense
             this.Close();
         }
 
-        private void btnAddNewApplication_Click(object sender, EventArgs e)
+        private async void btnAddNewApplication_Click(object sender, EventArgs e)
         {
             frmAddUpdateLocalDrivingLicenseApplication frm = new frmAddUpdateLocalDrivingLicenseApplication();
             frm.ShowDialog();
-            _RefreshData();
+            await _RefreshDataAsync();
         }
 
-        private void DeleteApplicationToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void DeleteApplicationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure do want to delete this application?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                 return;
@@ -84,7 +85,7 @@ namespace DVLD.Applications.LocalDrivingLicense
             int LocalDrivingLicenseApplicationID = (int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value;
 
             clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication =
-                clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
+               await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(LocalDrivingLicenseApplicationID);
 
 
 
@@ -96,7 +97,7 @@ namespace DVLD.Applications.LocalDrivingLicense
                     return;
                 }
 
-                if (LocalDrivingLicenseApplication.Delete())
+                if (await LocalDrivingLicenseApplication.DeleteAsync())
                 {
                     MessageBox.Show("Application Deleted Successfully.", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     //refresh the form again.
@@ -108,13 +109,13 @@ namespace DVLD.Applications.LocalDrivingLicense
                 }
             }
 
-            _RefreshData();
+            await _RefreshDataAsync();
         }
 
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             clsLocalDrivingLicenseApplication localDrivingLicenseApplication
-                = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+                = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             if (localDrivingLicenseApplication == null)
             {
                 MessageBox.Show("Application not found.", "Edit Application", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -131,7 +132,7 @@ namespace DVLD.Applications.LocalDrivingLicense
             frmAddUpdateLocalDrivingLicenseApplication frm = new frmAddUpdateLocalDrivingLicenseApplication((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             frm.ShowDialog();
 
-            _RefreshData();
+            await _RefreshDataAsync();
         }
 
         private void txtFilterValue_TextChanged(object sender, EventArgs e)
@@ -267,11 +268,11 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         }
 
-        private void _HandleLicenseEnabling()
+        private async Task _HandleLicenseEnablingAsync()
         {
             int LocalDrivingLicenseApplicationID = (int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value;
             clsLocalDrivingLicenseApplication localDrivingLicenseApplication
-                 = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
+                 = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(LocalDrivingLicenseApplicationID);
             clsLicense license = clsLicense.FindByApplicationID
                 (localDrivingLicenseApplication.ApplicationID);
 
@@ -302,7 +303,7 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         }
 
-        private void cmsApplications_Opening(object sender, CancelEventArgs e)
+        private async void cmsApplications_Opening(object sender, CancelEventArgs e)
         {
             string ApplicationStatus = dgvLocalDrivingLicenseApplications.CurrentRow.Cells["Status"].Value.ToString();
 
@@ -316,7 +317,7 @@ namespace DVLD.Applications.LocalDrivingLicense
 
             _HandleTsetsEnabling();
 
-            _HandleLicenseEnabling();
+            await _HandleLicenseEnablingAsync();
 
             //throw new NotImplementedException();
         }
@@ -332,14 +333,14 @@ namespace DVLD.Applications.LocalDrivingLicense
             clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvLocalDrivingLicenseApplications);
         }
 
-        private void CancelApplicaitonToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void CancelApplicaitonToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
             if (MessageBox.Show("Are you sure do want to cancel this application?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                 return;
 
             clsLocalDrivingLicenseApplication localDrivingLicenseApplication
-            = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             if (localDrivingLicenseApplication != null)
             {
                 if (localDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
@@ -348,10 +349,10 @@ namespace DVLD.Applications.LocalDrivingLicense
                     return;
                 }
 
-                if (localDrivingLicenseApplication.Cancel())
+                if (await localDrivingLicenseApplication.CancelAsync())
                 {
                     MessageBox.Show("Application Canceled Successfully.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    _RefreshData();
+                    await _RefreshDataAsync();
                 }
                 else
                 {
@@ -366,35 +367,35 @@ namespace DVLD.Applications.LocalDrivingLicense
 
         }
 
-        private void scheduleVisionTestToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void scheduleVisionTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _ScheduleTest(clsTestType.enTestType.VisionTest);
-            _RefreshData();
+            await _RefreshDataAsync();
 
         }
 
-        private void scheduleWrittenTestToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void scheduleWrittenTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _ScheduleTest(clsTestType.enTestType.WrittenTest);
-            _RefreshData();
+            await _RefreshDataAsync();
         }
 
-        private void scheduleStreetTestToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void scheduleStreetTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _ScheduleTest(clsTestType.enTestType.StreetTest);
-            _RefreshData();
+            await _RefreshDataAsync();
         }
 
-        private void issueDrivingLicenseFirstTimeToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void issueDrivingLicenseFirstTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             frmIssueDriverLicenseFirstTime frm = new frmIssueDriverLicenseFirstTime((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             frm.ShowDialog();
-            _RefreshData();
+            await _RefreshDataAsync();
         }
 
-        private void showLicenseToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void showLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            clsLocalDrivingLicenseApplication LocalDriving = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
+            clsLocalDrivingLicenseApplication LocalDriving = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
             frmShowLicenseInfo frm = new frmShowLicenseInfo(clsLicense.FindByApplicationID(LocalDriving.ApplicationID).LicenseID);
             frm.ShowDialog();
         }
