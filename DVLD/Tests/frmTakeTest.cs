@@ -90,9 +90,9 @@ namespace DVLD.Tests
             }
         }
 
-        private void frmTakeTest_Load(object sender, EventArgs e)
+        private async void frmTakeTest_Load(object sender, EventArgs e)
         {
-            if(ctrlSecheduledTest1.LoadData(_AppointmentID))
+            if(await ctrlSecheduledTest1.LoadDataAsync(_AppointmentID))
             {
                 _LoadTest();
             }

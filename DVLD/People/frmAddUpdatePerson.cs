@@ -26,9 +26,9 @@ namespace DVLD.People.Forms
         clsPerson _Person;
         int? _PersonID = -1;
 
-        public delegate void PersonDataReceivedEventHandlerInForm(object sender, clsPerson Person);
+        public delegate Task PersonDataReceivedEventHandlerInForm(object sender, clsPerson Person);
 
-        public delegate void PersonIDReceivedEventHandlerInForm(object sender, int? PersonID);
+        public delegate Task PersonIDReceivedEventHandlerInForm(object sender, int? PersonID);
 
         public event PersonIDReceivedEventHandlerInForm SendPersonIDBack;
 
@@ -411,7 +411,7 @@ namespace DVLD.People.Forms
                 return;
             }
             if (_Mode == enMode.Update)
-                _FillPersonWithData();
+                await _FillPersonWithData();
 
 
             if (await _SavePersonAsync())

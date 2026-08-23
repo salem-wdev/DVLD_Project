@@ -23,10 +23,10 @@ namespace DVLD.Applications.Application_Types
         }
 
 
-        private void frmEditApplicationType_Load(object sender, EventArgs e)
+        private async void frmEditApplicationType_Load(object sender, EventArgs e)
         {
             lblApplicationTypeID.Text = _ApplicationTypeID.ToString();
-            _ApplicationType = clsApplicationType.Find(_ApplicationTypeID);
+            _ApplicationType = await clsApplicationType.FindAsync(_ApplicationTypeID);
 
             if (_ApplicationType == null)
             {
@@ -45,7 +45,7 @@ namespace DVLD.Applications.Application_Types
             this.Close();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
             _ApplicationType.ApplicationTypeTitle = txtTitle.Text.Trim();
             if (decimal.TryParse(txtFees.Text.Trim(), out decimal fees))
@@ -53,7 +53,7 @@ namespace DVLD.Applications.Application_Types
                 _ApplicationType.ApplicationTypeFees = fees;
                 if (this.ValidateChildren())
                 {
-                    if (_ApplicationType.Save())
+                    if (await _ApplicationType.SaveAsync())
                     {
                         MessageBox.Show("Application Type updated successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         this.Close();

@@ -48,22 +48,22 @@ namespace DVLD
                 return false;
 
             _Person = await clsPerson.FindAsync(PersonID);
-            return LoadData(_Person);
+            return await LoadDataAsync(_Person);
         }
 
         public async Task<bool> LoadDataAsync(string NationalNo)
         {
             _Person = await clsPerson.FindAsync(NationalNo);
-            return LoadData(_Person);
+            return await LoadDataAsync(_Person);
         }
 
-        public bool LoadData(clsPerson Person)
+        public async Task<bool> LoadDataAsync(clsPerson Person)
         {
             _Person = Person;
             if (_Person != null)
             {
                 _PersonID = Person.PersonID.HasValue ? (int)Person.PersonID : -1;
-                _FillPersonInfo();
+                await _FillPersonInfo();
                 return true;
             }
             else
@@ -129,17 +129,17 @@ namespace DVLD
 
         }
 
-        private void BackData(object sender, int? personID)
+        private async Task BackDataAsync(object sender, int? personID)
         {
             if (!personID.HasValue || personID <= 0)
                 return;
-            LoadDataAsync(personID);
+            await LoadDataAsync(personID);
         }
 
         private void llEditPersonInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             frmAddUpdatePerson frm = new frmAddUpdatePerson(_Person);
-            frm.SendPersonIDBack += BackData;
+            frm.SendPersonIDBack += BackDataAsync;
             frm.ShowDialog();
             frm.Close();
         }

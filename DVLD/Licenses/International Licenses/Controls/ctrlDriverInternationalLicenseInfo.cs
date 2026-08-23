@@ -98,10 +98,10 @@ namespace DVLD.Licenses.International_Licenses.Controls
             _ResetControl();
         }
 
-        public bool LoadData(int LicenseID)
+        public async Task<bool> LoadDataAsync(int LicenseID)
         {
             _InternationalLicenseID = LicenseID;
-            _InternationalLicense = clsInternationalLicense.FindByInternationalLicenseID(_InternationalLicenseID);
+            _InternationalLicense = await clsInternationalLicense.FindByInternationalLicenseIDAsync(_InternationalLicenseID);
             if (_InternationalLicense == null)
             {
                 MessageBox.Show("Could not find License ID = " + _InternationalLicenseID.ToString(),

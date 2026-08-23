@@ -21,9 +21,9 @@ namespace DVLD.Users
             _UserID = UserID;
         }
 
-        private void frmShowUserInfo_Load(object sender, EventArgs e)
+        private async void frmShowUserInfo_Load(object sender, EventArgs e)
         {
-            ctrlUserCard1.LoadUserInfo(_UserID);
+            await ctrlUserCard1.LoadUserInfoAsync(_UserID);
 
         }
 

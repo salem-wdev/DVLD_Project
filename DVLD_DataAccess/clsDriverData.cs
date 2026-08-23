@@ -112,14 +112,16 @@ namespace DVLD_DataAccess
 
             dt.Columns.Add("DriverID", typeof(int));
             dt.Columns.Add("PersonID", typeof(int));
-            dt.Columns.Add("CreatedByUserID", typeof(int));
+            dt.Columns.Add("NationalNo", typeof(string));
+            dt.Columns.Add("FullName", typeof(string));
             dt.Columns.Add("CreatedDate", typeof(DateTime));
+            dt.Columns.Add("NumberOfActiveLicenses", typeof(int));
 
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
-                    string query = "SELECT DriverID, PersonID, CreatedByUserID, CreatedDate FROM Drivers_View order by FullName";
+                    string query = "SELECT DriverID, PersonID, NationalNo, FullName, CreatedDate, NumberOfActiveLicenses FROM Drivers_View order by FullName";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         await connection.OpenAsync().ConfigureAwait(false);
@@ -127,7 +129,7 @@ namespace DVLD_DataAccess
                         {
                            while (await reader.ReadAsync().ConfigureAwait(false))
                            {
-                               dt.Rows.Add(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2), reader.GetDateTime(3));
+                               dt.Rows.Add(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2), reader.GetString(3), reader.GetDateTime(4), reader.GetInt32(5));
                            }
                         }
                     }

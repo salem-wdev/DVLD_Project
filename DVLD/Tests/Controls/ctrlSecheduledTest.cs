@@ -132,7 +132,7 @@ namespace DVLD.Tests.Controls
             _ResetDefaultData();
         }
 
-        public bool LoadData(int TestAppointmentID)
+        public async Task<bool> LoadDataAsync(int TestAppointmentID)
         {
             _TestAppointmentID = TestAppointmentID;
 
@@ -141,7 +141,7 @@ namespace DVLD.Tests.Controls
             if (_TestAppointment != null)
             {
                 _LocalDrivingLicenseApplicationID = _TestAppointment.LocalDrivingLicenseApplicationID;
-                _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(_LocalDrivingLicenseApplicationID);
+                _LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(_LocalDrivingLicenseApplicationID);
                 TestTypeID = _TestAppointment.TestTypeID;
                 _TestID = _TestAppointment.TestID;
             }

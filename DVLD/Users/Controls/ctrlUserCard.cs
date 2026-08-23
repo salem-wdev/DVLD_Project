@@ -29,7 +29,7 @@ namespace DVLD.Users.Controls
         }
 
 
-        public void LoadUserInfo(int UserID)
+        public async Task LoadUserInfoAsync(int UserID)
         {
             _UserID = UserID;
             _User = clsUser.Find(UserID);
@@ -41,7 +41,7 @@ namespace DVLD.Users.Controls
                 return;
             }
 
-            _FillUserInfo();
+            await _FillUserInfoAsync();
         }
 
         private void _ResetInfo()
@@ -55,9 +55,9 @@ namespace DVLD.Users.Controls
             lblUserID.Text = "???";
         }
 
-        private void _FillUserInfo()
+        private async Task _FillUserInfoAsync()
         {
-            ctrlPersonCard1.LoadDataAsync(_User.PersonID);
+            await ctrlPersonCard1.LoadDataAsync(_User.PersonID);
             lblUserID.Text = _User.UserID.ToString();
             lblUserName.Text = _User.UserName;
             lblIsActive.Text = (_User.IsActive) ? "Active" : "Inactive";

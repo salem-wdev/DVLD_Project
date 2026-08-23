@@ -65,7 +65,7 @@ namespace DVLD.Users
             chkIsActive.Checked = true;
         }
 
-        private void _LoadData()
+        private async Task _LoadDataAsync()
         {
             _User = clsUser.Find(_UserID);
             ctrlPersonCardWithFilter1.FilterEnabled = false;
@@ -81,7 +81,7 @@ namespace DVLD.Users
             lblUserID.Text = _User.UserID.ToString();
             txtUserName.Text = _User.UserName;
             chkIsActive.Checked = _User.IsActive;
-            ctrlPersonCardWithFilter1.LoadPersonInfo(_User.PersonID);
+            await ctrlPersonCardWithFilter1.LoadPersonInfoAsync(_User.PersonID);
 
         }
 
@@ -118,14 +118,14 @@ namespace DVLD.Users
             return true;
         }
 
-        private void frmAddUpdateUser_Load(object sender, EventArgs e)
+        private async void frmAddUpdateUser_Load(object sender, EventArgs e)
         {
             _ResetValues();
             AcceptButton = ctrlPersonCardWithFilter1.AcceptButton;
 
             if(_Mode == enMode.Update)
             {
-                _LoadData();
+                await _LoadDataAsync();
                 ctrlPersonCardWithFilter1.FilterEnabled = false;
                 AcceptButton = btnSave;
                 tcInfo.SelectedTab = tcInfo.TabPages["tpLoginInfo"];

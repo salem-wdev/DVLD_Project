@@ -58,10 +58,10 @@ namespace DVLD.Licenses.Controls
             }
         }
 
-        private void _LoadInternationalLicenseInfo()
+        private async Task _LoadInternationalLicenseInfoAsync()
         {
 
-            _dtAllInternationalDrivingLicenses = clsDriver.GetInternationalLicenses(_DriverID);
+            _dtAllInternationalDrivingLicenses = await clsDriver.GetInternationalLicensesAsync(_DriverID);
 
 
             dgvInternationalLicensesHistory.DataSource = _dtAllInternationalDrivingLicenses;
@@ -90,10 +90,10 @@ namespace DVLD.Licenses.Controls
             }
         }
 
-        private void _RefreshDataGrids()
+        private async Task _RefreshDataGridsAsync()
         {
             _LoadLocalLicenseInfo();
-            _LoadInternationalLicenseInfo();
+            await _LoadInternationalLicenseInfoAsync();
         }
 
         private void _ResetData()
@@ -130,7 +130,7 @@ namespace DVLD.Licenses.Controls
                 MessageBox.Show("No driver information found for the provided DriverID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
-            _RefreshDataGrids();
+            await _RefreshDataGridsAsync();
         }
 
         public async Task LoadInfoByPersonID(int? PersonID)
@@ -151,7 +151,7 @@ namespace DVLD.Licenses.Controls
 
             _DriverID = _Driver.DriverID;
 
-            _RefreshDataGrids();
+            await _RefreshDataGridsAsync();
         }
 
         private void showLicenseInfoToolStripMenuItem_Click(object sender, EventArgs e)

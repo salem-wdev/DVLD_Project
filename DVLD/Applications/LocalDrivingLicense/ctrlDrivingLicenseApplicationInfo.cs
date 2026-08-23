@@ -31,7 +31,7 @@ namespace DVLD.Applications.LocalDrivingLicense
             InitializeComponent();
         }
 
-        private void _FillControlWithData()
+        private async void _FillControlWithData()
         {
 
             if (_LocalDrivingLicenseApplication != null)
@@ -43,7 +43,7 @@ namespace DVLD.Applications.LocalDrivingLicense
                 lblLocalDrivingLicenseApplicationID.Text = _LocalDrivingLicenseApplication.LocalDrivingLicenseApplicationID.ToString();
                 lblAppliedFor.Text = _LocalDrivingLicenseApplication.LicenseClassInfo.ClassName;
                 lblPassedTests.Text = _LocalDrivingLicenseApplication.GetPassedTestCount().ToString();
-                ctrlApplicationBasicInfo1.LoadApplicationBasicInfo(_LocalDrivingLicenseApplication.ApplicationID);
+                await ctrlApplicationBasicInfo1.LoadApplicationBasicInfoAsync(_LocalDrivingLicenseApplication.ApplicationID);
             }
         }
 
@@ -59,11 +59,11 @@ namespace DVLD.Applications.LocalDrivingLicense
             ctrlApplicationBasicInfo1.Reset();
         }
 
-        public void LoadData(int LocalDrivingLicenseApplicationID)
+        public async Task LoadDataAsync(int LocalDrivingLicenseApplicationID)
         {
             lblLocalDrivingLicenseApplicationID.Text = LocalDrivingLicenseApplicationID.ToString();
             _LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
-            _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(this.LocalDrivingLicenseApplicationID);
+            _LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(this.LocalDrivingLicenseApplicationID);
 
             if( _LocalDrivingLicenseApplication != null )
             {

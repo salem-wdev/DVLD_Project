@@ -40,16 +40,15 @@ namespace DVLD.Tests
 
 
 
-        private void frmScheduleTest_Load(object sender, EventArgs e)
+        private async void frmScheduleTest_Load(object sender, EventArgs e)
         {
             if (_TestAppointmentID == -1)
             {
-                ctrlScheduleTest1.LoadData(_LocalDrivingLicenseApplicationID, _TestType);
+                await ctrlScheduleTest1.LoadDataAsync(_LocalDrivingLicenseApplicationID, _TestType);
             }
             else
             {
-                ctrlScheduleTest1.LoadData(_TestAppointmentID);
-
+                await ctrlScheduleTest1.LoadDataAsync(_TestAppointmentID);
             }
 
             this.AcceptButton = ctrlScheduleTest1.SaveButtonAction;

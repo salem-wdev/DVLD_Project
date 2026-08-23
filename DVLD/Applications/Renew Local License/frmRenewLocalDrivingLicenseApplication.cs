@@ -22,14 +22,14 @@ namespace DVLD.Applications.Renew_Local_License
             InitializeComponent();
         }
 
-        private void frmRenewLocalDrivingLicenseApplication_Load(object sender, EventArgs e)
+        private async void frmRenewLocalDrivingLicenseApplication_Load(object sender, EventArgs e)
         {
         
             lblApplicationDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
             lblIssueDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
             lblCreatedByUser.Text = clsGlobal.CurrentUser.UserName;
-            lblApplicationFees.Text = clsApplicationType.Find
-                ((int)clsApplication.enApplicationType.RenewDrivingLicense)
+            lblApplicationFees.Text =(await clsApplicationType.FindAsync
+                ((int)clsApplication.enApplicationType.RenewDrivingLicense))
                 .ApplicationTypeFees.ToString("0.##");
             AcceptButton = ctrlDriverLicenseInfoWithFilter1.AcceptButton;
         }
@@ -49,9 +49,9 @@ namespace DVLD.Applications.Renew_Local_License
             }
         }
 
-        private void btnRenewLicense_Click(object sender, EventArgs e)
+        private async void btnRenewLicense_Click(object sender, EventArgs e)
         {
-            _NewLicense = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Renew(txtNotes.Text, clsGlobal.CurrentUser.UserID);
+            _NewLicense = await ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.RenewAsync(txtNotes.Text, clsGlobal.CurrentUser.UserID);
             if(_NewLicense == null)
             {
                 llShowLicenseInfo.Enabled = false;
@@ -81,7 +81,7 @@ namespace DVLD.Applications.Renew_Local_License
             this.Close();
         }
 
-        private void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
+        private async void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
         {
             int licensesID = e.LicenseID;
             if (licensesID > 0)
@@ -102,7 +102,7 @@ namespace DVLD.Applications.Renew_Local_License
                 lblOldLicenseID.Text = licensesID.ToString();
                 float ClassFees = clsLicenseClass.Find(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.LicenseClassID).ClassFees;
                 lblLicenseFees.Text = ClassFees.ToString();
-                lblTotalFees.Text = (ClassFees + (float)clsApplicationType.Find((int)clsApplication.enApplicationType.RenewDrivingLicense).ApplicationTypeFees).ToString();
+                lblTotalFees.Text = (ClassFees + (float)(await clsApplicationType.FindAsync((int)clsApplication.enApplicationType.RenewDrivingLicense)).ApplicationTypeFees).ToString();
             }
 
         }

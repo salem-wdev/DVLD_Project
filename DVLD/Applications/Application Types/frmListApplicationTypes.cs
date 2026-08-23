@@ -26,16 +26,16 @@ namespace DVLD.Applications.Application_Types
             lblRecordsCount.Text = _dtAllApplicationTypes.Rows.Count.ToString();
         }
 
-        private void _RefreshData()
+        private async Task _RefreshDataAsync()
         {
-            _dtAllApplicationTypes = clsApplicationType.GetAllApplicationTypes();
+            _dtAllApplicationTypes = await clsApplicationType.GetAllApplicationTypesAsync();
             dgvApplicationTypes.DataSource = _dtAllApplicationTypes;
             _RefreshNumberOfRecords();
         }
 
-        private void frmListApplicationTypes_Load(object sender, EventArgs e)
+        private async void frmListApplicationTypes_Load(object sender, EventArgs e)
         {
-            _RefreshData();
+            await _RefreshDataAsync();
 
             if(dgvApplicationTypes.Rows.Count > 0)
             {
@@ -50,11 +50,11 @@ namespace DVLD.Applications.Application_Types
             }
         }
 
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             frmEditApplicationType frm = new frmEditApplicationType((int)dgvApplicationTypes.CurrentRow.Cells[0].Value);
             frm.ShowDialog();
-            _RefreshData();
+            await _RefreshDataAsync();
         }
 
         private void dgvApplicationTypes_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)

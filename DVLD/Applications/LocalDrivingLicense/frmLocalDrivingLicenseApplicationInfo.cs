@@ -20,9 +20,9 @@ namespace DVLD.Applications.LocalDrivingLicense
             _LocalDrivingLicenseApplicationID = localDrivingLicenseApplicationID;
         }
 
-        private void frmLocalDrivingLicenseApplicationInfo_Load(object sender, EventArgs e)
+        private async void frmLocalDrivingLicenseApplicationInfo_Load(object sender, EventArgs e)
         {
-            ctrlDrivingLicenseApplicationInfo1.LoadData(_LocalDrivingLicenseApplicationID);
+            await ctrlDrivingLicenseApplicationInfo1.LoadDataAsync(_LocalDrivingLicenseApplicationID);
         }
 
         private void btnClose_Click(object sender, EventArgs e)

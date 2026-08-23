@@ -60,17 +60,17 @@ namespace DVLD.Applications.Rlease_Detained_License
             return FilterColumn;
         }
 
-        private void _RefreshGrid()
+        private async Task _RefreshGridAsync()
         {
-            _dtDetainedLicenses = clsDetainedLicense.GetAllDetainedLicenses();
+            _dtDetainedLicenses = await clsDetainedLicense.GetAllDetainedLicensesAsync();
 
             dgvDetainedLicenses.DataSource = _dtDetainedLicenses;
             lblTotalRecords.Text = dgvDetainedLicenses.Rows.Count.ToString();
         }
 
-        private void frmListDetainedLicenses_Load(object sender, EventArgs e)
+        private async void frmListDetainedLicenses_Load(object sender, EventArgs e)
         {
-            _RefreshGrid();
+            await _RefreshGridAsync();
             cbFilterBy.SelectedIndex = 0;
 
 
@@ -105,18 +105,18 @@ namespace DVLD.Applications.Rlease_Detained_License
             }
         }
 
-        private void btnReleaseDetainedLicense_Click(object sender, EventArgs e)
+        private async void btnReleaseDetainedLicense_Click(object sender, EventArgs e)
         {
             frmReleaseDetainedLicenseApplication frm = new frmReleaseDetainedLicenseApplication();
             frm.ShowDialog();
-            _RefreshGrid();
+            await _RefreshGridAsync();
         }
 
-        private void btnDetainLicense_Click(object sender, EventArgs e)
+        private async void btnDetainLicense_Click(object sender, EventArgs e)
         {
             frmDetainLicenseApplication frm = new frmDetainLicenseApplication();
             frm.ShowDialog();
-            _RefreshGrid();
+            await _RefreshGridAsync();
         }
 
         private void cbFilterBy_SelectedIndexChanged(object sender, EventArgs e)

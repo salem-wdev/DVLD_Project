@@ -1,14 +1,7 @@
-﻿using DVLD.Global_Classes;
-using DVLD.Properties;
+﻿using DVLD.Properties;
 using DVLD_Business;
 using DVLD_Business.Global_Classes;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -131,7 +124,7 @@ namespace DVLD.Tests.Controls
             lblUserMessage.Visible = true;
         }
 
-        private void _DisplayRetakeTestData()
+        private async Task _DisplayRetakeTestDataAsync()
         {
 
             if (_CreationMode == enCreationMode.RetakeTestSchedule)
@@ -144,7 +137,7 @@ namespace DVLD.Tests.Controls
                         lblRetakeTestAppID.Text = appID > 0 ? appID.ToString() : "N/A";
                     }
                 }
-                float RetakeTestFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.RetakeTest).ApplicationTypeFees;
+                float RetakeTestFees = (float)(await clsApplicationType.FindAsync((int)clsApplication.enApplicationType.RetakeTest)).ApplicationTypeFees;
                 TotalFees += RetakeTestFees;
                 lblRetakeAppFees.Text = $"${RetakeTestFees}";
             }
@@ -157,18 +150,18 @@ namespace DVLD.Tests.Controls
             //lblFees.Text =
         }
 
-        private void _DisplayAppointmentData()
+        private async Task _DisplayAppointmentDataAsync()
         {
             float fees = (float)clsTestType.Find(TestTypeID).TestTypeFees;
             lblUserMessage.Visible = false;
             lblFees.Text = $"${fees}";
             TotalFees += fees;
             lblTotalFees.Text = $"${TotalFees}";
-            _DisplayRetakeTestData();
+            await _DisplayRetakeTestDataAsync();
             
         }
 
-        private void _DisplayData()
+        private async Task _DisplayDataAsync()
         {
             if (_LocalDrivingLicenseApplication != null)
             {
@@ -178,7 +171,7 @@ namespace DVLD.Tests.Controls
                 lblTrial.Text = _LocalDrivingLicenseApplication.TotalTrialsPerTest(TestTypeID).ToString();
 
 
-                _DisplayAppointmentData();
+                await _DisplayAppointmentDataAsync();
 
             }
             else
@@ -187,9 +180,9 @@ namespace DVLD.Tests.Controls
             }
         }
 
-        private bool _SaveData()
+        private async Task<bool> _SaveDataAsync()
         {
-            _TestAppointment = clsTestAppointment.CreateNewTestAppointment(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value);
+            _TestAppointment = await clsTestAppointment.CreateNewTestAppointmentAsync(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value);
             if (_TestAppointment != null)
             {
                 _TestAppointmentID = _TestAppointment.TestAppointmentID;
@@ -203,13 +196,13 @@ namespace DVLD.Tests.Controls
         //////////////////////////////////////////////////////////////
         
 
-        public bool LoadData(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public async Task<bool> LoadDataAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
 
             _LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
             this.TestTypeID = TestTypeID;
             _LocalDrivingLicenseApplicationID = LocalDrivingLicenseApplicationID;
-            _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(_LocalDrivingLicenseApplicationID);
+            _LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(_LocalDrivingLicenseApplicationID);
             _Mode = enMode.AddNew;
 
             if (_LocalDrivingLicenseApplication == null)
@@ -220,7 +213,7 @@ namespace DVLD.Tests.Controls
                 return false;
             }
 
-            if (!clsTestAppointment.CanBookAppointment(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value))
+            if (!await clsTestAppointment.CanBookAppointmentAsync(_LocalDrivingLicenseApplicationID, TestTypeID, clsGlobal.CurrentUser.UserID, dtpTestDate.Value))
             {
                 lblUserMessage.Visible = true;
                 btnSave.Enabled = false;
@@ -228,19 +221,19 @@ namespace DVLD.Tests.Controls
                 return false;
             }
 
-            _CreationMode = _LocalDrivingLicenseApplication.DoesAttendTestType(TestTypeID) 
+            _CreationMode = await _LocalDrivingLicenseApplication.DoesAttendTestTypeAsync(TestTypeID) 
                 ? enCreationMode.RetakeTestSchedule : enCreationMode.FirstTimeSchedule;
 
             lblUserMessage.Visible = false;
             btnSave.Enabled = true;
             _Mode = enMode.AddNew;
             
-            _DisplayData();
+            _DisplayDataAsync();
 
             return true;
         }
 
-        public bool LoadData(int TestAppointmentID)
+        public async Task<bool> LoadDataAsync(int TestAppointmentID)
         {
 
 
@@ -277,23 +270,23 @@ namespace DVLD.Tests.Controls
 
             _Mode = enMode.Update;
             dtpTestDate.MinDate = _TestAppointment.AppointmentDate;
-            _LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(_TestAppointment.LocalDrivingLicenseApplicationID);
+            _LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(_TestAppointment.LocalDrivingLicenseApplicationID);
             _LocalDrivingLicenseApplicationID = _TestAppointment.LocalDrivingLicenseApplicationID;
 
 
-            _DisplayData();
+            _DisplayDataAsync();
 
             return true;
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to save changes? \nYou can't change this later.", "Confirm Save", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
             {
                 return;
             }
 
-            if (_SaveData())
+            if (await _SaveDataAsync())
             {
                 MessageBox.Show("Data saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if (_CreationMode == enCreationMode.RetakeTestSchedule)

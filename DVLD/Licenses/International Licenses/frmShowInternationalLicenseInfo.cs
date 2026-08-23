@@ -20,9 +20,9 @@ namespace DVLD.Licenses.International_Licenses
             _InternationalLicenseID = InternationalLicenseID;
         }
 
-        private void frmShowInternationalLicenseInfo_Load(object sender, EventArgs e)
+        private async void frmShowInternationalLicenseInfo_Load(object sender, EventArgs e)
         {
-            if(!ctrlDriverInternationalLicenseInfo1.LoadData(_InternationalLicenseID))
+            if(!await ctrlDriverInternationalLicenseInfo1.LoadDataAsync(_InternationalLicenseID))
             {
                 MessageBox.Show("Could not load the data for this license.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;

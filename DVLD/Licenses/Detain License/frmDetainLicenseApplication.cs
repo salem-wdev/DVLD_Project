@@ -35,7 +35,7 @@ namespace DVLD.Licenses.Detain_License
             e.Handled = !clsValidation.IsInputValidDecimal(e.KeyChar, CurrentTextBox.Text, CurrentTextBox.SelectionStart);
         }
 
-        private void btnDetain_Click(object sender, EventArgs e)
+        private async void btnDetain_Click(object sender, EventArgs e)
         {
             if(!this.ValidateChildren())
             {
@@ -43,7 +43,7 @@ namespace DVLD.Licenses.Detain_License
                 return;
             }
 
-            _DetainedLicense = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Detain(float.Parse(txtFineFees.Text), clsGlobal.CurrentUser.UserID);
+            _DetainedLicense = await ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainAsync(float.Parse(txtFineFees.Text), clsGlobal.CurrentUser.UserID);
             if (_DetainedLicense == null)
             {
                 llShowLicenseInfo.Enabled = false;

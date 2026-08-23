@@ -48,10 +48,10 @@ namespace DVLD.Applications.Rlease_Detained_License
             frm.ShowDialog();
         }
 
-        private void btnRelease_Click(object sender, EventArgs e)
+        private async void btnRelease_Click(object sender, EventArgs e)
         {
 
-            if (!ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.Release(clsGlobal.CurrentUser.UserID))
+            if (!await ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.ReleaseAsync(clsGlobal.CurrentUser.UserID))
             {
                 MessageBox.Show("Failed to release license.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -77,7 +77,7 @@ namespace DVLD.Applications.Rlease_Detained_License
             ctrlDriverLicenseInfoWithFilter1.txtLicenseIDFocus();
         }
 
-        private void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
+        private async void ctrlDriverLicenseInfoWithFilter1_LicenseSelected(object sender, Licenses.Local_Licenses.Controls.ctrlDriverLicenseInfoWithFilter.LicenseSelectedEventArgs e)
         {
             int licenseID = e.LicenseID;
             if (licenseID > 0)
@@ -97,7 +97,7 @@ namespace DVLD.Applications.Rlease_Detained_License
                 lblDetainID.Text = _DetainLicenseID.ToString();
                 lblDetainDate.Text = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.DetainDate.ToString("dd/MM/yyyy");
                 float FineFees = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.DetainedInfo.FineFees;
-                float ApplicationFees = (float)clsApplicationType.Find((int)clsApplication.enApplicationType.ReleaseDetainedDrivingLicense).ApplicationTypeFees;
+                float ApplicationFees = (float)(await clsApplicationType.FindAsync((int)clsApplication.enApplicationType.ReleaseDetainedDrivingLicense)).ApplicationTypeFees;
                 lblFineFees.Text = FineFees.ToString();
                 lblApplicationFees.Text = ApplicationFees.ToString();
                 lblTotalFees.Text = (FineFees + ApplicationFees).ToString();

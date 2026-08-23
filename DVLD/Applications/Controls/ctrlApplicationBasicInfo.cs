@@ -63,10 +63,10 @@ namespace DVLD.Applications.Controls
             ResetAll();
         }
 
-        public void LoadApplicationBasicInfo(int ApplicationID)
+        public async Task LoadApplicationBasicInfoAsync(int ApplicationID)
         {
             _ApplicationID = ApplicationID;
-            _Application = clsApplication.Find(ApplicationID);
+            _Application = await clsApplication.FindAsync(ApplicationID);
             if (_Application != null)
             {
                 _FillApplicationBasicInfo();
@@ -77,12 +77,12 @@ namespace DVLD.Applications.Controls
             }
         }
 
-        private void llViewPersonInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private async void llViewPersonInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             frmShowPersonInfo frm = new frmShowPersonInfo(_Application.ApplicantPersonID);
             frm.ShowDialog();
 
-            LoadApplicationBasicInfo(ApplicationID);
+             await LoadApplicationBasicInfoAsync(ApplicationID);
         }
     }
 }
