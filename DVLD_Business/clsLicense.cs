@@ -39,7 +39,7 @@ namespace DVLD_Business
 
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
-        private readonly Dictionary<enMode, Func<bool>> _saveDispatcher;
+        private readonly Dictionary<enMode, Func<Task<bool>>> _saveDispatcher;
 
         public enum enIssueReason { FirstTime = 1, Renew = 2, DamagedReplacement = 3, LostReplacement = 4 };
 
@@ -66,9 +66,16 @@ namespace DVLD_Business
         }
 
         public int CreatedByUserID { private set; get; }
+
+        private bool _IsDetained = false;
+
         public bool IsDetained
         {
-            get { return clsDetainedLicense.IsLicenseDetained(this.LicenseID); }
+            get
+            {
+                _GetIsDenidedInfo();
+                return _IsDetained;
+            }
         }
 
         private clsDriver _DriverInfo = null;
@@ -91,7 +98,7 @@ namespace DVLD_Business
             {
                 if (_DetainedInfo == null && this.LicenseID != -1)
                 {
-                    _DetainedInfo = clsDetainedLicense.FindByLicenseID(this.LicenseID);
+                    _GetDetainedInfo();
                 }
                 return _DetainedInfo;
             }
@@ -127,10 +134,10 @@ namespace DVLD_Business
             this.IssueReason = IssueReason;
             this.CreatedByUserID = CreatedByUserID;
 
-            _saveDispatcher = new Dictionary<enMode, Func<bool>>
+            _saveDispatcher = new Dictionary<enMode, Func<Task<bool>>>
             {
-                { enMode.AddNew, _AddNewLicense },
-                { enMode.Update, _UpdateLicense }
+                { enMode.AddNew, _AddNewLicenseAsync },
+                { enMode.Update, _UpdateLicenseAsync }
             };
 
             Mode = enMode.AddNew;
@@ -154,10 +161,10 @@ namespace DVLD_Business
             this.IssueReason = IssueReason;
             this.CreatedByUserID = CreatedByUserID;
 
-            _saveDispatcher = new Dictionary<enMode, Func<bool>>
+            _saveDispatcher = new Dictionary<enMode, Func<Task<bool>>>
             {
-                { enMode.AddNew, _AddNewLicense },
-                { enMode.Update, _UpdateLicense }
+                { enMode.AddNew, _AddNewLicenseAsync },
+                { enMode.Update, _UpdateLicenseAsync }
             };
 
             Mode = enMode.Update;
@@ -178,10 +185,10 @@ namespace DVLD_Business
             this.IssueReason = OldLicense.IssueReason;
             this.CreatedByUserID = OldLicense.CreatedByUserID;
 
-            _saveDispatcher = new Dictionary<enMode, Func<bool>>
+            _saveDispatcher = new Dictionary<enMode, Func<Task<bool>>>
             {
-                { enMode.AddNew, _AddNewLicense },
-                { enMode.Update, _UpdateLicense }
+                { enMode.AddNew, _AddNewLicenseAsync },
+                { enMode.Update, _UpdateLicenseAsync }
             };
 
             clsDetainedLicense.LicenseDetained += ClsDetainedLicense_LicenseDetained;
@@ -213,6 +220,12 @@ namespace DVLD_Business
             Dispose(false);
         }
 
+        private async void _GetIsDenidedInfo()
+        {
+            // Database query is deferred until this property is explicitly requested by the UI or other layers.
+            _IsDetained = await clsDetainedLicense.IsLicenseDetainedAsync(this.LicenseID);
+        }
+
         private async void _GetDriverInfo()
         {
             // Database query is deferred until this property is explicitly requested by the UI or other layers.
@@ -222,10 +235,20 @@ namespace DVLD_Business
             }
         }
 
+        private async void _GetDetainedInfo()
+        {
+            // Database query is deferred until this property is explicitly requested by the UI or other layers.
+            if (_DriverInfo == null && this.DriverID != -1)
+            {
+                _DetainedInfo = await clsDetainedLicense.FindByLicenseIDAsync(this.LicenseID);
+            }
+        }
+
+
         // TODO: Refactor date handling. 
         // Currently relying on DataAccess layer to override dates via ref parameters.
         // Need to move expiration logic (Class Validity) here to comply with Rich Domain Model.
-        private bool _AddNewLicense()
+        private async Task<bool> _AddNewLicenseAsync()
         {
             if (IssueReason != enIssueReason.FirstTime)
             {
@@ -239,7 +262,7 @@ namespace DVLD_Business
             }
 
             int OldLicenseID = -1;
-            if (clsApplication.GetApplicationStatus(ApplicationID) != clsApplication.enApplicationStatus.New)
+            if (await clsApplication.GetApplicationStatusAsync(ApplicationID) != clsApplication.enApplicationStatus.New)
             {
                 return false;
             }
@@ -256,7 +279,7 @@ namespace DVLD_Business
                this.IsActive, (byte)this.IssueReason, this.CreatedByUserID);
 
 
-            if (this.LicenseID != -1 && clsApplication.SetComplete(this.ApplicationID))
+            if (this.LicenseID != -1 && await clsApplication.SetCompleteAsync(this.ApplicationID))
             {
                 if (OldLicenseID > 0)
                 {
@@ -304,7 +327,7 @@ namespace DVLD_Business
                 this.PaidFees, this.IsActive, this.IsDetained));
         }
 
-        private bool _UpdateLicense()
+        private async Task<bool> _UpdateLicenseAsync()
         {
             //call DataAccess Layer 
 
@@ -386,10 +409,10 @@ namespace DVLD_Business
 
         }
 
-        private bool Save()
+        private async Task<bool> SaveAsync()
         {
 
-            return _saveDispatcher[this.Mode]();
+            return await _saveDispatcher[this.Mode]();
         }
 
         public static string GetIssueReasonText(enIssueReason IssueReason)
@@ -437,22 +460,22 @@ namespace DVLD_Business
             LicenseUpdated?.Invoke(this, e);
         }
 
-        private static float _CalculatePaidFees(clsApplication.enApplicationType ApplicationType, int LicenseClassID)
+        private static async Task<float> _CalculatePaidFeesAsync(clsApplication.enApplicationType ApplicationType, int LicenseClassID)
         { 
             if(ApplicationType == clsApplication.enApplicationType.ReplaceLostDrivingLicense
                 || ApplicationType == clsApplication.enApplicationType.ReplaceDamagedDrivingLicense)
             {
-                return (float)clsApplicationType.Find((int)ApplicationType).ApplicationTypeFees;
+                return (float)(await clsApplicationType.FindAsync((int)ApplicationType)).ApplicationTypeFees;
             }
-            return clsLicenseClass.Find(LicenseClassID).ClassFees + (float)clsApplicationType.Find((int)ApplicationType).ApplicationTypeFees;
+            return clsLicenseClass.Find(LicenseClassID).ClassFees + (float)(await clsApplicationType.FindAsync((int)ApplicationType)).ApplicationTypeFees;
         }
 
-        private static int? _CreateNewApplicationID(int CreatedByUserID, int? PersonID, clsApplication.enApplicationType ApplicationType)
+        private static async Task<int?> _CreateNewApplicationIDAsync(int CreatedByUserID, int? PersonID, clsApplication.enApplicationType ApplicationType)
         {
             if (!PersonID.HasValue || PersonID <= 0)
                 return null;
 
-            clsApplication application = clsApplication.GetNewApplication(CreatedByUserID, PersonID, ApplicationType);
+            clsApplication application = await clsApplication.GetNewApplicationAsync(CreatedByUserID, PersonID, ApplicationType);
             if(application != null)
             {
                 return application.ApplicationID;
@@ -494,7 +517,7 @@ namespace DVLD_Business
 
             clsLicense NewLicense = null;
             clsLocalDrivingLicenseApplication localDrivingLicenseApplication
-                = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
+                = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(LocalDrivingLicenseApplicationID);
 
             if (localDrivingLicenseApplication == null)
             {
@@ -506,7 +529,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            if (localDrivingLicenseApplication.HasLicense())
+            if (await localDrivingLicenseApplication.HasLicenseAsync())
             {
                 return null;
             }
@@ -516,13 +539,13 @@ namespace DVLD_Business
                 return null;
             }
 
-            if (!localDrivingLicenseApplication.DoesPassAllTests())
+            if (!await localDrivingLicenseApplication.DoesPassAllTestsAsync())
             {
                 return null;
             }
 
 
-            float PaidFees = _CalculatePaidFees(clsApplication.enApplicationType.NewDrivingLicense, localDrivingLicenseApplication.LicenseClassID);
+            float PaidFees = await _CalculatePaidFeesAsync(clsApplication.enApplicationType.NewDrivingLicense, localDrivingLicenseApplication.LicenseClassID);
             NewLicense = new clsLicense(localDrivingLicenseApplication.ApplicationID, localDrivingLicenseApplication.LicenseClassID,
                 CreatedByUserID, Notes, PaidFees, enIssueReason.FirstTime);
 
@@ -537,7 +560,7 @@ namespace DVLD_Business
             return (NewLicense._DriverInfo != null) ? NewLicense : null;
         }
        
-        private static clsLicense _PrepareRenewLicense(int LicenseID, string Notes, int CreatedByUserID)
+        private static async Task<clsLicense> _PrepareRenewLicenseAsync(int LicenseID, string Notes, int CreatedByUserID)
         {
             clsLicense OldLicense = Find(LicenseID);
             clsLicense NewLicense = null;
@@ -562,19 +585,19 @@ namespace DVLD_Business
                     return null;
                 }
 
-                if (clsDetainedLicense.IsLicenseDetained(LicenseID))
+                if (await clsDetainedLicense.IsLicenseDetainedAsync(LicenseID))
                 {
                     return null;
                 }
 
                 NewLicense = new clsLicense(OldLicense);
                 NewLicense.IssueReason = enIssueReason.Renew;
-                int? ApplicationID = _CreateNewApplicationID(CreatedByUserID,
+                int? ApplicationID = await _CreateNewApplicationIDAsync(CreatedByUserID,
                     NewLicense.DriverInfo.PersonID, clsApplication.enApplicationType.RenewDrivingLicense);
                 NewLicense.ApplicationID = ApplicationID.HasValue ? (int)ApplicationID : -1;
                 NewLicense.CreatedByUserID = CreatedByUserID;
                 NewLicense.Notes = Notes;
-                NewLicense.PaidFees = _CalculatePaidFees(clsApplication.enApplicationType.RenewDrivingLicense
+                NewLicense.PaidFees = await _CalculatePaidFeesAsync(clsApplication.enApplicationType.RenewDrivingLicense
                     , NewLicense.LicenseClassID);
                 NewLicense.IsActive = true;
                 OldLicense.IsActive = false;
@@ -582,7 +605,7 @@ namespace DVLD_Business
             return NewLicense;
         }
 
-        private static clsLicense _PrepareReplacementLicense(int LicenseID, int CreatedByUserID, string Notes, enIssueReason IssueReason)
+        private static async Task<clsLicense> _PrepareReplacementLicenseAsync(int LicenseID, int CreatedByUserID, string Notes, enIssueReason IssueReason)
         {
             if (IssueReason != enIssueReason.DamagedReplacement && IssueReason != enIssueReason.LostReplacement)
             {
@@ -608,9 +631,9 @@ namespace DVLD_Business
                 clsApplication.enApplicationType.ReplaceLostDrivingLicense;
 
 
-            NewLicense.PaidFees = _CalculatePaidFees(applicationType, NewLicense.LicenseClassID);
+            NewLicense.PaidFees = await _CalculatePaidFeesAsync(applicationType, NewLicense.LicenseClassID);
             NewLicense.IssueReason = IssueReason;
-            int? ApplicationID = _CreateNewApplicationID(CreatedByUserID,
+            int? ApplicationID = await _CreateNewApplicationIDAsync(CreatedByUserID,
                 NewLicense.DriverInfo.PersonID, applicationType);
             NewLicense.ApplicationID = ApplicationID.HasValue ? (int)ApplicationID : -1;
             NewLicense.CreatedByUserID = CreatedByUserID;
@@ -642,13 +665,13 @@ namespace DVLD_Business
             return clsLicenseData.DeactivateExpiredLicenses();
         }
 
-        public clsLicense Renew(string Notes, int CreatedByUserID)
+        public async Task<clsLicense> RenewAsync(string Notes, int CreatedByUserID)
         {
-            clsLicense license = _PrepareRenewLicense(this.LicenseID, Notes, CreatedByUserID);
+            clsLicense license = await _PrepareRenewLicenseAsync(this.LicenseID, Notes, CreatedByUserID);
 
             if (license != null)
             {
-                if (license.Save())
+                if (await license.SaveAsync())
                 {
                     OnLicenseUpdated(new LicenseUpdatedEventArgs(this.LicenseID, this.DriverID, this.ExpirationDate, this.Notes,
                                     this.PaidFees, this.IsActive, this.IsDetained));
@@ -665,7 +688,7 @@ namespace DVLD_Business
 
             if (license != null)
             {
-                if (license.Save())
+                if (await license.SaveAsync())
                 {
                     license.SubscribeToEvents();
                     return license;
@@ -675,12 +698,12 @@ namespace DVLD_Business
             return null;
         }
 
-        public clsLicense Replace(int CreatedByUserID, enIssueReason IssueReason)
+        public async Task<clsLicense> ReplaceAsync(int CreatedByUserID, enIssueReason IssueReason)
         {
-            clsLicense license = _PrepareReplacementLicense(this.LicenseID, CreatedByUserID, Notes, IssueReason);
+            clsLicense license = await _PrepareReplacementLicenseAsync(this.LicenseID, CreatedByUserID, Notes, IssueReason);
             if (license != null)
             {
-                if (license.Save())
+                if (await license.SaveAsync())
                 {
                     OnLicenseUpdated(new LicenseUpdatedEventArgs(this.LicenseID, this.DriverID, this.ExpirationDate, this.Notes,
                 this.PaidFees, this.IsActive, this.IsDetained));
@@ -690,14 +713,14 @@ namespace DVLD_Business
             return null;
         }
 
-        public clsDetainedLicense Detain(float FineFees, int CreatedByUserID)
+        public async Task<clsDetainedLicense> DetainAsync(float FineFees, int CreatedByUserID)
         {
-            return clsDetainedLicense.DetainedLicense(this.LicenseID, FineFees, CreatedByUserID);
+            return await clsDetainedLicense.DetainedLicenseAsync(this.LicenseID, FineFees, CreatedByUserID);
         }
 
-        public bool Release(int ReleasedByUserID)
+        public async Task<bool> ReleaseAsync(int ReleasedByUserID)
         {
-            clsDetainedLicense DetainedLicense = clsDetainedLicense.ReleaseDetainedLicense(this.LicenseID, ReleasedByUserID);
+            clsDetainedLicense DetainedLicense = await clsDetainedLicense.ReleaseDetainedLicenseAsync(this.LicenseID, ReleasedByUserID);
             if(DetainedLicense != null)
             {
                 this._DetainedInfo = DetainedLicense;

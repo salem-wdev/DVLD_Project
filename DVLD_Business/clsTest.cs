@@ -95,7 +95,7 @@ namespace DVLD_Business
 
             if (TestAppointmentInfo.RetakeTestAppInfo != null && TestResult == true)
             {
-                TestAppointmentInfo.RetakeTestAppInfo.SetComplete();
+                TestAppointmentInfo.RetakeTestAppInfo.SetCompleteAsync();
             }
             Mode = enMode.Update;
             return true;

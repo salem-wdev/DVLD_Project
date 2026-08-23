@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DVLD_Business
@@ -12,7 +10,7 @@ namespace DVLD_Business
     {
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         public int TestAppointmentID { private set; get; }
         public clsTestType.enTestType TestTypeID { private set; get; }
@@ -46,7 +44,7 @@ namespace DVLD_Business
             {
                 if (_RetakeTestAppInfo == null && RetakeTestApplicationID != -1)
                 {
-                    _RetakeTestAppInfo = clsApplication.Find(RetakeTestApplicationID);
+                    _LoadRetakeTestAppInfo();
                 }
                 return _RetakeTestAppInfo;
             }
@@ -70,10 +68,10 @@ namespace DVLD_Business
             this.CreatedByUserID = CreatedByUserID;
             this.RetakeTestApplicationID = -1;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew, _AddNewTestAppointment },
-                {enMode.Update, _UpdateTestAppointment },
+                {enMode.AddNew, _AddNewTestAppointmentAsync },
+                {enMode.Update, _UpdateTestAppointmentAsync },
             };
 
             Mode = enMode.AddNew;
@@ -94,18 +92,18 @@ namespace DVLD_Business
             this.IsLocked = IsLocked;
             this.RetakeTestApplicationID = RetakeTestApplicationID;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew, _AddNewTestAppointment },
-                {enMode.Update, _UpdateTestAppointment },
+                {enMode.AddNew, _AddNewTestAppointmentAsync },
+                {enMode.Update, _UpdateTestAppointmentAsync },
             };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewTestAppointment()
+        private async Task<bool> _AddNewTestAppointmentAsync()
         {
-            clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
+            clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(LocalDrivingLicenseApplicationID);
             if (LocalDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
             {
                 return false;
@@ -125,12 +123,12 @@ namespace DVLD_Business
             if (this.RetakeTestApplicationID != -1)
             {
                 // Delete the retake test application if the test appointment save fails.
-                clsApplication.Delete(this.RetakeTestApplicationID);
+                clsApplication.DeleteAsync(this.RetakeTestApplicationID);
             }
             return false;
         }
 
-        private bool _UpdateTestAppointment()
+        private async Task<bool> _UpdateTestAppointmentAsync()
         {
             if (this._AppointmentDate < clsUtilData.GetServerDate())
             {
@@ -148,6 +146,12 @@ namespace DVLD_Business
             return clsTestAppointmentData.UpdateTestAppointment(this.TestAppointmentID, (int)this.TestTypeID, this.LocalDrivingLicenseApplicationID,
                 this.AppointmentDate, this.PaidFees, this.CreatedByUserID, this.IsLocked, this.RetakeTestApplicationID);
         }
+
+        private async void _LoadRetakeTestAppInfo()
+        {
+            _RetakeTestAppInfo = await clsApplication.FindAsync(RetakeTestApplicationID);
+        }
+
 
         public static clsTestAppointment Find(int TestAppointmentID)
         {
@@ -237,14 +241,14 @@ namespace DVLD_Business
 
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
             if (RetakeTestAppInfo != null)
             {
                 RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
             }
 
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
 
         private int _GetTestID()
@@ -252,12 +256,12 @@ namespace DVLD_Business
             return clsTestAppointmentData.GetTestID(TestAppointmentID);
         }
 
-        private static float _CalculateFees(clsApplication RetakeTestAppInfo, clsTestType.enTestType TestTypeID)
+        private static async Task<float> _CalculateFeesAsync(clsApplication RetakeTestAppInfo, clsTestType.enTestType TestTypeID)
         {
             float paidFees = 0.0f;
             if (RetakeTestAppInfo != null)
             {
-                RetakeTestAppInfo.PaidFees = clsApplicationType.Find((int)clsApplication.enApplicationType.RetakeTest).ApplicationTypeFees;
+                RetakeTestAppInfo.PaidFees = (await clsApplicationType.FindAsync((int)clsApplication.enApplicationType.RetakeTest)).ApplicationTypeFees;
                 paidFees += (float)RetakeTestAppInfo.PaidFees;
             }
 
@@ -376,30 +380,30 @@ namespace DVLD_Business
 
         }
 
-        private static clsTestAppointment _GetReadyObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        private static async Task<clsTestAppointment> _GetReadyObjectAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
             clsTestAppointment testAppointment;
 
             testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
-            if (clsLocalDrivingLicenseApplication.DoesAttendTestType(LocalDrivingLicenseApplicationID, TestTypeID))
+            if (await clsLocalDrivingLicenseApplication.DoesAttendTestTypeAsync(LocalDrivingLicenseApplicationID, TestTypeID))
             {
-                if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID))
+                if (!await clsLocalDrivingLicenseApplication.DosPassTestAsync(LocalDrivingLicenseApplicationID, TestTypeID))
                 {
-                    testAppointment._RetakeTestAppInfo = _GetNewReTakeTestObj(testAppointment.CreatedByUserID, clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID).ApplicantPersonID);
+                    testAppointment._RetakeTestAppInfo = await _GetNewReTakeTestObjAsync(testAppointment.CreatedByUserID, (await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(LocalDrivingLicenseApplicationID)).ApplicantPersonID);
                 }
                 else
                 {
                     return null;
                 }
             }
-            testAppointment.PaidFees = _CalculateFees(testAppointment._RetakeTestAppInfo, TestTypeID);
+            testAppointment.PaidFees = await _CalculateFeesAsync(testAppointment._RetakeTestAppInfo, TestTypeID);
             return testAppointment;
         }
 
-        private static bool _CanBookAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        private static async Task<bool> _CanBookAppointmentAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
 
-            if (clsLocalDrivingLicenseApplication.GetApplicationStatus(LocalDrivingLicenseApplicationID) != clsApplication.enApplicationStatus.New)
+            if (await clsLocalDrivingLicenseApplication.GetApplicationStatusAsync(LocalDrivingLicenseApplicationID) != clsApplication.enApplicationStatus.New)
             {
                 return false;
             }
@@ -425,7 +429,7 @@ namespace DVLD_Business
             }
 
             // check is passed preveous test.
-            if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID - 1))
+            if (!await clsLocalDrivingLicenseApplication.DosPassTestAsync(LocalDrivingLicenseApplicationID, TestTypeID - 1))
             {
                 return false;
             }
@@ -433,14 +437,14 @@ namespace DVLD_Business
             return true;
         }
 
-        public static bool CanBookAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        public static async Task<bool> CanBookAppointmentAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
-            return _CanBookAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+            return await _CanBookAppointmentAsync(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
         }
 
-        private static clsTestAppointment _GetNewTestAppointmentObject(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        private static async Task<clsTestAppointment> _GetNewTestAppointmentObjectAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
-            clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication = clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseID(LocalDrivingLicenseApplicationID);
+            clsLocalDrivingLicenseApplication LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(LocalDrivingLicenseApplicationID);
             if(LocalDrivingLicenseApplication.ApplicationStatus != clsApplication.enApplicationStatus.New)
             {
                 return null;
@@ -463,27 +467,27 @@ namespace DVLD_Business
 
             if (TestTypeID == clsTestType.enTestType.VisionTest)
             {
-                return _GetReadyObject(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+                return await _GetReadyObjectAsync(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
             }
 
             // check is passed preveous test.
-            if (!clsLocalDrivingLicenseApplication.DosPassTest(LocalDrivingLicenseApplicationID, TestTypeID - 1))
+            if (!await clsLocalDrivingLicenseApplication.DosPassTestAsync(LocalDrivingLicenseApplicationID, TestTypeID - 1))
             {
                 return null;
             }
 
 
 
-            return _GetReadyObject(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+            return await _GetReadyObjectAsync(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
         }
 
-        public static clsTestAppointment CreateNewTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
+        public static async Task<clsTestAppointment> CreateNewTestAppointmentAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
-            clsTestAppointment appointment = _GetNewTestAppointmentObject(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
+            clsTestAppointment appointment = await _GetNewTestAppointmentObjectAsync(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
 
             if (appointment != null)
             {
-                if(appointment.Save())
+                if(await appointment.SaveAsync())
                 {
                     return appointment;
                 }
@@ -491,9 +495,9 @@ namespace DVLD_Business
             return null;
         }
 
-        private static clsApplication _GetNewReTakeTestObj(int CreatedByUserID, int ApplicantPersonID)
+        private static async Task<clsApplication> _GetNewReTakeTestObjAsync(int CreatedByUserID, int ApplicantPersonID)
         {
-            return clsApplication.GetNewApplication(CreatedByUserID, ApplicantPersonID, clsApplication.enApplicationType.RetakeTest);
+            return await clsApplication.GetNewApplicationAsync(CreatedByUserID, ApplicantPersonID, clsApplication.enApplicationType.RetakeTest);
         }
 
         public static bool LockExpiredTestAppointments()
