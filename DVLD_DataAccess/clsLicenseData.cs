@@ -5,16 +5,25 @@ using System.Configuration;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace DVLD_DataAccess
 {
     public class clsLicenseData
     {
-        public static bool GetLicenseInfoByID(int LicenseID, ref int ApplicationID, ref int DriverID, ref int LicenseClass,
-            ref DateTime IssueDate, ref DateTime ExpirationDate, ref string Notes,
-            ref float PaidFees, ref bool IsActive, ref byte IssueReason, ref int CreatedByUserID)
+        public static async Task<(bool IsFound, int ApplicationID, int DriverID, int LicenseClass, DateTime IssueDate, DateTime ExpirationDate, string Notes, float PaidFees, bool IsActive, byte IssueReason, int CreatedByUserID)> GetLicenseInfoByIDAsync(int LicenseID)
         {
+            int ApplicationID = -1;
+            int DriverID = -1;
+            int LicenseClass = -1;
+            DateTime IssueDate = DateTime.MinValue;
+            DateTime ExpirationDate = DateTime.MinValue;
+            string Notes = string.Empty;
+            float PaidFees = 0;
+            bool IsActive = false;
+            byte IssueReason = 0;
+            int CreatedByUserID = -1;
             bool isFound = false;
             try
             {
@@ -28,10 +37,10 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LicenseID", SqlDbType.Int).Value = LicenseID;
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
 
                                 // The record was found
@@ -65,13 +74,21 @@ namespace DVLD_DataAccess
 
             }
 
-            return isFound;
+            return (isFound, ApplicationID, DriverID, LicenseClass, IssueDate, ExpirationDate, Notes, PaidFees, IsActive, IssueReason, CreatedByUserID);
         }
 
-        public static bool GetLicenseInfoByApplicationID(int ApplicationID, ref int LicenseID, ref int DriverID, ref int LicenseClass,
-    ref DateTime IssueDate, ref DateTime ExpirationDate, ref string Notes,
-    ref float PaidFees, ref bool IsActive, ref byte IssueReason, ref int CreatedByUserID)
+        public static async Task<(bool IsFound, int LicenseID, int DriverID, int LicenseClass, DateTime IssueDate, DateTime ExpirationDate, string Notes, float PaidFees, bool IsActive, byte IssueReason, int CreatedByUserID)> GetLicenseInfoByApplicationIDAsync(int ApplicationID)
         {
+            int LicenseID = -1;
+            int DriverID = -1;
+            int LicenseClass = -1;
+            DateTime IssueDate = DateTime.MinValue;
+            DateTime ExpirationDate = DateTime.MinValue;
+            string Notes = string.Empty;
+            float PaidFees = 0;
+            bool IsActive = false;
+            byte IssueReason = 0;
+            int CreatedByUserID = -1;
             bool isFound = false;
 
             try
@@ -85,11 +102,11 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@ApplicationID", SqlDbType.Int).Value = ApplicationID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
 
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
 
                                 // The record was found
@@ -125,26 +142,54 @@ namespace DVLD_DataAccess
             {
                 clsLogger.LogException(ex, $"Failed to retrieve License info for ApplicationID: {ApplicationID}");
             }
-            return isFound;
+            return (isFound, LicenseID, DriverID, LicenseClass, IssueDate, ExpirationDate, Notes, PaidFees, IsActive, IssueReason, CreatedByUserID);
         }
 
 
-        public static DataTable GetAllLicenses()
+        public static async Task<DataTable> GetAllLicensesAsync()
         {
 
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("LicenseID",typeof(int));
+            dt.Columns.Add("ApplicationID", typeof(int));
+            dt.Columns.Add("DriverID", typeof(int));
+            dt.Columns.Add("LicenseClass", typeof(int));
+            dt.Columns.Add("IssueDate", typeof(DateTime));
+            dt.Columns.Add("ExpirationDate", typeof(DateTime));
+            dt.Columns.Add("Notes", typeof(string));
+            dt.Columns.Add("PaidFees", typeof(decimal));
+            dt.Columns.Add("IsActive", typeof(bool));
+            dt.Columns.Add("IssueReason", typeof(byte));
+            dt.Columns.Add("CreatedByUserID", typeof(int));
+
+
             try
             {   using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
-                    string query = "SELECT * FROM Licenses";
+                    string query = @"SELECT LicenseID, ApplicationID, DriverID, LicenseClass,
+                                     IssueDate, ExpirationDate, Notes, PaidFees, IsActive, IssueReason, CreatedByUserID
+                                     FROM Licenses";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
+                            while (await reader.ReadAsync().ConfigureAwait(false))
                             {
-                                dt.Load(reader);
+                                dt.Rows.Add(
+                                    reader.GetInt32(0),     // LicenseID
+                                    reader.GetInt32(1),     // ApplicationID
+                                    reader.GetInt32(2),     // DriverID
+                                    reader.GetInt32(3),     // LicenseClass
+                                    reader.GetDateTime(4),  // IssueDate
+                                    reader.GetDateTime(5),  // ExpirationDate
+                                    reader.GetString(6),    // Notes
+                                    reader.GetDecimal(7),   // PaidFees
+                                    reader.GetBoolean(8),   // IsActive
+                                    reader.GetByte(9),      // IssueReason
+                                    reader.GetInt32(10)     // CreatedByUserID
+                                    );                      
                             }
                         }
                     }
@@ -158,10 +203,18 @@ namespace DVLD_DataAccess
 
         }
 
-        public static DataTable GetDriverLicenses(int DriverID)
+        public static async Task<DataTable> GetDriverLicensesAsync(int DriverID)
         {
 
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("LicenseID", typeof(int));
+            dt.Columns.Add("ApplicationID", typeof(int));
+            dt.Columns.Add("ClassName", typeof(string));
+            dt.Columns.Add("IssueDate", typeof(DateTime));
+            dt.Columns.Add("ExpirationDate", typeof(DateTime));
+            dt.Columns.Add("IsActive", typeof(bool));
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -178,12 +231,19 @@ namespace DVLD_DataAccess
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
+                            while (await reader.ReadAsync().ConfigureAwait(false))
                             {
-                                dt.Load(reader);
+                                dt.Rows.Add(
+                                    reader.GetInt32(0),     // LicenseID
+                                    reader.GetInt32(1),     // ApplicationID
+                                    reader.GetString(3),    // ClassName
+                                    reader.GetDateTime(4),  // IssueDate
+                                    reader.GetDateTime(5),  // ExpirationDate
+                                    reader.GetBoolean(8)    // IsActive
+                                    );
                             }
                         }
                     }
@@ -197,11 +257,12 @@ namespace DVLD_DataAccess
             return dt;
         }
 
-        public static int AddNewLicense(int ApplicationID, int DriverID, int LicenseClass,
-            ref DateTime IssueDate, ref DateTime ExpirationDate, string Notes,
-             float PaidFees, bool IsActive, byte IssueReason, int CreatedByUserID)
+        public static async Task<(int LicenseID, DateTime IssueDate, DateTime ExpirationDate)> AddNewLicenseAsync(int ApplicationID, int DriverID, int LicenseClass,
+            string Notes, float PaidFees, bool IsActive, byte IssueReason, int CreatedByUserID)
         {
             int LicenseID = -1;
+            DateTime IssueDate = DateTime.MinValue;
+            DateTime ExpirationDate = DateTime.MinValue;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -269,10 +330,10 @@ namespace DVLD_DataAccess
 
                         command.Parameters.Add("@CreatedByUserID", SqlDbType.Int).Value = CreatedByUserID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 LicenseID = reader.GetInt32(0);
                                 IssueDate = reader.GetDateTime(1);
@@ -286,10 +347,10 @@ namespace DVLD_DataAccess
             {
                 clsLogger.LogException(ex, $"Failed to add new license for DriverID: {DriverID}, LicenseClass: {LicenseClass}");
             }
-            return LicenseID;
+            return (LicenseID, IssueDate, ExpirationDate);
         }
 
-        public static bool UpdateLicense(int LicenseID, int ApplicationID, int DriverID, int LicenseClass,
+        public static async Task<bool> UpdateLicenseAsync(int LicenseID, int ApplicationID, int DriverID, int LicenseClass,
              string Notes, float PaidFees, bool IsActive, byte IssueReason,
              int CreatedByUserID)
         {
@@ -325,8 +386,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@IssueReason", SqlDbType.TinyInt).Value = IssueReason;
                         command.Parameters.Add("@CreatedByUserID", SqlDbType.Int).Value = CreatedByUserID;
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -339,7 +400,7 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
       
-        public static int GetActiveLicenseIDByPersonID(int PersonID, int LicenseClassID)
+        public static async Task<int> GetActiveLicenseIDByPersonIDAsync(int PersonID, int LicenseClassID)
         {
             int LicenseID = -1;
             try
@@ -361,9 +422,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LicenseClass", SqlDbType.Int).Value = LicenseClassID;
 
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (result is int retrievedID)
                         {
@@ -380,7 +441,7 @@ namespace DVLD_DataAccess
             return LicenseID;
         }
 
-        public static int GetLicenseIDByApplicationID(int ApplicationID)
+        public static async Task<int> GetLicenseIDByApplicationIDAsync(int ApplicationID)
         {
             int LicenseID = -1;
             try
@@ -395,9 +456,9 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@ApplicationID", SqlDbType.Int).Value = ApplicationID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (result is int retrievedID)
                         {
@@ -415,7 +476,7 @@ namespace DVLD_DataAccess
             return LicenseID;
         }
 
-        public static int GetLastLicenseIDByDriverID(int DriverID, int LicenseClassID)
+        public static async Task<int> GetLastLicenseIDByDriverIDAsync(int DriverID, int LicenseClassID)
         {
             int lastLicenseID = -1;
             try
@@ -432,8 +493,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
                         command.Parameters.Add("@LicenseClassID", SqlDbType.Int).Value = LicenseClassID;
 
-                        connection.Open();
-                        object scalar = command.ExecuteScalar();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        object scalar = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (scalar is int retrievedID)
                         {
@@ -451,7 +512,7 @@ namespace DVLD_DataAccess
             return lastLicenseID;
         }
 
-        public static int GetActiveLicenseIDByDriverID(int DriverID, int LicenseClassID)
+        public static async Task<int> GetActiveLicenseIDByDriverIDAsync(int DriverID, int LicenseClassID)
         {
             int LicenseID = -1;
             try
@@ -472,9 +533,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
                         command.Parameters.Add("@LicenseClass", SqlDbType.Int).Value = LicenseClassID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (result is int retrievedID)
                         {
@@ -491,7 +552,7 @@ namespace DVLD_DataAccess
             return LicenseID;
         }
 
-        public static int GetLicenseIDByDriverID(int DriverID, int LicenseClassID)
+        public static async Task<int> GetLicenseIDByDriverIDAsync(int DriverID, int LicenseClassID)
         {
             int LicenseID = -1;
             try
@@ -511,9 +572,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
                         command.Parameters.Add("@LicenseClass", SqlDbType.Int).Value = LicenseClassID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (result is int retrievedID)
                         {
@@ -531,7 +592,7 @@ namespace DVLD_DataAccess
         }
 
 
-        public static bool DeactivateLicenseIDByDriverID(int DriverID, int LicenseClassID)
+        public static async Task<bool> DeactivateLicenseIDByDriverIDAsync(int DriverID, int LicenseClassID)
         {
             int effectedRows = 0;
             try
@@ -553,9 +614,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@DriverID", SqlDbType.Int).Value = DriverID;
                         command.Parameters.Add("@LicenseClass", SqlDbType.Int).Value = LicenseClassID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        effectedRows = command.ExecuteNonQuery();
+                        effectedRows = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -567,7 +628,7 @@ namespace DVLD_DataAccess
             return (effectedRows > 0);
         }
 
-        public static bool DeactivateLicense(int LicenseID)
+        public static async Task<bool> DeactivateLicenseAsync(int LicenseID)
         {
 
             int rowsAffected = 0;
@@ -585,8 +646,8 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@LicenseID", SqlDbType.Int).Value = LicenseID;
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -598,7 +659,7 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
-        public static bool IsLicenseActive(int LicenseID)
+        public static async Task<bool> IsLicenseActiveAsync(int LicenseID)
         {
             bool isActive = false;
             try
@@ -613,9 +674,9 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@LicenseID", SqlDbType.Int).Value = LicenseID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        object result = command.ExecuteScalar();
+                        object result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         if (result != null)
                         {
@@ -632,7 +693,7 @@ namespace DVLD_DataAccess
             return isActive;
         }
 
-        public static bool DeactivateExpiredLicenses()
+        public static async Task<bool> DeactivateExpiredLicensesAsync()
         {
 
             int rowsAffected = 0;
@@ -647,8 +708,8 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
