@@ -12,7 +12,7 @@ namespace DVLD_Business
     {
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
 
         public int LicenseClassID { private set; get; }
@@ -32,10 +32,10 @@ namespace DVLD_Business
             this.DefaultValidityLength = 10;
             this.ClassFees = 0;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewLicenseClass},
-                {enMode.Update,_UpdateLicenseClass}
+                {enMode.AddNew,_AddNewLicenseClassAsync},
+                {enMode.Update,_UpdateLicenseClassAsync}
             };
 
             Mode = enMode.AddNew;
@@ -54,20 +54,20 @@ namespace DVLD_Business
             this.DefaultValidityLength = DefaultValidityLength;
             this.ClassFees = ClassFees;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew,_AddNewLicenseClass},
-                {enMode.Update,_UpdateLicenseClass}
+                {enMode.AddNew,_AddNewLicenseClassAsync},
+                {enMode.Update,_UpdateLicenseClassAsync}
             };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewLicenseClass()
+        private async Task<bool> _AddNewLicenseClassAsync()
         {
             //call DataAccess Layer 
 
-            this.LicenseClassID = clsLicenseClassData.AddNewLicenseClass(this.ClassName, this.ClassDescription,
+            this.LicenseClassID = await clsLicenseClassData.AddNewLicenseClassAsync(this.ClassName, this.ClassDescription,
                 this.MinimumAllowedAge, this.DefaultValidityLength, this.ClassFees);
 
 
@@ -79,53 +79,49 @@ namespace DVLD_Business
             return false;
         }
 
-        private bool _UpdateLicenseClass()
+        private async Task<bool> _UpdateLicenseClassAsync()
         {
             //call DataAccess Layer 
 
-            return clsLicenseClassData.UpdateLicenseClass(this.LicenseClassID, this.ClassName, this.ClassDescription,
+            return await clsLicenseClassData.UpdateLicenseClassAsync(this.LicenseClassID, this.ClassName, this.ClassDescription,
                 this.MinimumAllowedAge, this.DefaultValidityLength, this.ClassFees);
         }
 
-        public static clsLicenseClass Find(int LicenseClassID)
+        public static async Task<clsLicenseClass> FindAsync(int LicenseClassID)
         {
-            string ClassName = ""; string ClassDescription = "";
-            byte MinimumAllowedAge = 18; byte DefaultValidityLength = 10; float ClassFees = 0;
+            
+            var result = await clsLicenseClassData.GetLicenseClassInfoByIDAsync(LicenseClassID);
 
-            if (clsLicenseClassData.GetLicenseClassInfoByID(LicenseClassID, ref ClassName, ref ClassDescription,
-                    ref MinimumAllowedAge, ref DefaultValidityLength, ref ClassFees))
-
-                return new clsLicenseClass(LicenseClassID, ClassName, ClassDescription,
-                    MinimumAllowedAge, DefaultValidityLength, ClassFees);
+            if(result.IsFound)
+                return new clsLicenseClass(LicenseClassID, result.ClassName, result.ClassDescription,
+                    result.MinimumAllowedAge, result.DefaultValidityLength, result.ClassFees);
             else
                 return null;
 
         }
 
-        public static clsLicenseClass Find(string ClassName)
+        public static async Task<clsLicenseClass> FindAsync(string ClassName)
         {
-            int LicenseClassID = -1; string ClassDescription = "";
-            byte MinimumAllowedAge = 18; byte DefaultValidityLength = 10; float ClassFees = 0;
+            
+            var result = await clsLicenseClassData.GetLicenseClassInfoByClassNameAsync(ClassName);
 
-            if (clsLicenseClassData.GetLicenseClassInfoByClassName(ClassName, ref LicenseClassID, ref ClassDescription,
-                    ref MinimumAllowedAge, ref DefaultValidityLength, ref ClassFees))
-
-                return new clsLicenseClass(LicenseClassID, ClassName, ClassDescription,
-                    MinimumAllowedAge, DefaultValidityLength, ClassFees);
+            if(result.IsFound)
+                return new clsLicenseClass(result.LicenseClassID, ClassName, result.ClassDescription,
+                    result.MinimumAllowedAge, result.DefaultValidityLength, result.ClassFees);
             else
                 return null;
 
         }
 
-        public static DataTable GetAllLicenseClasses()
+        public static async Task<DataTable> GetAllLicenseClassesAsync()
         {
-            return clsLicenseClassData.GetAllLicenseClasses();
+            return await clsLicenseClassData.GetAllLicenseClassesAsync();
 
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
     }
 }

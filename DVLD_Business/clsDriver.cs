@@ -128,9 +128,9 @@ namespace DVLD_Business
 
         }
 
-        public static DataTable GetLicenses(int DriverID)
+        public static async Task<DataTable> GetLicensesAsync(int DriverID)
         {
-            return clsLicenseData.GetDriverLicenses(DriverID);
+            return await clsLicenseData.GetDriverLicensesAsync(DriverID).ConfigureAwait(false);
         }
 
         public static async Task<DataTable> GetInternationalLicensesAsync(int DriverID)
@@ -143,9 +143,9 @@ namespace DVLD_Business
            return await _saveDictionary[Mode]().ConfigureAwait(false);
         }
 
-        public static int GetLastLicenseID(int DriverID, int LicenseClassID)
+        public static async Task<int> GetLastLicenseIDAsync(int DriverID, int LicenseClassID)
         {
-            return clsLicenseData.GetLastLicenseIDByDriverID(DriverID,LicenseClassID);
+            return await clsLicenseData.GetLastLicenseIDByDriverIDAsync(DriverID,LicenseClassID).ConfigureAwait(false);
         }
 
         private static async Task<clsDriver> _PrepareDriverAsync(int PersonID, int CreatedByUserID)

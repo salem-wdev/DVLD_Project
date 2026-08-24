@@ -44,7 +44,7 @@ namespace DVLD_Business
             {
                 if (_LicenseClassInfo == null && LicenseClassID != -1)
                 {
-                    _LicenseClassInfo = clsLicenseClass.Find(LicenseClassID);
+                    _LicenseClassInfo = clsLicenseClass.FindAsync(LicenseClassID);
                 }
                 return _LicenseClassInfo;
             }
@@ -149,7 +149,7 @@ namespace DVLD_Business
 
         private async Task<bool> _AddNewLocalDrivingLicenseApplicationAsync()
         {
-            if (clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID) != -1)
+            if (await clsLicense.GetActiveLicenseIDByPersonIDAsync(this.ApplicantPersonID, this.LicenseClassID) != -1)
             {
                 return false;
             }
@@ -253,9 +253,9 @@ namespace DVLD_Business
             return clsTest.GetPassedTestCount(this.LocalDrivingLicenseApplicationID);
         }
 
-        public int GetActiveLicenseID()
+        public async Task<int> GetActiveLicenseIDAsync()
         {//this will get the license id that belongs to this application
-            return clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID);
+            return await clsLicense.GetActiveLicenseIDByPersonIDAsync(this.ApplicantPersonID, this.LicenseClassID);
         }
 
         /// <summary>
@@ -268,12 +268,12 @@ namespace DVLD_Business
         /// </remarks>
         /// <exception cref="NotImplementedException">Thrown because the method is unstable and pending refactoring.</exception>
         [Obsolete("This method is unstable and pending refactoring.", true)]
-        public int GetApplicationLicenseID()
+        public async Task<int> GetApplicationLicenseIDAsync()
         {
             //throw new NotImplementedException("This method is unstable and pending refactoring.");
 
             // This will get the license id that belongs to this application
-            return clsLicense.GetLicenseIDByApplicationID(this.ApplicationID);
+            return await clsLicense.GetLicenseIDByApplicationIDAsync(this.ApplicationID);
         }
 
         public async Task<byte> TotalTrialsPerTest(clsTestType.enTestType TestTypeID)
@@ -346,7 +346,7 @@ namespace DVLD_Business
 
                 // TODO: if there is active application for the same person
                 // and license class we should not allow to create new application.
-                if (clsLicense.GetActiveLicenseIDByPersonID(ApplicantPersonID, LicenseClassID) != -1
+                if (await clsLicense.GetActiveLicenseIDByPersonIDAsync(ApplicantPersonID, LicenseClassID) != -1
                     || await clsApplication.GetActiveApplicationIDForLicenseClassAsync(ApplicantPersonID, ApplicationTypeID, LicenseClassID) != -1)
                 {
                     return null;

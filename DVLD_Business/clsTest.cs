@@ -57,7 +57,7 @@ namespace DVLD_Business
 
             _saveDictionary = new Dictionary<enMode, Func<bool>>
             {
-                {enMode.AddNew, _AddNewTest },
+                {enMode.AddNew, _AddNewTestAsync },
                 {enMode.Update, _UpdateTest },
             };
 
@@ -76,14 +76,14 @@ namespace DVLD_Business
 
             _saveDictionary = new Dictionary<enMode, Func<bool>>
             {
-                {enMode.AddNew, _AddNewTest },
+                {enMode.AddNew, _AddNewTestAsync },
                 {enMode.Update, _UpdateTest },
             };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewTest()
+        private async Task<bool> _AddNewTestAsync()
         {
             //call DataAccess Layer 
 
@@ -95,7 +95,7 @@ namespace DVLD_Business
 
             if (TestAppointmentInfo.RetakeTestAppInfo != null && TestResult == true)
             {
-                TestAppointmentInfo.RetakeTestAppInfo.SetCompleteAsync();
+                await TestAppointmentInfo.RetakeTestAppInfo.SetCompleteAsync();
             }
             Mode = enMode.Update;
             return true;
