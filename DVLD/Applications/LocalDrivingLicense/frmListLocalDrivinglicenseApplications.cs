@@ -273,7 +273,7 @@ namespace DVLD.Applications.LocalDrivingLicense
             int LocalDrivingLicenseApplicationID = (int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value;
             clsLocalDrivingLicenseApplication localDrivingLicenseApplication
                  = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(LocalDrivingLicenseApplicationID);
-            clsLicense license = clsLicense.FindByApplicationID
+            clsLicense license = await clsLicense.FindByApplicationIDAsync
                 (localDrivingLicenseApplication.ApplicationID);
 
             bool DosHasLicenses = false;
@@ -283,7 +283,7 @@ namespace DVLD.Applications.LocalDrivingLicense
             DosHasLicenses = license != null;
             bool issueDrivingLicenseFirstTime = false;
             bool showLicense = false;
-            bool showPersonLicenseHistory = clsLicense.GetActiveLicenseIDByPersonID(localDrivingLicenseApplication.ApplicantPersonID,
+            bool showPersonLicenseHistory = await clsLicense.GetActiveLicenseIDByPersonIDAsync(localDrivingLicenseApplication.ApplicantPersonID,
                 localDrivingLicenseApplication.LicenseClassID) != -1;
 
             if (NumberOfPssedTests == clsTestType.enTestType.StreetTest && !DosHasLicenses)
@@ -396,7 +396,7 @@ namespace DVLD.Applications.LocalDrivingLicense
         private async void showLicenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             clsLocalDrivingLicenseApplication LocalDriving = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync((int)dgvLocalDrivingLicenseApplications.CurrentRow.Cells[0].Value);
-            frmShowLicenseInfo frm = new frmShowLicenseInfo(clsLicense.FindByApplicationID(LocalDriving.ApplicationID).LicenseID);
+            frmShowLicenseInfo frm = new frmShowLicenseInfo((await clsLicense.FindByApplicationIDAsync(LocalDriving.ApplicationID)).LicenseID);
             frm.ShowDialog();
         }
 

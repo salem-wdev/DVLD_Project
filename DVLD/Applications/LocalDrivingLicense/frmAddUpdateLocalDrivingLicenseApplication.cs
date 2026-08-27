@@ -100,9 +100,9 @@ namespace DVLD.Applications.Local_Driving_License
         }
 
 
-        private void _FillcbLicenseClassWithData()
+        private async Task _FillcbLicenseClassWithDataAsync()
         {
-            cbLicenseClass.DataSource = clsLicenseClass.GetAllLicenseClasses();
+            cbLicenseClass.DataSource = await clsLicenseClass.GetAllLicenseClassesAsync();
             cbLicenseClass.DisplayMember = "ClassName";
             cbLicenseClass.ValueMember = "LicenseClassID";
             cbLicenseClass.SelectedIndex = 0;
@@ -138,7 +138,7 @@ namespace DVLD.Applications.Local_Driving_License
 
         private async void frmAddUpdateLocalDrivingLicesnseApplication_Load(object sender, EventArgs e)
         {
-            _FillcbLicenseClassWithData();
+            _FillcbLicenseClassWithDataAsync();
 
                 _LocalLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(_ApplicationID);
             if (_LocalLicenseApplication != null)

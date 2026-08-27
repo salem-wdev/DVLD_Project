@@ -36,7 +36,7 @@ namespace DVLD.Applications.LocalDrivingLicense
 
             if (_LocalDrivingLicenseApplication != null)
             {
-                _LicenseID = _LocalDrivingLicenseApplication.GetActiveLicenseID();
+                _LicenseID = await _LocalDrivingLicenseApplication.GetActiveLicenseIDAsync();
 
                 llShowLicenceInfo.Enabled = (_LicenseID != -1);
 
