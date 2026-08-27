@@ -18,7 +18,7 @@ namespace DVLD
         [STAThread]
         static async Task Main()
         {
-            if (!clsLicense.DeactivateExpiredLicenses())
+            if (!await clsLicense.DeactivateExpiredLicensesAsync())
             {
                 //MessageBox.Show("An error occurred while deactivating expired licenses. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 //return;
