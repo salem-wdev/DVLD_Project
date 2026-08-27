@@ -73,12 +73,12 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             InitializeComponent();
         }
 
-        private void _Find()
+        private async Task _FindAsync()
         {
             _LicenseID = int.Parse(txtLicenseID.Text);
-            if (clsLicense.Find(_LicenseID) != null)
+            if (clsLicense.FindAsync(_LicenseID) != null)
             {
-               if( ctrlDriverLicenseInfo1.LoadData(_LicenseID))
+               if(await ctrlDriverLicenseInfo1.LoadDataAsync(_LicenseID))
                     ctrlDriverLicenseInfo1.SelectedLicenseInfo.LicenseUpdated += SelectedLicenseInfo_LicenseUpdated;
             }
             else
@@ -90,10 +90,10 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             OnLicenseSelected(new LicenseSelectedEventArgs(_LicenseID)); // Raise the event
         }
 
-        private void SelectedLicenseInfo_LicenseUpdated(object sender, clsLicense.LicenseUpdatedEventArgs e)
+        private async void SelectedLicenseInfo_LicenseUpdated(object sender, clsLicense.LicenseUpdatedEventArgs e)
         {
             ctrlDriverLicenseInfo1?.SelectedLicenseInfo?.Dispose();
-            _Find();
+            await _FindAsync();
 
         }
 
@@ -101,7 +101,7 @@ namespace DVLD.Licenses.Local_Licenses.Controls
         {
             txtLicenseID.Text = LicenseID.ToString();
             FilterEnabled = false; // Disable the filter controls when loading a specific license.
-            _Find();
+            _FindAsync();
         }
 
         private void btnFind_Click(object sender, EventArgs e)
@@ -112,7 +112,7 @@ namespace DVLD.Licenses.Local_Licenses.Controls
                 return;
             }
 
-            _Find();
+            _FindAsync();
         }
 
         public void txtLicenseIDFocus()
