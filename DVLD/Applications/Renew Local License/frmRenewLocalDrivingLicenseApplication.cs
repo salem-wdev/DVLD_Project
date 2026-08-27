@@ -100,7 +100,7 @@ namespace DVLD.Applications.Renew_Local_License
                 llShowLicenseHistory.Enabled = true;
                 btnRenewLicense.Enabled = true;
                 lblOldLicenseID.Text = licensesID.ToString();
-                float ClassFees = clsLicenseClass.Find(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.LicenseClassID).ClassFees;
+                float ClassFees = (await clsLicenseClass.FindAsync(ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.LicenseClassID)).ClassFees;
                 lblLicenseFees.Text = ClassFees.ToString();
                 lblTotalFees.Text = (ClassFees + (float)(await clsApplicationType.FindAsync((int)clsApplication.enApplicationType.RenewDrivingLicense)).ApplicationTypeFees).ToString();
             }
