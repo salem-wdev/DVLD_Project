@@ -72,5 +72,17 @@
       <Name>DVLD_Shared</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".editorconfig" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\DVLD\packages\Microsoft.VisualStudio.Threading.Analyzers.18.7.23\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\DVLD\packages\Microsoft.VisualStudio.Threading.Analyzers.18.7.23\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CSharp.dll" />
+    <Analyzer Include="..\DVLD\packages\Microsoft.VisualStudio.Threading.Analyzers.18.7.23\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.dll" />
+    <Analyzer Include="..\DVLD\packages\Microsoft.VisualStudio.Threading.Analyzers.18.7.23\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\DVLD\packages\Microsoft.VisualStudio.Threading.Analyzers.18.7.23\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.dll" />
+    <Analyzer Include="..\DVLD\packages\Microsoft.VisualStudio.Threading.Analyzers.18.7.23\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.VisualBasic.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
