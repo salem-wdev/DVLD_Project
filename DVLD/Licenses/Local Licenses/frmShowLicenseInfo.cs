@@ -22,7 +22,7 @@ namespace DVLD.Licenses.Local_Licenses
 
         private void frmShowLicenseInfo_Load(object sender, EventArgs e)
         {
-            ctrlDriverLicenseInfo1.LoadData(_LicenseID);
+            ctrlDriverLicenseInfo1.LoadDataAsync(_LicenseID);
         }
 
         private void btnClose_Click(object sender, EventArgs e)

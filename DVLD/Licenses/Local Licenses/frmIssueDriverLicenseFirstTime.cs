@@ -28,7 +28,7 @@ namespace DVLD.Licenses.Local_Licenses
             _LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(_LocalDriverLicenseAppID);
             if (_LocalDrivingLicenseApplication != null)
             {
-                if (clsLicense.GetActiveLicenseIDByPersonID(_LocalDrivingLicenseApplication.ApplicantPersonID, _LocalDrivingLicenseApplication.LicenseClassID) != -1)
+                if (await clsLicense.GetActiveLicenseIDByPersonIDAsync(_LocalDrivingLicenseApplication.ApplicantPersonID, _LocalDrivingLicenseApplication.LicenseClassID) != -1)
                 {
                     MessageBox.Show("There is an active license for this person.");
                     btnIssueLicense.Enabled = false;
