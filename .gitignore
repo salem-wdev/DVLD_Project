@@ -50,3 +50,5 @@ $RECYCLE.BIN/
 *DVLD/test.Designer.cs
 /DVLD_Setup/Release/DVLD_Setup.msi
 *.msi
+packages/
+**/packages/*
