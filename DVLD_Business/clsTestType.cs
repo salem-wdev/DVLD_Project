@@ -14,7 +14,7 @@ namespace DVLD_Business
 
         public enum enMode { AddNew = 0, Update = 1 }
         public enMode Mode { get; private set; }
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         public enum enTestType
         {
@@ -36,10 +36,10 @@ namespace DVLD_Business
             TestTypeTitle = string.Empty;
             TestTypeDescription = string.Empty;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew, _AddNewTestType },
-                {enMode.Update, _UpdateTestType},
+                {enMode.AddNew, _AddNewTestTypeAsync },
+                {enMode.Update, _UpdateTestTypeAsync},
             };
 
             Mode = enMode.AddNew;
@@ -54,19 +54,19 @@ namespace DVLD_Business
             this.TestTypeDescription = TestTypeDescription;
             this.TestTypeFees = TestTypeFees;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew, _AddNewTestType },
-                {enMode.Update, _UpdateTestType},
+                {enMode.AddNew, _AddNewTestTypeAsync },
+                {enMode.Update, _UpdateTestTypeAsync},
             };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewTestType()
+        private async Task<bool> _AddNewTestTypeAsync()
         {
             
-            this.ID = (enTestType)clsTestTypeData.AddNewTestType(TestTypeTitle, TestTypeDescription, TestTypeFees);
+            this.ID = (enTestType)await clsTestTypeData.AddNewTestTypeAsync(TestTypeTitle, TestTypeDescription, TestTypeFees);
 
             if (ID != enTestType.None)
             {
@@ -76,22 +76,19 @@ namespace DVLD_Business
             return false;
         }
 
-        private bool _UpdateTestType()
+        private async Task<bool> _UpdateTestTypeAsync()
         {
-            return clsTestTypeData.UpdateTestType((int)ID, TestTypeTitle, TestTypeDescription, TestTypeFees);
+            return await clsTestTypeData.UpdateTestTypeAsync((int)ID, TestTypeTitle, TestTypeDescription, TestTypeFees);
         }
 
-        public static clsTestType Find(enTestType ID)
+        public static async Task<clsTestType> FindAsync(enTestType ID)
         {
-            string TestTypeTitle = string.Empty;
-            string TestTypeDescription = string.Empty;
-            decimal TestTypeFees = 0.0m;
+            
+           var result = await clsTestTypeData.GetTestTypeInfoByIDAsync((int)ID);
 
-            bool found = clsTestTypeData.GetTestTypeInfoByID((int)ID, ref TestTypeTitle, ref TestTypeDescription, ref TestTypeFees);
-
-            if (found)
+            if (result.IsFound)
             {
-                return new clsTestType(ID, TestTypeTitle, TestTypeDescription, TestTypeFees);
+                return new clsTestType(ID, result.TestTypeTitle, result.TestTypeDescription, result.TestTypeFees);
             }
             else
             {
@@ -99,14 +96,14 @@ namespace DVLD_Business
             }
         }
 
-        public static DataTable GetAllTestTypes()
+        public static async Task<DataTable> GetAllTestTypesAsync()
         {
-            return clsTestTypeData.GetAllTestTypes();
+            return await clsTestTypeData.GetAllTestTypesAsync();
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
 
 
