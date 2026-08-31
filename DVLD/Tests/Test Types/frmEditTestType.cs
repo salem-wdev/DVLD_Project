@@ -61,9 +61,9 @@ namespace DVLD.Tests.Test_Types
             }
         }
 
-        private void frmEditTestType_Load(object sender, EventArgs e)
+        private async void frmEditTestType_Load(object sender, EventArgs e)
         {
-            _TestType = clsTestType.Find(_TestTypeID);
+            _TestType = await clsTestType.FindAsync(_TestTypeID);
             if (_TestType != null)
             {
                 lblTestTypeID.Text = ((int)_TestType.ID).ToString();
@@ -83,7 +83,7 @@ namespace DVLD.Tests.Test_Types
             this.Close();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
             if (this.ValidateChildren())
             {
@@ -92,7 +92,7 @@ namespace DVLD.Tests.Test_Types
                 if (decimal.TryParse(txtFees?.Text.Trim(), out decimal fees))
                 {
                     _TestType.TestTypeFees = fees;
-                    if (_TestType.Save())
+                    if (await _TestType.SaveAsync())
                     {
                         MessageBox.Show("Test Type updated successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         this.Close();

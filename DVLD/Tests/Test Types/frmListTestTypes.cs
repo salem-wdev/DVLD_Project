@@ -21,16 +21,16 @@ namespace DVLD.Tests.Test_Types
             InitializeComponent();
         }
 
-        private void _Refresh()
+        private async Task _RefreshAsync()
         {
-            _dtAllTestTypes = clsTestType.GetAllTestTypes();
+            _dtAllTestTypes = await clsTestType.GetAllTestTypesAsync();
             dgvTestTypes.DataSource = _dtAllTestTypes;
             lblRecordsCount.Text = _dtAllTestTypes.Rows.Count.ToString();
         }
 
-        private void frmTestTypes_Load(object sender, EventArgs e)
+        private async void frmTestTypes_Load(object sender, EventArgs e)
         {
-            _Refresh();
+            await _RefreshAsync();
 
             if (dgvTestTypes.Columns.Count > 0)
             {
@@ -64,11 +64,11 @@ namespace DVLD.Tests.Test_Types
             clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvTestTypes);
         }
 
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             frmEditTestType frm = new frmEditTestType((clsTestType.enTestType)dgvTestTypes.CurrentRow.Cells[0].Value);
             frm.ShowDialog();
-            _Refresh();
+            await _RefreshAsync();
         }
     }
 }

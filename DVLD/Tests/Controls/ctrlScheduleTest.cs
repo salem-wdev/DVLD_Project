@@ -133,8 +133,11 @@ namespace DVLD.Tests.Controls
                 {
                     if (_TestAppointment.RetakeTestAppInfo != null)
                     {
-                        int appID = _TestAppointment.RetakeTestAppInfo.ApplicationID;
-                        lblRetakeTestAppID.Text = appID > 0 ? appID.ToString() : "N/A";
+                        var result = await _TestAppointment.RetakeTestAppInfo;
+                        int? appID = -1;
+                        if (result != null)
+                            appID = result?.ApplicationID ?? -1;
+                        lblRetakeTestAppID.Text = appID.Value > 0 ? appID.ToString() : "N/A";
                     }
                 }
                 float RetakeTestFees = (float)(await clsApplicationType.FindAsync((int)clsApplication.enApplicationType.RetakeTest)).ApplicationTypeFees;
@@ -152,7 +155,7 @@ namespace DVLD.Tests.Controls
 
         private async Task _DisplayAppointmentDataAsync()
         {
-            float fees = (float)clsTestType.Find(TestTypeID).TestTypeFees;
+            float fees = (float)(await clsTestType.FindAsync(TestTypeID)).TestTypeFees;
             lblUserMessage.Visible = false;
             lblFees.Text = $"${fees}";
             TotalFees += fees;
@@ -166,7 +169,7 @@ namespace DVLD.Tests.Controls
             if (_LocalDrivingLicenseApplication != null)
             {
                 lblLocalDrivingLicenseAppID.Text = _LocalDrivingLicenseApplication.LocalDrivingLicenseApplicationID.ToString();
-                lblDrivingClass.Text = _LocalDrivingLicenseApplication.LicenseClassInfo.ClassName;
+                lblDrivingClass.Text = (await _LocalDrivingLicenseApplication?.LicenseClassInfoAsync).ClassName;
                 lblFullName.Text = _LocalDrivingLicenseApplication.PersonFullName;
                 lblTrial.Text = _LocalDrivingLicenseApplication.TotalTrialsPerTest(TestTypeID).ToString();
 
@@ -237,7 +240,7 @@ namespace DVLD.Tests.Controls
         {
 
 
-            _TestAppointment = clsTestAppointment.Find(TestAppointmentID);
+            _TestAppointment = await clsTestAppointment.FindAsync(TestAppointmentID);
             this.TestTypeID = _TestAppointment.TestTypeID;
             _Mode = enMode.Update;
             if (_TestAppointment != null)
@@ -291,7 +294,7 @@ namespace DVLD.Tests.Controls
                 MessageBox.Show("Data saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if (_CreationMode == enCreationMode.RetakeTestSchedule)
                 {
-                    int appID = _TestAppointment.RetakeTestAppInfo.ApplicationID;
+                    int appID = (await _TestAppointment?.RetakeTestAppInfo).ApplicationID;
                     lblRetakeTestAppID.Text = appID > 0 ? appID.ToString() : "N/A";
                 }
             }

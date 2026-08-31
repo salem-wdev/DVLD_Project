@@ -31,9 +31,9 @@ namespace DVLD.Tests
             _TestTypeID = TestTypeID;
         }
 
-        private void _RefreshData()
+        private async Task _RefreshDataAsync()
         {
-            _dtAllTestAppointmentsList = clsTestAppointment.GetApplicationTestAppointmentsPerTestType(_LocalDrivingLicenseApplicationID, _TestTypeID);
+            _dtAllTestAppointmentsList = await clsTestAppointment.GetApplicationTestAppointmentsPerTestTypeAsync(_LocalDrivingLicenseApplicationID, _TestTypeID);
             dgvLicenseTestAppointments.DataSource = _dtAllTestAppointmentsList;
         }
 
@@ -89,7 +89,7 @@ namespace DVLD.Tests
 
             await ctrlDrivingLicenseApplicationInfo1.LoadDataAsync(_LocalDrivingLicenseApplicationID);
 
-            _RefreshData();
+            _RefreshDataAsync();
 
         }
 
@@ -124,7 +124,7 @@ namespace DVLD.Tests
 
             frmScheduleTest frm = new frmScheduleTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
             frm.ShowDialog();
-            _RefreshData();
+            _RefreshDataAsync();
         }
 
         private void dgvLicenseTestAppointments_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
@@ -136,7 +136,7 @@ namespace DVLD.Tests
         {
             frmScheduleTest frm = new frmScheduleTest(Convert.ToInt32(dgvLicenseTestAppointments.SelectedRows[0].Cells["TestAppointmentID"].Value));
             frm.ShowDialog();
-            _RefreshData();
+            _RefreshDataAsync();
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -148,7 +148,7 @@ namespace DVLD.Tests
         {
             frmTakeTest frm = new frmTakeTest(Convert.ToInt32(dgvLicenseTestAppointments.SelectedRows[0].Cells["TestAppointmentID"].Value), _TestTypeID); 
             frm.ShowDialog();
-            _RefreshData();
+            _RefreshDataAsync();
         }
     }
 }

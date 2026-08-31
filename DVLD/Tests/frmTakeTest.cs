@@ -39,9 +39,9 @@ namespace DVLD.Tests
             }
         }
 
-        private void _FillTestObjectWithData()
+        private async Task _FillTestObjectWithDataAsync()
         {
-            _Test = clsTest.GetNewTestObj(_AppointmentID, rbPass.Checked, txtNotes.Text, clsGlobal.CurrentUser.UserID);
+            _Test = await clsTest.GetNewTestObjAsync(_AppointmentID, rbPass.Checked, txtNotes.Text, clsGlobal.CurrentUser.UserID);
         }
 
         private void _LockTestScreen(bool LockAllScreen, string message)
@@ -56,9 +56,9 @@ namespace DVLD.Tests
             lblUserMessage.Text = message;
         }
 
-        private void _LoadTest()
+        private async Task _LoadTestAsync()
         {
-            _TestID = ctrlSecheduledTest1.TestAppointment.TestID;
+            _TestID = await ctrlSecheduledTest1.TestAppointment.TestIDAsync();
 
             if (ctrlSecheduledTest1.TestAppointment.AppointmentDate <clsBusinessSettings.GetServerDateTime())
             {
@@ -68,7 +68,7 @@ namespace DVLD.Tests
 
             if (_TestID != -1)
             {
-                _Test = clsTest.Find(_TestID);
+                _Test = await clsTest.FindAsync(_TestID);
                 if (_Test != null)
                 {
                     this.Text = _TestType.ToString() + " Test";
@@ -94,7 +94,7 @@ namespace DVLD.Tests
         {
             if(await ctrlSecheduledTest1.LoadDataAsync(_AppointmentID))
             {
-                _LoadTest();
+                await _LoadTestAsync();
             }
             else
             {
@@ -107,7 +107,7 @@ namespace DVLD.Tests
             this.Close();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
             //if (clsTestAppointment.IsTestAppointmentLocked(ctrlSecheduledTest1.TestAppointment.LocalDrivingLicenseApplicationID, _TestType))
             //{
@@ -127,7 +127,7 @@ namespace DVLD.Tests
 
             if (_Test == null)
             {
-                _FillTestObjectWithData();
+                await _FillTestObjectWithDataAsync();
             }
             else
             {
@@ -136,7 +136,7 @@ namespace DVLD.Tests
 
             if (_Test != null)
             {
-                if (_Test.Save())
+                if (await _Test.SaveAsync())
                 {
                     _LockTestScreen(false, "Test data saved successfully.");
                     _TestID = _Test.TestID;
