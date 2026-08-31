@@ -1,4 +1,5 @@
 ﻿using DVLD_DataAccess;
+using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,7 +13,7 @@ namespace DVLD_Business
     {
         public enum enMode { AddNew = 0, Update = 1 };
         public enMode Mode = enMode.AddNew;
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         public int TestID { private set; get; }
         public int TestAppointmentID { private set; get; }
@@ -20,16 +21,21 @@ namespace DVLD_Business
         public string Notes { set; get; }
         public int CreatedByUserID { private set; get; }
 
-        private clsTestAppointment _TestAppointmentInfo = null;
-        public clsTestAppointment TestAppointmentInfo
+        private AsyncLazy<clsTestAppointment> _TestAppointmentInfoLazy = null;
+        public Task<clsTestAppointment> TestAppointmentInfoAsync
         {
             get
             {
-                if (_TestAppointmentInfo == null && TestAppointmentID != -1)
+                if (_TestAppointmentInfoLazy == null)
                 {
-                    _TestAppointmentInfo = clsTestAppointment.Find(TestAppointmentID);
+                    _TestAppointmentInfoLazy = new AsyncLazy<clsTestAppointment>(async () =>
+                    {
+                        if (TestAppointmentID == -1)
+                            return null;
+
+                        return await clsTestAppointment.FindAsync(TestAppointmentID); });
                 }
-                return _TestAppointmentInfo;
+                return _TestAppointmentInfoLazy.GetValueAsync();
             }
         }
 
@@ -55,10 +61,10 @@ namespace DVLD_Business
             this.Notes = Notes;
             this.CreatedByUserID = CreatedByUserID;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew, _AddNewTest },
-                {enMode.Update, _UpdateTest },
+                {enMode.AddNew, _AddNewTestAsync },
+                {enMode.Update, _UpdateTestAsync },
             };
 
             Mode = enMode.AddNew;
@@ -74,106 +80,102 @@ namespace DVLD_Business
             this.Notes = Notes;
             this.CreatedByUserID = CreatedByUserID;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
             {
-                {enMode.AddNew, _AddNewTest },
-                {enMode.Update, _UpdateTest },
+                {enMode.AddNew, _AddNewTestAsync },
+                {enMode.Update, _UpdateTestAsync },
             };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewTest()
+        private async Task<bool> _AddNewTestAsync()
         {
             //call DataAccess Layer 
 
-            this.TestID = clsTestData.AddNewTest(this.TestAppointmentID,
+            this.TestID = await clsTestData.AddNewTestAsync(this.TestAppointmentID,
                 this.TestResult, this.Notes, this.CreatedByUserID);
 
 
             if (this.TestID == -1) return false;
 
-            if (TestAppointmentInfo.RetakeTestAppInfo != null && TestResult == true)
+            clsTestAppointment appointment = await this.TestAppointmentInfoAsync;
+
+            if (appointment?.RetakeTestAppInfo != null && TestResult == true)
             {
-                TestAppointmentInfo.RetakeTestAppInfo.SetCompleteAsync();
+                clsApplication retakeTestAppInfo = await appointment.RetakeTestAppInfo;
+                if (retakeTestAppInfo != null)
+                    await retakeTestAppInfo.SetCompleteAsync();
             }
             Mode = enMode.Update;
             return true;
         }
 
-        private bool _UpdateTest()
+        private async Task<bool> _UpdateTestAsync()
         {
             //call DataAccess Layer 
 
-            return clsTestData.UpdateTest(this.TestID, this.TestAppointmentID,
+            return await clsTestData.UpdateTestAsync(this.TestID, this.TestAppointmentID,
                 this.TestResult, this.Notes, this.CreatedByUserID);
         }
 
-        public static clsTest Find(int TestID)
+        public static async Task<clsTest> FindAsync(int TestID)
         {
-            int TestAppointmentID = -1;
-            bool TestResult = false; string Notes = ""; int CreatedByUserID = -1;
+            
+            var result = await clsTestData.GetTestInfoByIDAsync(TestID);
 
-            if (clsTestData.GetTestInfoByID(TestID,
-            ref TestAppointmentID, ref TestResult,
-            ref Notes, ref CreatedByUserID))
-
+            if(result.isFound)
                 return new clsTest(TestID,
-                        TestAppointmentID, TestResult,
-                        Notes, CreatedByUserID);
+                        result.TestAppointmentID, result.TestResult,
+                        result.Notes, result.CreatedByUserID);
             else
                 return null;
 
         }
 
-        public static clsTest FindLastTestPerPersonAndLicenseClass
+        public static async Task<clsTest> FindLastTestPerPersonAndLicenseClassAsync
             (int PersonID, int LicenseClassID, clsTestType.enTestType TestTypeID)
         {
-            int TestID = -1;
-            int TestAppointmentID = -1;
-            bool TestResult = false; string Notes = ""; int CreatedByUserID = -1;
 
-            if (clsTestData.GetLastTestByPersonAndTestTypeAndLicenseClass
-                (PersonID, LicenseClassID, (int)TestTypeID, ref TestID,
-            ref TestAppointmentID, ref TestResult,
-            ref Notes, ref CreatedByUserID))
+            var result = await clsTestData.GetLastTestByPersonAndTestTypeAndLicenseClassAsync(PersonID, LicenseClassID, (int)TestTypeID);
 
-                return new clsTest(TestID,
-                        TestAppointmentID, TestResult,
-                        Notes, CreatedByUserID);
+            if(result.isFound)
+                return new clsTest(result.TestID,
+                        result.TestAppointmentID, result.TestResult,
+                        result.Notes, result.CreatedByUserID);
             else
                 return null;
 
         }
 
-        public static DataTable GetAllTests()
+        public static async Task<DataTable> GetAllTestsAsync()
         {
-            return clsTestData.GetAllTests();
+            return await clsTestData.GetAllTestsAsync();
 
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
 
-        public static byte GetPassedTestCount(int LocalDrivingLicenseApplicationID)
+        public static async Task<byte> GetPassedTestCountAsync(int LocalDrivingLicenseApplicationID)
         {
-            return clsTestData.GetPassedTestCount(LocalDrivingLicenseApplicationID);
+            return await clsTestData.GetPassedTestCountAsync(LocalDrivingLicenseApplicationID);
         }
 
-        public static bool PassedAllTests(int LocalDrivingLicenseApplicationID)
+        public static async Task<bool> PassedAllTestsAsync(int LocalDrivingLicenseApplicationID)
         {
             //if total passed test less than 3 it will return false otherwise will return true
-            return GetPassedTestCount(LocalDrivingLicenseApplicationID) == 3;
+            return await GetPassedTestCountAsync(LocalDrivingLicenseApplicationID) == 3;
         }
 
-        public static bool IsTestPassed(int TestAppointmentID)
+        public static async Task<bool> IsTestPassedAsync(int TestAppointmentID)
         {
-            return clsTestData.GetIsPassedTestByTestAppointmentID(TestAppointmentID);
+            return await clsTestData.GetIsPassedTestByTestAppointmentIDAsync(TestAppointmentID);
         }
 
-        public static clsTest GetNewTestObj(int TestAppointmentID, bool TestResult, string Notes, int CreatedByUserID)
+        public static async Task<clsTest> GetNewTestObjAsync(int TestAppointmentID, bool TestResult, string Notes, int CreatedByUserID)
         {
             // prevent creating a test object if the TestAppointmentID or CreatedByUserID is invalid,
             // or if the related TestAppointment is invalid or locked.
@@ -182,7 +184,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            clsTestAppointment TestAppointmentInfo = clsTestAppointment.Find(TestAppointmentID);
+            clsTestAppointment TestAppointmentInfo = await clsTestAppointment.FindAsync(TestAppointmentID);
 
             if (TestAppointmentInfo == null || TestAppointmentInfo.TestTypeID == clsTestType.enTestType.None)
             {

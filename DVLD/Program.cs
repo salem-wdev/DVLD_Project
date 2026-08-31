@@ -18,7 +18,7 @@ namespace DVLD
         [STAThread]
         static async Task Main()
         {
-            if (!clsLicense.DeactivateExpiredLicenses())
+            if (!await clsLicense.DeactivateExpiredLicensesAsync())
             {
                 //MessageBox.Show("An error occurred while deactivating expired licenses. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 //return;
@@ -30,7 +30,7 @@ namespace DVLD
                 //return;
             }
 
-            if (!clsTestAppointment.LockExpiredTestAppointments())
+            if (!await clsTestAppointment.LockExpiredTestAppointmentsAsync())
             {
                 //MessageBox.Show("An error occurred while locking expired test appointments. Please contact support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 //return;

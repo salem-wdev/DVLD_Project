@@ -1,9 +1,11 @@
 using DVLD_Shared;
+using DVLD_Shared;
 using DVLD_Infrastructure.Storage;
 using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 
 namespace DVLD_DataAccess
@@ -11,11 +13,18 @@ namespace DVLD_DataAccess
     public class clsTestAppointmentData
     {
 
-        public static bool GetTestAppointmentInfoByID(int TestAppointmentID,
-            ref int TestTypeID, ref int LocalDrivingLicenseApplicationID,
-            ref DateTime AppointmentDate, ref float PaidFees, ref int CreatedByUserID, ref bool IsLocked, ref int RetakeTestApplicationID)
+        public static async Task<(bool isFound, int TestTypeID, int LocalDrivingLicenseApplicationID,
+            DateTime AppointmentDate, float PaidFees, int CreatedByUserID, bool IsLocked, int RetakeTestApplicationID)>
+            GetTestAppointmentInfoByIDAsync(int TestAppointmentID)
         {
             bool isFound = false;
+            int TestTypeID = -1;
+            int LocalDrivingLicenseApplicationID = -1;
+            DateTime AppointmentDate = DateTime.MinValue;
+            float PaidFees = 0;
+            int CreatedByUserID = -1;
+            bool IsLocked = false;
+            int RetakeTestApplicationID = -1;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -28,10 +37,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@TestAppointmentID", SqlDbType.Int).Value = TestAppointmentID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 isFound = true;
                                 TestTypeID = reader.GetInt32(0);
@@ -56,15 +65,18 @@ namespace DVLD_DataAccess
                 isFound = false;
             }
 
-            return isFound;
+            return (isFound, TestTypeID, LocalDrivingLicenseApplicationID, AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
         }
 
-        public static bool GetTestAppointmentInfoByLocalDrivingLicenseApplicationID(int LocalDrivingLicenseApplicationID, int TestTypeID,
-            ref int TestAppointmentID, ref DateTime AppointmentDate,
-            ref float PaidFees, ref int CreatedByUserID, ref bool IsLocked,
-            ref int RetakeTestApplicationID)
+        public static async Task<(bool isFound, int TestAppointmentID, DateTime AppointmentDate, float PaidFees, int CreatedByUserID, bool IsLocked, int RetakeTestApplicationID)> GetTestAppointmentInfoByLocalDrivingLicenseApplicationIDAsync(int LocalDrivingLicenseApplicationID, int TestTypeID)
         {
             bool isFound = false;
+            int TestAppointmentID = -1;
+            DateTime AppointmentDate = DateTime.MinValue;
+            float PaidFees = 0;
+            int CreatedByUserID = -1;
+            bool IsLocked = false;
+            int RetakeTestApplicationID = -1;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -80,10 +92,10 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 isFound = true;
                                 TestAppointmentID = reader.GetInt32(0);
@@ -107,15 +119,19 @@ namespace DVLD_DataAccess
                 isFound = false;
             }
 
-            return isFound;
+            return (isFound, TestAppointmentID, AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
         }
 
-        public static bool GetLastTestAppointment(
-             int LocalDrivingLicenseApplicationID, int TestTypeID,
-            ref int TestAppointmentID, ref DateTime AppointmentDate,
-            ref float PaidFees, ref int CreatedByUserID, ref bool IsLocked, ref int RetakeTestApplicationID)
+        public static async Task<(bool isFound, int TestAppointmentID, DateTime AppointmentDate, float PaidFees, int CreatedByUserID, bool IsLocked, int RetakeTestApplicationID)> GetLastTestAppointmentAsync(
+             int LocalDrivingLicenseApplicationID, int TestTypeID)
         {
             bool isFound = false;
+            int TestAppointmentID = -1;
+            DateTime AppointmentDate = DateTime.MinValue;
+            float PaidFees = 0;
+            int CreatedByUserID = -1;
+            bool IsLocked = false;
+            int RetakeTestApplicationID = -1;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -131,10 +147,10 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 isFound = true;
                                 TestAppointmentID = reader.GetInt32(0);
@@ -158,10 +174,10 @@ namespace DVLD_DataAccess
                 isFound = false;
             }
 
-            return isFound;
+            return (isFound, TestAppointmentID, AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
         }
 
-        public static DataTable GetAllTestAppointments()
+        public static async Task<DataTable> GetAllTestAppointmentsAsync()
         {
             DataTable dt = new DataTable();
             try
@@ -174,9 +190,9 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
                             if (reader.HasRows)
                             {
@@ -194,7 +210,7 @@ namespace DVLD_DataAccess
             return dt;
         }
 
-        public static DataTable GetApplicationTestAppointmentsPerTestType(int LocalDrivingLicenseApplicationID, int TestTypeID)
+        public static async Task<DataTable> GetApplicationTestAppointmentsPerTestTypeAsync(int LocalDrivingLicenseApplicationID, int TestTypeID)
         {
             DataTable dt = new DataTable();
             try
@@ -212,9 +228,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
                             if (reader.HasRows)
                             {
@@ -232,7 +248,7 @@ namespace DVLD_DataAccess
             return dt;
         }
 
-        public static int AddNewTestAppointment(
+        public static async Task<int> AddNewTestAppointmentAsync(
              int TestTypeID, int LocalDrivingLicenseApplicationID,
              DateTime AppointmentDate, float PaidFees, int CreatedByUserID, int RetakeTestApplicationID)
         {
@@ -254,9 +270,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@CreatedByUserID", SqlDbType.Int).Value = CreatedByUserID;
                         command.Parameters.Add("@RetakeTestApplicationID", SqlDbType.Int).Value = RetakeTestApplicationID == -1 ? (object)DBNull.Value : RetakeTestApplicationID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is int insertedID)
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is int insertedID)
                         {
                             TestAppointmentID = insertedID;
                         }
@@ -271,7 +287,7 @@ namespace DVLD_DataAccess
             return TestAppointmentID;
         }
 
-        public static bool UpdateTestAppointment(int TestAppointmentID, int TestTypeID, int LocalDrivingLicenseApplicationID,
+        public static async Task<bool> UpdateTestAppointmentAsync(int TestAppointmentID, int TestTypeID, int LocalDrivingLicenseApplicationID,
              DateTime AppointmentDate, float PaidFees,
              int CreatedByUserID, bool IsLocked, int RetakeTestApplicationID)
         {
@@ -301,8 +317,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@IsLocked", SqlDbType.Bit).Value = IsLocked;
                         command.Parameters.Add("@RetakeTestApplicationID", SqlDbType.Int).Value = RetakeTestApplicationID == -1 ? (object)DBNull.Value : RetakeTestApplicationID;
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -316,7 +332,7 @@ namespace DVLD_DataAccess
         }
 
 
-        public static int GetTestID(int TestAppointmentID)
+        public static async Task<int> GetTestIDAsync(int TestAppointmentID)
         {
             int TestID = -1;
             try
@@ -329,9 +345,9 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@TestAppointmentID", SqlDbType.Int).Value = TestAppointmentID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is int testID)
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is int testID)
                         {
                             TestID = testID;
                         }
@@ -346,7 +362,7 @@ namespace DVLD_DataAccess
             return TestID;
         }
 
-        public static bool DoesHaveAnActiveAppointment(int TestTypeID,
+        public static async Task<bool> DoesHaveAnActiveAppointmentAsync(int TestTypeID,
             int LocalDrivingLicenseApplicationID)
         {
             bool IsFound = false;
@@ -366,9 +382,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is bool found)
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool found)
                         {
                             IsFound = found;
                         }
@@ -384,7 +400,7 @@ namespace DVLD_DataAccess
             return IsFound;
         }
 
-        public static bool GetIsAppointmentLocked(int TestTypeID,
+        public static async Task<bool> GetIsAppointmentLockedAsync(int TestTypeID,
             int LocalDrivingLicenseApplicationID)
         {
             bool IsLocked = false;
@@ -403,9 +419,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is bool isLocked)
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool isLocked)
                         {
                             IsLocked = isLocked;
                         }
@@ -421,7 +437,7 @@ namespace DVLD_DataAccess
             return IsLocked;
         }
 
-        public static bool GetIsAppointmentLockedByID(int TestAppointmentID)
+        public static async Task<bool> GetIsAppointmentLockedByIDAsync(int TestAppointmentID)
         {
             bool IsLocked = false;
             try
@@ -436,9 +452,9 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@TestAppointmentID", SqlDbType.Int).Value = TestAppointmentID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is bool isLocked)
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool isLocked)
                         {
                             IsLocked = isLocked;
                         }
@@ -454,7 +470,7 @@ namespace DVLD_DataAccess
             return IsLocked;
         }
 
-        public static bool LockExpiredAppointments(int TestTypeID,
+        public static async Task<bool> LockExpiredAppointmentsAsync(int TestTypeID,
             int LocalDrivingLicenseApplicationID)
         {
             bool IsLocked = false;
@@ -474,9 +490,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is bool isLocked)
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool isLocked)
                         {
                             IsLocked = isLocked;
                         }
@@ -492,7 +508,7 @@ namespace DVLD_DataAccess
             return IsLocked;
         }
 
-        public static bool GetIsAppointmentexists(int TestTypeID,
+        public static async Task<bool> GetIsAppointmentexistsAsync(int TestTypeID,
             int LocalDrivingLicenseApplicationID)
         {
             bool IsFound = false;
@@ -511,9 +527,9 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@LocalDrivingLicenseApplicationID", SqlDbType.Int).Value = LocalDrivingLicenseApplicationID;
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        if (command.ExecuteScalar() is bool found)
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool found)
                         {
                             IsFound = found;
                         }
@@ -529,7 +545,7 @@ namespace DVLD_DataAccess
             return IsFound;
         }
 
-        public static bool LockExpiredTestAppointments()
+        public static async Task<bool> LockExpiredTestAppointmentsAsync()
         {
             int EffectedRows = 0;
             try
@@ -543,8 +559,8 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
-                        EffectedRows = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        EffectedRows = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }

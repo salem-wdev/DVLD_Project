@@ -89,7 +89,7 @@ namespace DVLD.Applications.International_License
             if (licenseID > 0)
             {
                 llShowLicenseHistory.Enabled = true;
-                int LicenseClass = (clsLicense.Find(licenseID)?.LicenseClassID ?? -1);
+                int LicenseClass = ((await clsLicense.FindAsync(licenseID))?.LicenseClassID ?? -1);
                 if (LicenseClass < 1)
                 {
                     MessageBox.Show("License not Existes!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

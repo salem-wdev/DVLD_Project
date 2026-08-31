@@ -101,10 +101,10 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             _ResetControl();
         }
 
-        public bool LoadData(int LicenseID)
+        public async Task<bool> LoadDataAsync(int LicenseID)
         {
             _LicenseID = LicenseID;
-            _License = clsLicense.Find(_LicenseID);
+            _License = await clsLicense.FindAsync(_LicenseID);
             if (_License == null)
             {
                 MessageBox.Show("Could not find License ID = " + _LicenseID.ToString(),

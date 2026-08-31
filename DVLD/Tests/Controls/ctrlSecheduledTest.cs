@@ -88,10 +88,10 @@ namespace DVLD.Tests.Controls
             InitializeComponent();
         }
 
-        private void _FillControlWithData()
+        private async Task _FillControlWithDataAsync()
         {
             lblLocalDrivingLicenseAppID.Text = _TestAppointment.LocalDrivingLicenseApplicationID.ToString();
-            lblDrivingClass.Text = _LocalDrivingLicenseApplication.LicenseClassInfo.ClassName;
+            lblDrivingClass.Text =(await _LocalDrivingLicenseApplication?.LicenseClassInfoAsync).ClassName;
             lblFullName.Text = _LocalDrivingLicenseApplication.PersonFullName;
             lblTrial.Text = _LocalDrivingLicenseApplication.TotalTrialsPerTest(_TestAppointment.TestTypeID).ToString();
             lblDate.Text = _TestAppointment.AppointmentDate.ToShortDateString();
@@ -136,14 +136,14 @@ namespace DVLD.Tests.Controls
         {
             _TestAppointmentID = TestAppointmentID;
 
-            _TestAppointment = clsTestAppointment.Find(_TestAppointmentID);
+            _TestAppointment = await clsTestAppointment.FindAsync(_TestAppointmentID);
 
             if (_TestAppointment != null)
             {
                 _LocalDrivingLicenseApplicationID = _TestAppointment.LocalDrivingLicenseApplicationID;
                 _LocalDrivingLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(_LocalDrivingLicenseApplicationID);
                 TestTypeID = _TestAppointment.TestTypeID;
-                _TestID = _TestAppointment.TestID;
+                _TestID = await _TestAppointment.TestIDAsync();
             }
             else
             {
@@ -154,7 +154,7 @@ namespace DVLD.Tests.Controls
 
             if (_LocalDrivingLicenseApplication != null)
             {
-                _FillControlWithData();
+                await _FillControlWithDataAsync();
                 return true;
             }
             else

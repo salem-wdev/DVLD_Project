@@ -158,7 +158,7 @@ namespace DVLD_Business
         {
             //call DataAccess Layer 
 
-            clsLicense license = clsLicense.Find(IssuedUsingLocalLicenseID);
+            clsLicense license = await clsLicense.FindAsync(IssuedUsingLocalLicenseID);
 
             if (license == null || license.ExpirationDate < clsUtilData.GetServerDate()
                 || license.IsActive == false
@@ -248,7 +248,7 @@ namespace DVLD_Business
             LocalLicenseID = -1;
             if (DriverID <= 0) return (false, LocalLicenseID); // To prevent unnessasry database connection.
 
-            LocalLicenseID = clsLicense.GetActiveLicenseIDByDriverID(DriverID, 3);
+            LocalLicenseID = await clsLicense.GetActiveLicenseIDByDriverIDAsync(DriverID, 3);
             if (LocalLicenseID == -1)
             {
                 return (false, LocalLicenseID);
@@ -299,7 +299,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            clsLicense LocalLicense = clsLicense.Find(LocalLicenseID);
+            clsLicense LocalLicense = await clsLicense.FindAsync(LocalLicenseID);
 
             if(LocalLicense == null)
             {

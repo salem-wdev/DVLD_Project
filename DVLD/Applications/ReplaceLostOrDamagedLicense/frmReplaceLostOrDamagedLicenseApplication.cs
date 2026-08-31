@@ -120,7 +120,7 @@ namespace DVLD.Applications.ReplaceLostOrDamagedLicense
             int licenseID = e.LicenseID;
             if (licenseID > 0)
             {
-                if (!clsLicense.IsLicenseActive(licenseID))
+                if (!await clsLicense.IsLicenseActiveAsync(licenseID))
                 {
                     MessageBox.Show("License not active!" +
                         "\nSelect another one", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

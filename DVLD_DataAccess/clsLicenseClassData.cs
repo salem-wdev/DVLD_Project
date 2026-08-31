@@ -4,15 +4,19 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
     public class clsLicenseClassData
     {
-        public static bool GetLicenseClassInfoByID(int LicenseClassID,
-    ref string ClassName, ref string ClassDescription, ref byte MinimumAllowedAge,
-    ref byte DefaultValidityLength, ref float ClassFees)
+        public static async Task<(bool IsFound, string ClassName, string ClassDescription, byte MinimumAllowedAge, byte DefaultValidityLength, float ClassFees)> GetLicenseClassInfoByIDAsync(int LicenseClassID)
         {
+            string ClassName = string.Empty;
+            string ClassDescription = string.Empty;
+            byte MinimumAllowedAge = 0;
+            byte DefaultValidityLength = 0;
+            float ClassFees = 0;
             bool isFound = false;
             try
             {
@@ -27,11 +31,11 @@ namespace DVLD_DataAccess
 
                         command.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
 
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 // The record was found
                                 isFound = true;
@@ -57,14 +61,17 @@ namespace DVLD_DataAccess
                 clsLogger.LogException(ex, $"faild to get license class info by id = {LicenseClassID}");
             }
 
-            return isFound;
+            return (isFound, ClassName, ClassDescription, MinimumAllowedAge, DefaultValidityLength, ClassFees);
         }
 
 
-        public static bool GetLicenseClassInfoByClassName(string ClassName, ref int LicenseClassID,
-            ref string ClassDescription, ref byte MinimumAllowedAge,
-           ref byte DefaultValidityLength, ref float ClassFees)
+        public static async Task<(bool IsFound, int LicenseClassID, string ClassDescription, byte MinimumAllowedAge, byte DefaultValidityLength, float ClassFees)> GetLicenseClassInfoByClassNameAsync(string ClassName)
         {
+            int LicenseClassID = -1;
+            string ClassDescription = string.Empty;
+            byte MinimumAllowedAge = 0;
+            byte DefaultValidityLength = 0;
+            float ClassFees = 0;
             bool isFound = false;
             try
             {
@@ -80,11 +87,11 @@ namespace DVLD_DataAccess
                         command.Parameters.AddWithValue("@ClassName", ClassName);
 
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
 
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 // The record was found
                                 isFound = true;
@@ -109,30 +116,36 @@ namespace DVLD_DataAccess
                 clsLogger.LogException(ex, $"faild to get license class info by class name = {ClassName}");
             }
 
-            return isFound;
+            return (isFound, LicenseClassID, ClassDescription, MinimumAllowedAge, DefaultValidityLength, ClassFees);
         }
 
-
-
-        public static DataTable GetAllLicenseClasses()
+        public static async Task<DataTable> GetAllLicenseClassesAsync()
         {
 
             DataTable dt = new DataTable();
+
+            dt.Columns.Add("LicenseClassID", typeof(int));
+            dt.Columns.Add("ClassName", typeof(string));
+            dt.Columns.Add("ClassDescription", typeof(string));
+            dt.Columns.Add("MinimumAllowedAge", typeof(byte));
+            dt.Columns.Add("DefaultValidityLength", typeof(byte));
+            dt.Columns.Add("ClassFees", typeof(decimal));
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
                 {
-                    string query = "SELECT * FROM LicenseClasses order by ClassName";
+                    string query = "SELECT LicenseClassID, ClassName, ClassDescription, MinimumAllowedAge, DefaultValidityLength, ClassFees FROM LicenseClasses order by ClassName";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            if (reader.HasRows)
+                            while (await reader.ReadAsync().ConfigureAwait(false))
                             {
-                                dt.Load(reader);
+                                dt.Rows.Add(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetByte(3), reader.GetByte(4), reader.GetDecimal(5));
                             }
                         }
                     }
@@ -148,7 +161,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static int AddNewLicenseClass(string ClassName, string ClassDescription,
+        public static async Task<int> AddNewLicenseClassAsync(string ClassName, string ClassDescription,
             byte MinimumAllowedAge, byte DefaultValidityLength, float ClassFees)
         {
             int LicenseClassID = -1;
@@ -175,12 +188,12 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@DefaultValidityLength", SqlDbType.TinyInt).Value = DefaultValidityLength;
                         command.Parameters.Add("@ClassFees", SqlDbType.Real).Value = ClassFees;
 
-                        connection.Open();
+                        await connection.OpenAsync().ConfigureAwait(false);
 
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess).ConfigureAwait(false))
                         {
 
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 LicenseClassID = Convert.ToInt32(reader.GetValue(0));
                             }
@@ -200,7 +213,7 @@ namespace DVLD_DataAccess
 
         }
 
-        public static bool UpdateLicenseClass(int LicenseClassID, string ClassName,
+        public static async Task<bool> UpdateLicenseClassAsync(int LicenseClassID, string ClassName,
             string ClassDescription,
             byte MinimumAllowedAge, byte DefaultValidityLength, float ClassFees)
         {
@@ -230,8 +243,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@ClassFees", SqlDbType.Real).Value = ClassFees;
 
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
                     }
                 }

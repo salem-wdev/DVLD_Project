@@ -1,4 +1,5 @@
 ﻿using DVLD_DataAccess;
+using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -37,23 +38,25 @@ namespace DVLD_Business
         public bool IsLocked { protected set; get; }
         public int RetakeTestApplicationID { private set; get; }
 
-        private clsApplication _RetakeTestAppInfo = null;
-        public clsApplication RetakeTestAppInfo
+        private AsyncLazy<clsApplication> _RetakeTestAppInfo = null;
+        public Task<clsApplication>RetakeTestAppInfo
         {
             get
             {
                 if (_RetakeTestAppInfo == null && RetakeTestApplicationID != -1)
                 {
-                    _LoadRetakeTestAppInfo();
+                    _RetakeTestAppInfo = new AsyncLazy<clsApplication>(async () =>
+                    {
+                        return await clsApplication.FindAsync(this.RetakeTestApplicationID);
+                    });
                 }
-                return _RetakeTestAppInfo;
+                return _RetakeTestAppInfo.GetValueAsync();
             }
         }
 
-        public int TestID
+        public async Task<int> TestIDAsync()
         {
-            get { return _GetTestID(); }
-
+           return await _GetTestIDAsync(this.TestAppointmentID);
         }
 
         protected clsTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
@@ -111,7 +114,7 @@ namespace DVLD_Business
 
             //call DataAccess Layer 
 
-            this.TestAppointmentID = clsTestAppointmentData.AddNewTestAppointment((int)this.TestTypeID, this.LocalDrivingLicenseApplicationID,
+            this.TestAppointmentID = await clsTestAppointmentData.AddNewTestAppointmentAsync((int)this.TestTypeID, this.LocalDrivingLicenseApplicationID,
                 this.AppointmentDate, this.PaidFees, this.CreatedByUserID, this.RetakeTestApplicationID);
 
             if (this.TestAppointmentID != -1)
@@ -123,7 +126,7 @@ namespace DVLD_Business
             if (this.RetakeTestApplicationID != -1)
             {
                 // Delete the retake test application if the test appointment save fails.
-                clsApplication.DeleteAsync(this.RetakeTestApplicationID);
+                await clsApplication.DeleteAsync(this.RetakeTestApplicationID);
             }
             return false;
         }
@@ -136,63 +139,50 @@ namespace DVLD_Business
                 return false;
             }
 
-            if (clsTestAppointmentData.GetIsAppointmentLockedByID(this.TestAppointmentID))
+            if (await clsTestAppointmentData.GetIsAppointmentLockedByIDAsync(this.TestAppointmentID))
             {
                 return false;
             }
 
             //call DataAccess Layer 
 
-            return clsTestAppointmentData.UpdateTestAppointment(this.TestAppointmentID, (int)this.TestTypeID, this.LocalDrivingLicenseApplicationID,
+            return await clsTestAppointmentData.UpdateTestAppointmentAsync(this.TestAppointmentID, (int)this.TestTypeID, this.LocalDrivingLicenseApplicationID,
                 this.AppointmentDate, this.PaidFees, this.CreatedByUserID, this.IsLocked, this.RetakeTestApplicationID);
         }
 
-        private async void _LoadRetakeTestAppInfo()
+        public static async Task<clsTestAppointment> FindAsync(int TestAppointmentID)
         {
-            _RetakeTestAppInfo = await clsApplication.FindAsync(RetakeTestApplicationID);
-        }
+           
+            var result = await clsTestAppointmentData.GetTestAppointmentInfoByIDAsync(TestAppointmentID);
 
-
-        public static clsTestAppointment Find(int TestAppointmentID)
-        {
-            int TestTypeID = 1; int LocalDrivingLicenseApplicationID = -1;
-            DateTime AppointmentDate = DateTime.Now; float PaidFees = 0;
-            int CreatedByUserID = -1; bool IsLocked = false; int RetakeTestApplicationID = -1;
-
-            if (clsTestAppointmentData.GetTestAppointmentInfoByID(TestAppointmentID, ref TestTypeID, ref LocalDrivingLicenseApplicationID,
-            ref AppointmentDate, ref PaidFees, ref CreatedByUserID, ref IsLocked, ref RetakeTestApplicationID))
-
+            if (result.isFound)
             {
-                if (AppointmentDate < clsUtilData.GetServerDate())
+                if (result.AppointmentDate < clsUtilData.GetServerDate())
                 {
-                    IsLocked = true;
+                    result.IsLocked = true;
                 }
 
-                return new clsTestAppointment(TestAppointmentID, (clsTestType.enTestType)TestTypeID, LocalDrivingLicenseApplicationID,
-          AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
+                return new clsTestAppointment(TestAppointmentID, (clsTestType.enTestType)result.TestTypeID, result.LocalDrivingLicenseApplicationID,
+          result.AppointmentDate, result.PaidFees, result.CreatedByUserID, result.IsLocked, result.RetakeTestApplicationID);
             }
             else
                 return null;
 
         }
 
-        public static clsTestAppointment FindByLocalDrivingLicenseApplicationID(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<clsTestAppointment> FindByLocalDrivingLicenseApplicationIDAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            int TestAppointmentID = -1;
-            DateTime AppointmentDate = DateTime.Now; float PaidFees = 0;
-            int CreatedByUserID = -1; bool IsLocked = false; int RetakeTestApplicationID = -1;
+            var result = await clsTestAppointmentData.GetTestAppointmentInfoByLocalDrivingLicenseApplicationIDAsync(LocalDrivingLicenseApplicationID, (int)TestTypeID);
 
-            if (clsTestAppointmentData.GetTestAppointmentInfoByLocalDrivingLicenseApplicationID(LocalDrivingLicenseApplicationID, (int)TestTypeID, ref TestAppointmentID,
-            ref AppointmentDate, ref PaidFees, ref CreatedByUserID, ref IsLocked, ref RetakeTestApplicationID))
-
+            if(result.isFound)
             {
-                if (AppointmentDate < clsUtilData.GetServerDate())
+                if (result.AppointmentDate < clsUtilData.GetServerDate())
                 {
-                    IsLocked = true;
+                    result.IsLocked = true;
                 }
 
-                return new clsTestAppointment(TestAppointmentID, (clsTestType.enTestType)TestTypeID, LocalDrivingLicenseApplicationID,
-          AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
+                return new clsTestAppointment(result.TestAppointmentID, (clsTestType.enTestType)TestTypeID, LocalDrivingLicenseApplicationID,
+          result.AppointmentDate, result.PaidFees, result.CreatedByUserID, result.IsLocked, result.RetakeTestApplicationID);
             }
             else
                 return null;
@@ -200,44 +190,41 @@ namespace DVLD_Business
         }
 
 
-        public static clsTestAppointment GetLastTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<clsTestAppointment> GetLastTestAppointmentAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            int TestAppointmentID = -1;
-            DateTime AppointmentDate = DateTime.Now; float PaidFees = 0;
-            int CreatedByUserID = -1; bool IsLocked = false; int RetakeTestApplicationID = -1;
 
-            if (clsTestAppointmentData.GetLastTestAppointment(LocalDrivingLicenseApplicationID, (int)TestTypeID,
-                ref TestAppointmentID, ref AppointmentDate, ref PaidFees, ref CreatedByUserID, ref IsLocked, ref RetakeTestApplicationID))
+            var result = await clsTestAppointmentData.GetLastTestAppointmentAsync(LocalDrivingLicenseApplicationID, (int)TestTypeID);
 
+            if(result.isFound)
             {
-                if (AppointmentDate < clsUtilData.GetServerDate())
+                if (result.AppointmentDate < clsUtilData.GetServerDate())
                 {
-                    IsLocked = true;
+                    result.IsLocked = true;
                 }
 
-                return new clsTestAppointment(TestAppointmentID, TestTypeID, LocalDrivingLicenseApplicationID,
-         AppointmentDate, PaidFees, CreatedByUserID, IsLocked, RetakeTestApplicationID);
+                return new clsTestAppointment(result.TestAppointmentID, TestTypeID, LocalDrivingLicenseApplicationID,
+         result.AppointmentDate, result.PaidFees, result.CreatedByUserID, result.IsLocked, result.RetakeTestApplicationID);
             }
             else
                 return null;
 
         }
 
-        public static DataTable GetAllTestAppointments()
+        public static async Task<DataTable> GetAllTestAppointmentsAsync()
         {
-            return clsTestAppointmentData.GetAllTestAppointments();
+            return await clsTestAppointmentData.GetAllTestAppointmentsAsync();
 
         }
 
-        public DataTable GetApplicationTestAppointmentsPerTestType(clsTestType.enTestType TestTypeID)
+        public async Task<DataTable> GetApplicationTestAppointmentsPerTestTypeAsync(clsTestType.enTestType TestTypeID)
         {
-            return clsTestAppointmentData.GetApplicationTestAppointmentsPerTestType(this.LocalDrivingLicenseApplicationID, (int)TestTypeID);
+            return await clsTestAppointmentData.GetApplicationTestAppointmentsPerTestTypeAsync(this.LocalDrivingLicenseApplicationID, (int)TestTypeID);
 
         }
 
-        public static DataTable GetApplicationTestAppointmentsPerTestType(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<DataTable> GetApplicationTestAppointmentsPerTestTypeAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            return clsTestAppointmentData.GetApplicationTestAppointmentsPerTestType(LocalDrivingLicenseApplicationID, (int)TestTypeID);
+            return await clsTestAppointmentData.GetApplicationTestAppointmentsPerTestTypeAsync(LocalDrivingLicenseApplicationID, (int)TestTypeID);
 
         }
 
@@ -245,15 +232,20 @@ namespace DVLD_Business
         {
             if (RetakeTestAppInfo != null)
             {
-                RetakeTestApplicationID = RetakeTestAppInfo.ApplicationID;
+                RetakeTestApplicationID = (await RetakeTestAppInfo).ApplicationID;
             }
 
             return await _saveDictionary[this.Mode]();
         }
 
-        private int _GetTestID()
+        private static async Task<int> _GetTestIDAsync(int testAppointmentID)
         {
-            return clsTestAppointmentData.GetTestID(TestAppointmentID);
+            return await clsTestAppointmentData.GetTestIDAsync(testAppointmentID);
+        }
+
+        public static async Task<int> GetTestIDAsync(int testAppointmentID)
+        {
+            return await _GetTestIDAsync(testAppointmentID);
         }
 
         private static async Task<float> _CalculateFeesAsync(clsApplication RetakeTestAppInfo, clsTestType.enTestType TestTypeID)
@@ -265,12 +257,12 @@ namespace DVLD_Business
                 paidFees += (float)RetakeTestAppInfo.PaidFees;
             }
 
-            paidFees += (float)clsTestType.Find(TestTypeID).TestTypeFees;
+            paidFees += (float)(await clsTestType.FindAsync(TestTypeID)).TestTypeFees;
 
             return paidFees;
         }
 
-        private static bool _IsNextTestAppointmentScheduled(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        private static async Task<bool> _IsNextTestAppointmentScheduledAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             // If the test type is less than StreetTest, then check if the next test appointment is already scheduled.
             if (TestTypeID == clsTestType.enTestType.StreetTest)
@@ -279,25 +271,25 @@ namespace DVLD_Business
             }
 
             // Check if the next test appointment is already scheduled.
-            return clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID + 1, LocalDrivingLicenseApplicationID);
+            return await clsTestAppointmentData.GetIsAppointmentexistsAsync((int)TestTypeID + 1, LocalDrivingLicenseApplicationID);
         }
 
-        public static bool IsPreviousTestAppointmentLocked(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<bool> IsPreviousTestAppointmentLockedAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            return _IsPreviousTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID);
+            return await _IsPreviousTestAppointmentLockedAsync(LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
-        public static bool IsTestAppointmentLocked(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<bool> IsTestAppointmentLockedAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            return _IsTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID);
+            return await _IsTestAppointmentLockedAsync(LocalDrivingLicenseApplicationID, TestTypeID);
         }
 
-        private static bool _IsTestAppointmentLocked(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        private static async Task<bool> _IsTestAppointmentLockedAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            return clsTestAppointmentData.GetIsAppointmentLocked((int)TestTypeID, LocalDrivingLicenseApplicationID);
+            return await clsTestAppointmentData.GetIsAppointmentLockedAsync((int)TestTypeID, LocalDrivingLicenseApplicationID);
         }
 
-        private static bool _IsPreviousTestAppointmentLocked(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        private static async Task<bool> _IsPreviousTestAppointmentLockedAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             // If the test type is greater than VisionTest, then check if the previous test appointment is locked.
             if (TestTypeID == clsTestType.enTestType.VisionTest)
@@ -305,29 +297,29 @@ namespace DVLD_Business
                 return true;
             }
             // Check if the previous test appointment is locked.
-            return _IsTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID - 1);
+            return await _IsTestAppointmentLockedAsync(LocalDrivingLicenseApplicationID, TestTypeID - 1);
 
         }
 
-        private static bool _DoesHaveActiveTestAppointment(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        private static async Task<bool> _DoesHaveActiveTestAppointmentAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             // Check if there is an active test appointment for the given test type and application ID.
-            return clsTestAppointmentData.DoesHaveAnActiveAppointment((int)TestTypeID, LocalDrivingLicenseApplicationID);
+            return await clsTestAppointmentData.DoesHaveAnActiveAppointmentAsync((int)TestTypeID, LocalDrivingLicenseApplicationID);
         }
 
-        private static bool _IsTestAppointmentInTheRightOrder(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        private static async Task<bool> _IsTestAppointmentInTheRightOrderAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             // Check if the test appointment is in the right order based on the test type.
 
             // If there is active test appointment for the current test type, then it is not in the right order.
-            if (_DoesHaveActiveTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID))
+            if (await _DoesHaveActiveTestAppointmentAsync(LocalDrivingLicenseApplicationID, TestTypeID))
             {
                 return false;
             }
 
 
             // If the previous test appointment is not locked, then it is not in the right order.
-            if (!_IsPreviousTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID))
+            if (!await _IsPreviousTestAppointmentLockedAsync(LocalDrivingLicenseApplicationID, TestTypeID))
             {
                 return false;
             }
@@ -335,7 +327,7 @@ namespace DVLD_Business
 
 
             // If the next test appointment is already scheduled, then it is not in the right order.
-            if (_IsNextTestAppointmentScheduled(LocalDrivingLicenseApplicationID, TestTypeID))
+            if (await _IsNextTestAppointmentScheduledAsync(LocalDrivingLicenseApplicationID, TestTypeID))
             {
                 return false;
             }
@@ -354,7 +346,7 @@ namespace DVLD_Business
         /// This function only validates the structural order and sequence of appointments. 
         /// It DOES NOT check whether the applicant passed or failed the previous test.
         /// </remarks>
-        public static bool IsTestAppointmentInTheRightOrder(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
+        public static async Task<bool> IsTestAppointmentInTheRightOrderAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
             // Check if the test appointment is in the right order based on the test type.
             // result not important here, only checking the sequence.
@@ -365,12 +357,12 @@ namespace DVLD_Business
             }
 
             // If the appointment already exists, then it is in the right order.
-            if (clsTestAppointmentData.GetIsAppointmentexists((int)TestTypeID, LocalDrivingLicenseApplicationID))
+            if (await clsTestAppointmentData.GetIsAppointmentexistsAsync((int)TestTypeID, LocalDrivingLicenseApplicationID))
             {
                 return true;
             }
 
-            if (!_IsTestAppointmentInTheRightOrder(LocalDrivingLicenseApplicationID, TestTypeID))
+            if (!await _IsTestAppointmentInTheRightOrderAsync(LocalDrivingLicenseApplicationID, TestTypeID))
             {
                 return false;
             }
@@ -383,20 +375,27 @@ namespace DVLD_Business
         private static async Task<clsTestAppointment> _GetReadyObjectAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID, int CreatedByUserID, DateTime AppointmentDate)
         {
             clsTestAppointment testAppointment;
+            clsApplication retakeTestApp = null;
 
             testAppointment = new clsTestAppointment(LocalDrivingLicenseApplicationID, TestTypeID, CreatedByUserID, AppointmentDate);
             if (await clsLocalDrivingLicenseApplication.DoesAttendTestTypeAsync(LocalDrivingLicenseApplicationID, TestTypeID))
             {
-                if (!await clsLocalDrivingLicenseApplication.DosPassTestAsync(LocalDrivingLicenseApplicationID, TestTypeID))
-                {
-                    testAppointment._RetakeTestAppInfo = await _GetNewReTakeTestObjAsync(testAppointment.CreatedByUserID, (await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(LocalDrivingLicenseApplicationID)).ApplicantPersonID);
-                }
-                else
+                if (await clsLocalDrivingLicenseApplication.DosPassTestAsync(LocalDrivingLicenseApplicationID, TestTypeID))
                 {
                     return null;
                 }
+
+                var applicantPersonID = (await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(LocalDrivingLicenseApplicationID))?.ApplicantPersonID ?? -1;
+                if (applicantPersonID <= 0)
+                {
+                    return null;
+                }
+
+                retakeTestApp = await _GetNewReTakeTestObjAsync(testAppointment.CreatedByUserID, applicantPersonID);
+                testAppointment._RetakeTestAppInfo = new AsyncLazy<clsApplication>(() => Task.FromResult(retakeTestApp));
+
             }
-            testAppointment.PaidFees = await _CalculateFeesAsync(testAppointment._RetakeTestAppInfo, TestTypeID);
+            testAppointment.PaidFees = await _CalculateFeesAsync(retakeTestApp, TestTypeID);
             return testAppointment;
         }
 
@@ -418,7 +417,7 @@ namespace DVLD_Business
                 return false;
             }
 
-            if (!_IsTestAppointmentInTheRightOrder(LocalDrivingLicenseApplicationID, TestTypeID))
+            if (!await _IsTestAppointmentInTheRightOrderAsync(LocalDrivingLicenseApplicationID, TestTypeID))
             {
                 return false;
             }
@@ -460,7 +459,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            if (!_IsTestAppointmentInTheRightOrder(LocalDrivingLicenseApplicationID, TestTypeID))
+            if (!await _IsTestAppointmentInTheRightOrderAsync(LocalDrivingLicenseApplicationID, TestTypeID))
             {
                 return null;
             }
@@ -500,9 +499,9 @@ namespace DVLD_Business
             return await clsApplication.GetNewApplicationAsync(CreatedByUserID, ApplicantPersonID, clsApplication.enApplicationType.RetakeTest);
         }
 
-        public static bool LockExpiredTestAppointments()
+        public static async Task<bool> LockExpiredTestAppointmentsAsync()
         {
-            return clsTestAppointmentData.LockExpiredTestAppointments();
+            return await clsTestAppointmentData.LockExpiredTestAppointmentsAsync();
         }
     }
 }

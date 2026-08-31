@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using static DVLD_Business.clsApplication;
 using static DVLD_Business.clsLicense;
 using DVLD_Business.Users;
+using Microsoft.VisualStudio.Threading;
 
 namespace DVLD_Business
 {
@@ -28,7 +29,7 @@ namespace DVLD_Business
             {
                 if (value != _LicenseClassID)
                 {
-                    _LicenseClassInfo = null;
+                    _LicenseClassInfoLazy = null;
                     _LicenseClassID = value;
                 }
             }
@@ -36,17 +37,24 @@ namespace DVLD_Business
             get => _LicenseClassID;
         }
 
-        private clsLicenseClass _LicenseClassInfo = null;
+        private AsyncLazy<clsLicenseClass> _LicenseClassInfoLazy = null;
 
-        public clsLicenseClass LicenseClassInfo
+        public Task<clsLicenseClass> LicenseClassInfoAsync
         {
             get
             {
-                if (_LicenseClassInfo == null && LicenseClassID != -1)
+                if (_LicenseClassInfoLazy == null)
                 {
-                    _LicenseClassInfo = clsLicenseClass.Find(LicenseClassID);
+                    _LicenseClassInfoLazy = new AsyncLazy<clsLicenseClass>(async () =>
+                    {
+                        if (LicenseClassID == -1)
+                        {
+                            return null;
+                        }
+                        return await clsLicenseClass.FindAsync(LicenseClassID);
+                    });
                 }
-                return _LicenseClassInfo;
+                return _LicenseClassInfoLazy.GetValueAsync();
             }
         }
         public string PersonFullName
@@ -149,7 +157,7 @@ namespace DVLD_Business
 
         private async Task<bool> _AddNewLocalDrivingLicenseApplicationAsync()
         {
-            if (clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID) != -1)
+            if (await clsLicense.GetActiveLicenseIDByPersonIDAsync(this.ApplicantPersonID, this.LicenseClassID) != -1)
             {
                 return false;
             }
@@ -248,14 +256,14 @@ namespace DVLD_Business
 
         }
 
-        public byte GetPassedTestCount()
+        public async Task<byte> GetPassedTestCountAsync()
         {
-            return clsTest.GetPassedTestCount(this.LocalDrivingLicenseApplicationID);
+            return await clsTest.GetPassedTestCountAsync(this.LocalDrivingLicenseApplicationID);
         }
 
-        public int GetActiveLicenseID()
+        public async Task<int> GetActiveLicenseIDAsync()
         {//this will get the license id that belongs to this application
-            return clsLicense.GetActiveLicenseIDByPersonID(this.ApplicantPersonID, this.LicenseClassID);
+            return await clsLicense.GetActiveLicenseIDByPersonIDAsync(this.ApplicantPersonID, this.LicenseClassID);
         }
 
         /// <summary>
@@ -268,12 +276,12 @@ namespace DVLD_Business
         /// </remarks>
         /// <exception cref="NotImplementedException">Thrown because the method is unstable and pending refactoring.</exception>
         [Obsolete("This method is unstable and pending refactoring.", true)]
-        public int GetApplicationLicenseID()
+        public async Task<int> GetApplicationLicenseIDAsync()
         {
             //throw new NotImplementedException("This method is unstable and pending refactoring.");
 
             // This will get the license id that belongs to this application
-            return clsLicense.GetLicenseIDByApplicationID(this.ApplicationID);
+            return await clsLicense.GetLicenseIDByApplicationIDAsync(this.ApplicationID);
         }
 
         public async Task<byte> TotalTrialsPerTest(clsTestType.enTestType TestTypeID)
@@ -311,7 +319,7 @@ namespace DVLD_Business
 
         public static async Task<bool> DosPassTestAsync(int LocalDrivingLicenseApplicationID, clsTestType.enTestType TestTypeID)
         {
-            if (!clsTestAppointment.IsTestAppointmentLocked(LocalDrivingLicenseApplicationID, TestTypeID))
+            if (!await clsTestAppointment.IsTestAppointmentLockedAsync(LocalDrivingLicenseApplicationID, TestTypeID))
             {
                 return false;
             }
@@ -346,7 +354,7 @@ namespace DVLD_Business
 
                 // TODO: if there is active application for the same person
                 // and license class we should not allow to create new application.
-                if (clsLicense.GetActiveLicenseIDByPersonID(ApplicantPersonID, LicenseClassID) != -1
+                if (await clsLicense.GetActiveLicenseIDByPersonIDAsync(ApplicantPersonID, LicenseClassID) != -1
                     || await clsApplication.GetActiveApplicationIDForLicenseClassAsync(ApplicantPersonID, ApplicationTypeID, LicenseClassID) != -1)
                 {
                     return null;

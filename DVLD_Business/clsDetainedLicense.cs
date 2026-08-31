@@ -255,7 +255,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            clsLicense license = clsLicense.Find(LicenseID);
+            clsLicense license = await clsLicense.FindAsync(LicenseID);
             if (license == null || license.DriverInfo == null)
             {
                 return null;
@@ -302,7 +302,7 @@ namespace DVLD_Business
 
         private static async Task<clsDetainedLicense> _CreateNewDetainedLicenseAsync(int LicenseID, float FineFees, int CreatedByUserID)
         {
-            if(!clsLicense.IsLicenseActive(LicenseID) || !clsUser.IsUserExists(CreatedByUserID))
+            if(!await clsLicense.IsLicenseActiveAsync(LicenseID) || !clsUser.IsUserExists(CreatedByUserID))
             {
                 return null;
             }

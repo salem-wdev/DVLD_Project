@@ -211,9 +211,9 @@ namespace DVLD.Applications.Rlease_Detained_License
             clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvDetainedLicenses);
         }
 
-        private void PesonDetailsToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void PesonDetailsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            clsLicense license = clsLicense.Find((int)dgvDetainedLicenses.SelectedRows[0].Cells["LicenseID"].Value);
+            clsLicense license = await clsLicense.FindAsync((int)dgvDetainedLicenses.SelectedRows[0].Cells["LicenseID"].Value);
             if (license != null)
             {
                 frmShowPersonInfo frm = new frmShowPersonInfo(license.DriverInfo.PersonID);
@@ -227,9 +227,9 @@ namespace DVLD.Applications.Rlease_Detained_License
             frm.ShowDialog();
         }
 
-        private void showPersonLicenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void showPersonLicenseHistoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            clsLicense license = clsLicense.Find((int)dgvDetainedLicenses.SelectedRows[0].Cells["LicenseID"].Value);
+            clsLicense license = await clsLicense.FindAsync((int)dgvDetainedLicenses.SelectedRows[0].Cells["LicenseID"].Value);
             if (license != null)
             {
                 frmShowPersonLicenseHistory frm = new frmShowPersonLicenseHistory(license.DriverInfo.PersonID);

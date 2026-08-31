@@ -62,7 +62,7 @@ namespace DVLD_Business
             {
                 if (_ApplicationTypeInfo == null && (int)ApplicationTypeID > 0)
                 {
-                    _GetApplicationTypeInfo();
+                    _GetApplicationTypeInfoAsync();
                 }
                 return _ApplicationTypeInfo;
             }
@@ -73,7 +73,7 @@ namespace DVLD_Business
             {
                 if (_PersonInfo == null && ApplicantPersonID != -1)
                 {
-                    _FindPerson();
+                    _FindPersonAsync();
                 }
                 return _PersonInfo;
             }
@@ -187,7 +187,7 @@ namespace DVLD_Business
             Mode = enMode.Update;
         }
 
-        private async void _GetApplicationTypeInfo()
+        private async void _GetApplicationTypeInfoAsync()
         {
             _ApplicationTypeInfo = await clsApplicationType.FindAsync((int)ApplicationTypeID).ConfigureAwait(false);
         }
@@ -229,7 +229,7 @@ namespace DVLD_Business
                 this.PaidFees, this.CreatedByUserID);
         }
 
-        private async void _FindPerson()
+        private async Task _FindPersonAsync()
         {
             _PersonInfo = await clsPerson.FindAsync(ApplicantPersonID).ConfigureAwait(false);
         }

@@ -4,15 +4,19 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
     public class clsTestTypeData
     {
-        public static bool GetTestTypeInfoByID(int TestTypeID,
-        ref string TestTypeTitle, ref string TestTypeDescription, ref decimal TestTypeFees)
+        public static async Task<(bool IsFound, string TestTypeTitle, string TestTypeDescription, decimal TestTypeFees)>
+            GetTestTypeInfoByIDAsync(int TestTypeID)
         {
             bool IsFound = false;
+            string TestTypeTitle = string.Empty;
+            string TestTypeDescription = string.Empty;
+            decimal TestTypeFees = 0;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -25,10 +29,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@TestTypeID", SqlDbType.Int).Value = TestTypeID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 TestTypeTitle = reader.IsDBNull(0) ? string.Empty : reader.GetString(0);
                                 TestTypeDescription = reader.IsDBNull(1) ? string.Empty : reader.GetString(1);
@@ -49,10 +53,10 @@ namespace DVLD_DataAccess
                 IsFound = false;
             }
 
-            return IsFound;
+            return (IsFound, TestTypeTitle, TestTypeDescription, TestTypeFees);
         }
 
-        public static int AddNewTestType(string TestTypeTitle,
+        public static async Task<int> AddNewTestTypeAsync(string TestTypeTitle,
            string TestTypeDescription, decimal TestTypeFees)
         {
             int TestTypeID = -1;
@@ -70,8 +74,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@TestTypeDescription", SqlDbType.NVarChar).Value = TestTypeDescription;
                         command.Parameters.Add("@TestTypeFees", SqlDbType.Decimal).Value = TestTypeFees;
 
-                        connection.Open();
-                        if (command.ExecuteScalar() is int NewID)
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is int NewID)
                         {
                             TestTypeID = NewID;
                         }
@@ -86,7 +90,7 @@ namespace DVLD_DataAccess
             return TestTypeID;
         }
 
-        public static bool UpdateTestType(int TestTypeID,
+        public static async Task<bool> UpdateTestTypeAsync(int TestTypeID,
         string TestTypeTitle, string TestTypeDescription, decimal TestTypeFees)
         {
             int NumberOfEffectedRows = 0;
@@ -107,8 +111,8 @@ namespace DVLD_DataAccess
                         Command.Parameters.Add("@TestTypeTitle", SqlDbType.NVarChar).Value = TestTypeTitle;
                         Command.Parameters.Add("@TestTypeFees", SqlDbType.Decimal).Value = TestTypeFees;
 
-                        connection.Open();
-                        NumberOfEffectedRows = Command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        NumberOfEffectedRows = await Command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -120,7 +124,7 @@ namespace DVLD_DataAccess
             return NumberOfEffectedRows > 0;
         }
 
-        public static DataTable GetAllTestTypes()
+        public static async Task<DataTable> GetAllTestTypesAsync()
         {
             DataTable Table = new DataTable();
             try
@@ -132,8 +136,8 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand Command = new SqlCommand(Query, connection))
                     {
-                        connection.Open();
-                        using (SqlDataReader reader = Command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await Command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
                             if (reader.HasRows)
                             {

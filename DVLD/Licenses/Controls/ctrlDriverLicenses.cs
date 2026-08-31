@@ -26,10 +26,10 @@ namespace DVLD.Licenses.Controls
             InitializeComponent();
         }
 
-        private void _LoadLocalLicenseInfo()
+        private async Task _LoadLocalLicenseInfoAsync()
         {
 
-            _dtAllLocalDrivingLicenses = clsDriver.GetLicenses(_DriverID);
+            _dtAllLocalDrivingLicenses = await clsDriver.GetLicensesAsync(_DriverID);
 
 
             dgvLocalLicensesHistory.DataSource = _dtAllLocalDrivingLicenses;
@@ -92,7 +92,7 @@ namespace DVLD.Licenses.Controls
 
         private async Task _RefreshDataGridsAsync()
         {
-            _LoadLocalLicenseInfo();
+            _LoadLocalLicenseInfoAsync();
             await _LoadInternationalLicenseInfoAsync();
         }
 

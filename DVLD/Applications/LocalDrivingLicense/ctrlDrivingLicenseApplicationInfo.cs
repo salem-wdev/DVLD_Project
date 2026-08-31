@@ -31,18 +31,18 @@ namespace DVLD.Applications.LocalDrivingLicense
             InitializeComponent();
         }
 
-        private async void _FillControlWithData()
+        private async Task _FillControlWithDataAsync()
         {
 
             if (_LocalDrivingLicenseApplication != null)
             {
-                _LicenseID = _LocalDrivingLicenseApplication.GetActiveLicenseID();
+                _LicenseID = await _LocalDrivingLicenseApplication.GetActiveLicenseIDAsync();
 
                 llShowLicenceInfo.Enabled = (_LicenseID != -1);
 
                 lblLocalDrivingLicenseApplicationID.Text = _LocalDrivingLicenseApplication.LocalDrivingLicenseApplicationID.ToString();
-                lblAppliedFor.Text = _LocalDrivingLicenseApplication.LicenseClassInfo.ClassName;
-                lblPassedTests.Text = _LocalDrivingLicenseApplication.GetPassedTestCount().ToString();
+                lblAppliedFor.Text = (await _LocalDrivingLicenseApplication?.LicenseClassInfoAsync).ClassName;
+                lblPassedTests.Text = _LocalDrivingLicenseApplication.GetPassedTestCountAsync().ToString();
                 await ctrlApplicationBasicInfo1.LoadApplicationBasicInfoAsync(_LocalDrivingLicenseApplication.ApplicationID);
             }
         }
@@ -67,7 +67,7 @@ namespace DVLD.Applications.LocalDrivingLicense
 
             if( _LocalDrivingLicenseApplication != null )
             {
-                _FillControlWithData();
+                await _FillControlWithDataAsync();
             }
             else
             {

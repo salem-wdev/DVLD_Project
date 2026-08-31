@@ -54,11 +54,11 @@ namespace DVLD.Licenses.International_Licenses.Controls
 
         }
 
-        private void _FillControlWithData()
+        private async Task _FillControlWithDataAsync()
         {
             lblFullName.Text = _InternationalLicense.DriverInfo.PersonInfo.FullName;
             lblInternationalLicenseID.Text = _InternationalLicense.InternationalLicenseID.ToString();
-            lblLocalLicenseID.Text = clsLicense.GetActiveLicenseIDByDriverID(_InternationalLicense.DriverID, 3).ToString();
+            lblLocalLicenseID.Text = (await clsLicense.GetActiveLicenseIDByDriverIDAsync(_InternationalLicense.DriverID, 3)).ToString();
             lblNationalNo.Text = _InternationalLicense.DriverInfo.PersonInfo.NationalNo;
             lblGendor.Text = _InternationalLicense.DriverInfo.PersonInfo.Gender == 0 ? "Male" : "Female";
             lblIssueDate.Text = clsFormat.DateToShort(_InternationalLicense.IssueDate);
@@ -111,7 +111,7 @@ namespace DVLD.Licenses.International_Licenses.Controls
             }
             else
             {
-                _FillControlWithData();
+                _FillControlWithDataAsync();
                 SelectedLicenseInfo.InternationalLicenseUpdated += SelectedLicenseInfo_InternationalLicenseUpdated;
                 return true;
             }
