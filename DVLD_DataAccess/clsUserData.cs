@@ -4,15 +4,19 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using DVLD_Infrastructure.Storage;
+using System.Threading.Tasks;
 
 namespace DVLD_DataAccess
 {
     public class clsUserData
     {
-        public static bool GetUserInfoByUserID(int UserID, ref int PersonID, ref string UserName,
-            ref string Password, ref bool IsActive)
+        public static async Task<(bool IsFound, int PersonID, string UserName, string Password, bool IsActive)> GetUserInfoByUserIDAsync(int UserID)
         {
             bool IsFound = false;
+            int PersonID = -1;
+            string UserName = string.Empty;
+            string Password = string.Empty;
+            bool IsActive = false;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -25,10 +29,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@UserID", SqlDbType.Int).Value = UserID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 PersonID = reader.GetInt32(0);
                                 UserName = reader.GetString(1);
@@ -50,14 +54,16 @@ namespace DVLD_DataAccess
                 IsFound = false;
             }
 
-            return IsFound;
+            return (IsFound, PersonID, UserName, Password, IsActive);
         }
 
-        public static bool GetUserInfoByUserName(string UserName,
-           ref int UserID, ref int PersonID,
-            ref string Password, ref bool IsActive)
+        public static async Task<(bool IsFound, int UserID, int PersonID, string Password, bool IsActive)> GetUserInfoByUserNameAsync(string UserName)
         {
             bool IsFound = false;
+            int UserID = -1;
+            int PersonID = -1;
+            string Password = string.Empty;
+            bool IsActive = false;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -70,10 +76,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@UserName", SqlDbType.NVarChar).Value = UserName;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 UserID = reader.GetInt32(0);
                                 PersonID = reader.GetInt32(1);
@@ -95,14 +101,16 @@ namespace DVLD_DataAccess
                 IsFound = false;
             }
 
-            return IsFound;
+            return (IsFound, UserID, PersonID, Password, IsActive);
         }
 
-        public static bool GetUserInfoByPersonID(int PersonID,
-            ref int UserID, ref string UserName,
-            ref string Password, ref bool IsActive)
+        public static async Task<(bool IsFound, int UserID, string UserName, string Password, bool IsActive)> GetUserInfoByPersonIDAsync(int PersonID)
         {
             bool IsFound = false;
+            int UserID = -1;
+            string UserName = string.Empty;
+            string Password = string.Empty;
+            bool IsActive = false;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -115,10 +123,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 UserID = reader.GetInt32(0);
                                 UserName = reader.GetString(1);
@@ -140,13 +148,15 @@ namespace DVLD_DataAccess
                 IsFound = false;
             }
 
-            return IsFound;
+            return (IsFound, UserID, UserName, Password, IsActive);
         }
 
-        public static bool GetUserInfoByUsernameAndPassword(string UserName, string Password,
-    ref int UserID, ref int PersonID, ref bool IsActive)
+        public static async Task<(bool IsFound, int UserID, int PersonID, bool IsActive)> GetUserInfoByUsernameAndPasswordAsync(string UserName, string Password)
         {
             bool isFound = false;
+            int UserID = -1;
+            int PersonID = -1;
+            bool IsActive = false;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString))
@@ -161,10 +171,10 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@UserName", SqlDbType.NVarChar).Value = UserName;
                         command.Parameters.Add("@Password", SqlDbType.NVarChar).Value = Password;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 isFound = true;
                                 UserID = reader.GetInt32(0);
@@ -187,11 +197,11 @@ namespace DVLD_DataAccess
                 isFound = false;
             }
 
-            return isFound;
+            return (isFound, UserID, PersonID, IsActive);
         }
 
 
-        public static int AddNewUser(int PersonID, string UserName,
+        public static async Task<int> AddNewUserAsync(int PersonID, string UserName,
             string Password, bool IsActive)
         {
             int UserID = -1;
@@ -210,8 +220,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@Password", SqlDbType.NVarChar).Value = Password;
                         command.Parameters.Add("@IsActive", SqlDbType.Bit).Value = IsActive;
 
-                        connection.Open();
-                        if (command.ExecuteScalar() is int NewID)
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is int NewID)
                         {
                             UserID = NewID;
                         }
@@ -226,7 +236,7 @@ namespace DVLD_DataAccess
             return UserID;
         }
 
-        public static bool UpdateUser(int UserID, string UserName,
+        public static async Task<bool> UpdateUserAsync(int UserID, string UserName,
             string Password, bool IsActive)
         {
             int NumberOfEffectedRows = 0;
@@ -247,8 +257,8 @@ namespace DVLD_DataAccess
                         Command.Parameters.Add("@IsActive", SqlDbType.Bit).Value = IsActive;
                         Command.Parameters.Add("@UserID", SqlDbType.Int).Value = UserID;
 
-                        connection.Open();
-                        NumberOfEffectedRows = Command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        NumberOfEffectedRows = await Command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -260,7 +270,7 @@ namespace DVLD_DataAccess
             return NumberOfEffectedRows > 0;
         }
 
-        public static bool IsUserExists(int UserID)
+        public static async Task<bool> IsUserExistsAsync(int UserID)
         {
             bool IsExist = false;
             try
@@ -275,8 +285,8 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@UserID", SqlDbType.Int).Value = UserID;
 
-                        connection.Open();
-                        if (command.ExecuteScalar() is bool found)
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool found)
                         {
                             IsExist = found;
                         }
@@ -296,7 +306,7 @@ namespace DVLD_DataAccess
             return IsExist;
         }
 
-        public static bool IsUserExists(string UserName)
+        public static async Task<bool> IsUserExistsAsync(string UserName)
         {
             bool IsExist = false;
             try
@@ -311,8 +321,8 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@UserName", SqlDbType.NVarChar).Value = UserName;
 
-                        connection.Open();
-                        if (command.ExecuteScalar() is bool found)
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool found)
                         {
                             IsExist = found;
                         }
@@ -332,7 +342,7 @@ namespace DVLD_DataAccess
             return IsExist;
         }
 
-        public static bool IsUserExistForPersonID(int PersonID)
+        public static async Task<bool> IsUserExistForPersonIDAsync(int PersonID)
         {
             bool isFound = false;
             try
@@ -347,8 +357,8 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
 
-                        connection.Open();
-                        if (command.ExecuteScalar() is bool found)
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool found)
                         {
                             isFound = found;
                         }
@@ -368,7 +378,7 @@ namespace DVLD_DataAccess
             return isFound;
         }
 
-        public static bool DeleteUser(int UserID)
+        public static async Task<bool> DeleteUserAsync(int UserID)
         {
             int NumberOfEffectedRows = 0;
             try
@@ -382,8 +392,8 @@ namespace DVLD_DataAccess
                     {
                         Command.Parameters.Add("@UserID", SqlDbType.Int).Value = UserID;
 
-                        connection.Open();
-                        NumberOfEffectedRows = Command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        NumberOfEffectedRows = await Command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -395,7 +405,7 @@ namespace DVLD_DataAccess
             return NumberOfEffectedRows > 0;
         }
 
-        public static DataTable GetAllUsers()
+        public static async Task<DataTable> GetAllUsersAsync()
         {
             DataTable Table = new DataTable();
             try
@@ -412,8 +422,8 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand Command = new SqlCommand(Query, connection))
                     {
-                        connection.Open();
-                        using (SqlDataReader reader = Command.ExecuteReader())
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await Command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
                             if (reader.HasRows)
                             {
@@ -431,7 +441,7 @@ namespace DVLD_DataAccess
             return Table;
         }
 
-        public static bool DoesPersonHaveUser44(int PersonID)
+        public static async Task<bool> DoesPersonHaveUser44Async(int PersonID)
         {
             bool isFound = false;
             try
@@ -446,8 +456,8 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@PersonID", SqlDbType.Int).Value = PersonID;
 
-                        connection.Open();
-                        if (command.ExecuteScalar() is bool found)
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool found)
                         {
                             isFound = found;
                         }
@@ -467,7 +477,7 @@ namespace DVLD_DataAccess
             return isFound;
         }
 
-        public static bool ChangeUserCredentials(int UserID, string NewUserName, string NewPassword)
+        public static async Task<bool> ChangeUserCredentialsAsync(int UserID, string NewUserName, string NewPassword)
         {
             int rowsAffected = 0;
             try
@@ -485,8 +495,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@UserName", SqlDbType.NVarChar).Value = NewUserName;
                         command.Parameters.Add("@Password", SqlDbType.NVarChar).Value = NewPassword;
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -499,7 +509,7 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
-        public static bool ChangePassword(int UserID, string NewPassword)
+        public static async Task<bool> ChangePasswordAsync(int UserID, string NewPassword)
         {
             int rowsAffected = 0;
             try
@@ -515,8 +525,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@UserID", SqlDbType.Int).Value = UserID;
                         command.Parameters.Add("@Password", SqlDbType.NVarChar).Value = NewPassword;
 
-                        connection.Open();
-                        rowsAffected = command.ExecuteNonQuery();
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -529,7 +539,7 @@ namespace DVLD_DataAccess
             return (rowsAffected > 0);
         }
 
-        public static bool ChangeUserActivity(int UserID, bool IsActive)
+        public static async Task<bool> ChangeUserActivityAsync(int UserID, bool IsActive)
         {
             bool IsSucceed = false;
             try
@@ -545,8 +555,8 @@ namespace DVLD_DataAccess
                         command.Parameters.Add("@UserID", SqlDbType.Int).Value = UserID;
                         command.Parameters.Add("@IsActive", SqlDbType.Bit).Value = IsActive;
 
-                        connection.Open();
-                        IsSucceed = (command.ExecuteNonQuery() > 0);
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        IsSucceed = (await command.ExecuteNonQueryAsync().ConfigureAwait(false) > 0);
                     }
                 }
             }
@@ -559,7 +569,7 @@ namespace DVLD_DataAccess
             return IsSucceed;
         }
 
-        public static bool HasUsers()
+        public static async Task<bool> HasUsersAsync()
         {
             bool isFound = false;
             try
@@ -571,8 +581,8 @@ namespace DVLD_DataAccess
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        connection.Open();
-                        if (command.ExecuteScalar() is bool found)
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        if (await command.ExecuteScalarAsync().ConfigureAwait(false) is bool found)
                         {
                             isFound = found;
                         }
@@ -592,7 +602,7 @@ namespace DVLD_DataAccess
             return isFound;
         }
 
-        public static int GetUserPermissionsByUserID(int UserID)
+        public static async Task<int> GetUserPermissionsByUserIDAsync(int UserID)
         {
             int Permissions = 0;
             try
@@ -607,10 +617,10 @@ namespace DVLD_DataAccess
                     {
                         command.Parameters.Add("@UserID", SqlDbType.Int).Value = UserID;
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
+                        await connection.OpenAsync().ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess).ConfigureAwait(false))
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync().ConfigureAwait(false))
                             {
                                 Permissions = reader.GetInt32(0);
                             }

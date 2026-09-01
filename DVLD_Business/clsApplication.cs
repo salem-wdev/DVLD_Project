@@ -45,16 +45,13 @@ namespace DVLD_Business
 
         private clsPerson _PersonInfo = null;
 
-        public clsUser CreatedByUserInfo
+        public async Task<clsUser> CreatedByUserInfoAsync()
         {
-            get
+            if (_CreatedByUserInfo == null && CreatedByUserID != -1)
             {
-                if (_CreatedByUserInfo == null && CreatedByUserID != -1)
-                {
-                    _CreatedByUserInfo = clsUser.Find(CreatedByUserID);
-                }
-                return _CreatedByUserInfo;
+                _CreatedByUserInfo = await clsUser.FindAsync(CreatedByUserID);
             }
+            return _CreatedByUserInfo;
         }
         public clsApplicationType ApplicationTypeInfo
         {
@@ -73,7 +70,7 @@ namespace DVLD_Business
             {
                 if (_PersonInfo == null && ApplicantPersonID != -1)
                 {
-                    _FindPersonAsync();
+                     _ = _FindPersonAsync();
                 }
                 return _PersonInfo;
             }

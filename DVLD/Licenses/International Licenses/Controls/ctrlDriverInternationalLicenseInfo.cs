@@ -111,7 +111,7 @@ namespace DVLD.Licenses.International_Licenses.Controls
             }
             else
             {
-                _FillControlWithDataAsync();
+                await _FillControlWithDataAsync();
                 SelectedLicenseInfo.InternationalLicenseUpdated += SelectedLicenseInfo_InternationalLicenseUpdated;
                 return true;
             }

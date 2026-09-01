@@ -67,7 +67,7 @@ namespace DVLD.Users
 
         private async Task _LoadDataAsync()
         {
-            _User = clsUser.Find(_UserID);
+            _User = await clsUser.FindAsync(_UserID);
             ctrlPersonCardWithFilter1.FilterEnabled = false;
 
             if (_User == null)
@@ -85,11 +85,11 @@ namespace DVLD.Users
 
         }
 
-        private bool _IsPersonUser()
+        private async Task<bool> _IsPersonUserAsync()
         {
 
             return (_Mode == enMode.AddNew && ctrlPersonCardWithFilter1.PersonID > 0)
-                                                  ? clsUser.IsUserExistsForPersonID(ctrlPersonCardWithFilter1.PersonID)
+                                                  ? await clsUser.IsUserExistsForPersonIDAsync(ctrlPersonCardWithFilter1.PersonID)
                                                   : false;
         }
 
@@ -139,7 +139,7 @@ namespace DVLD.Users
         }
 
 
-        private void btnNext_Click(object sender, EventArgs e)
+        private async void btnNext_Click(object sender, EventArgs e)
         {
             if (_Mode == enMode.Update)
             {
@@ -152,7 +152,7 @@ namespace DVLD.Users
             if (ctrlPersonCardWithFilter1.PersonID > 0)
             {
                 // check is person is a user
-                if (_IsPersonUser())
+                if (await _IsPersonUserAsync())
                 {
                     MessageBox.Show("Person already is a User", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     btnNext.Enabled = false;
@@ -211,7 +211,7 @@ namespace DVLD.Users
             }
 
             // check is person is a user if mode is add new
-            if (_Mode == enMode.AddNew && _IsPersonUser())
+            if (_Mode == enMode.AddNew && await _IsPersonUserAsync())
             {
                 MessageBox.Show("Person already is a User", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 btnSave.Enabled = false;
@@ -222,7 +222,7 @@ namespace DVLD.Users
                 _User = await clsUser.CreateNewUserAsync(ctrlPersonCardWithFilter1.PersonID, txtUserName.Text.Trim(), txtPassword.Text.Trim());
                 _User.IsActive = chkIsActive.Checked;
 
-                if (_User.Save())
+                if (await _User.SaveAsync())
                 {
                     _Mode = enMode.Update;
                     MessageBox.Show("Saved successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -236,7 +236,7 @@ namespace DVLD.Users
             }
             else
             {
-                if (_User.ChangeUserCredentials(txtUserName.Text.Trim(), txtPassword.Text.Trim()) && _User.ChangeUserActivity(chkIsActive.Checked) && _User.ChangeUserActivity(chkIsActive.Checked))
+                if (await _User.ChangeUserCredentialsAsync(txtUserName.Text.Trim(), txtPassword.Text.Trim()) && await _User.ChangeUserActivityAsync(chkIsActive.Checked))
                 {
                     MessageBox.Show("Updated successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -255,7 +255,7 @@ namespace DVLD.Users
 
         }
 
-        private void txtUserName_Validating(object sender, CancelEventArgs e)
+        private async void txtUserName_Validating(object sender, CancelEventArgs e)
         {
             TextBox text = (TextBox)sender;
             string currentinput = text.Text.Trim();
@@ -267,7 +267,7 @@ namespace DVLD.Users
                 return;
             }
 
-            clsUser user = clsUser.Find(currentinput);
+            clsUser user = await clsUser.FindAsync(currentinput);
 
             if(user != null)
             {
@@ -288,12 +288,12 @@ namespace DVLD.Users
 
         }
 
-        private void ctrlPersonCardWithFilter1_PersonSelected(object sender, People.Controls.ctrlPersonCardWithFilter.PersonSelectedEventArgs e)
+        private async void ctrlPersonCardWithFilter1_PersonSelected(object sender, People.Controls.ctrlPersonCardWithFilter.PersonSelectedEventArgs e)
         {
             tpLoginInfo.Enabled = false;
             btnNext.Enabled = false;
 
-            if (_IsPersonUser())
+            if (await _IsPersonUserAsync())
             {
                 MessageBox.Show("Person already is a User", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 AcceptButton = ctrlPersonCardWithFilter1.AcceptButton;

@@ -29,7 +29,7 @@ namespace DVLD.Applications.Controls
             InitializeComponent();
         }
 
-        private void _FillApplicationBasicInfo()
+        private async Task _FillApplicationBasicInfoAsync()
         {
             lblApplicationID.Text = _Application.ApplicationID.ToString();
             lblStatus.Text = _Application.ApplicationStatus.ToString();
@@ -38,7 +38,7 @@ namespace DVLD.Applications.Controls
             lblApplicant.Text = _Application.PersonInfo.FullName;
             lblDate.Text = _Application.ApplicationDate.ToString("dd/MM/yyyy");
             lblStatusDate.Text = _Application.LastStatusDate.ToString("dd/MM/yyyy");
-            lblCreatedByUser.Text = _Application.CreatedByUserInfo.UserName;
+            lblCreatedByUser.Text = (await _Application.CreatedByUserInfoAsync()).UserName;
 
             llViewPersonInfo.Enabled = (_Application.ApplicantPersonID != -1);
         }
@@ -69,7 +69,7 @@ namespace DVLD.Applications.Controls
             _Application = await clsApplication.FindAsync(ApplicationID);
             if (_Application != null)
             {
-                _FillApplicationBasicInfo();
+                await _FillApplicationBasicInfoAsync();
             }
             else
             {

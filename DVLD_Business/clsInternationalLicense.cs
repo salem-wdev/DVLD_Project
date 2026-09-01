@@ -150,7 +150,7 @@ namespace DVLD_Business
                 Mode = enMode.Update;
                 return true;
             }
-            clsApplication.DeleteAsync(this.ApplicationID);
+            await clsApplication.DeleteAsync(this.ApplicationID);
             return false;
         }
 

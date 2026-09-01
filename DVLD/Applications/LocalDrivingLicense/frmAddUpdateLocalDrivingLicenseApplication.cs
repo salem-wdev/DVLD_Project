@@ -89,7 +89,7 @@ namespace DVLD.Applications.Local_Driving_License
                 cbLicenseClass.SelectedValue = _LocalLicenseApplication.LicenseClassID;
                 lblApplicationDate.Text = _LocalLicenseApplication.ApplicationDate.ToShortDateString();
                 lblFees.Text = _LocalLicenseApplication.PaidFees.ToString();
-                lblCreatedByUser.Text = _LocalLicenseApplication.CreatedByUserInfo.UserName;
+                lblCreatedByUser.Text = (await _LocalLicenseApplication?.CreatedByUserInfoAsync())?.UserName ?? string.Empty;
                 await ctrlPersonCardWithFilter1.ctrlPersonCard1.LoadDataAsync(_LocalLicenseApplication.PersonInfo);
 
                 return true;
@@ -138,7 +138,7 @@ namespace DVLD.Applications.Local_Driving_License
 
         private async void frmAddUpdateLocalDrivingLicesnseApplication_Load(object sender, EventArgs e)
         {
-            _FillcbLicenseClassWithDataAsync();
+            await _FillcbLicenseClassWithDataAsync();
 
                 _LocalLicenseApplication = await clsLocalDrivingLicenseApplication.FindByLocalDrivingAppLicenseIDAsync(_ApplicationID);
             if (_LocalLicenseApplication != null)

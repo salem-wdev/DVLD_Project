@@ -92,7 +92,7 @@ namespace DVLD.Licenses.Controls
 
         private async Task _RefreshDataGridsAsync()
         {
-            _LoadLocalLicenseInfoAsync();
+            await _LoadLocalLicenseInfoAsync();
             await _LoadInternationalLicenseInfoAsync();
         }
 
