@@ -70,7 +70,7 @@ namespace DVLD_Business
             {
                 if (_PersonInfo == null && ApplicantPersonID != -1)
                 {
-                     _FindPersonAsync();
+                     _ = _FindPersonAsync();
                 }
                 return _PersonInfo;
             }

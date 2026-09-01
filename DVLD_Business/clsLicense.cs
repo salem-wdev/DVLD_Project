@@ -291,7 +291,7 @@ namespace DVLD_Business
             {
                 if (OldLicenseID > 0)
                 {
-                    clsLicense.DeactivateLicenseAsync(OldLicenseID);
+                    await clsLicense.DeactivateLicenseAsync(OldLicenseID).ConfigureAwait(false);
                 }
                 Mode = enMode.Update;
                 return true;
