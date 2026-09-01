@@ -21,9 +21,9 @@ namespace DVLD.Users
             lblRecord.Text = dgvUsers.Rows.Count.ToString();
         }
 
-        private void _RefreshUsersList()
+        private async Task _RefreshUsersListAsync()
         {
-            _dtAllUsers = clsUser.GetAllUsers();
+            _dtAllUsers = await clsUser.GetAllUsersAsync();
             dgvUsers.DataSource = _dtAllUsers;
             _RefreshRecordsNumber();
         }
@@ -33,9 +33,9 @@ namespace DVLD.Users
             InitializeComponent();
         }
 
-        private void frmUsersList_Load(object sender, EventArgs e)
+        private async void frmUsersList_Load(object sender, EventArgs e)
         {
-            _RefreshUsersList();
+            await _RefreshUsersListAsync();
 
             cbFilter.SelectedIndex = 0;
             cbIsActive.SelectedIndex = 0;
@@ -179,11 +179,11 @@ namespace DVLD.Users
             this.Close();
         }
 
-        private void btnAddNewUser_Click(object sender, EventArgs e)
+        private async void btnAddNewUser_Click(object sender, EventArgs e)
         {
             frmAddUpdateUser frm = new frmAddUpdateUser();
             frm.ShowDialog();
-            _RefreshUsersList();
+            await _RefreshUsersListAsync();
         }
 
         private void showDetailsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -192,14 +192,14 @@ namespace DVLD.Users
             frm.ShowDialog();
         }
 
-        private void AddNewUsertoolStripMenuItem_Click(object sender, EventArgs e)
+        private async void AddNewUsertoolStripMenuItem_Click(object sender, EventArgs e)
         {
             frmAddUpdateUser frm = new frmAddUpdateUser();
             frm.ShowDialog();
-            _RefreshUsersList();
+            await _RefreshUsersListAsync();
         }
 
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if ((int)dgvUsers.CurrentRow.Cells[0].Value == clsGlobal.CurrentUser.UserID)
             {
@@ -209,14 +209,14 @@ namespace DVLD.Users
 
             frmAddUpdateUser frm = new frmAddUpdateUser((int)dgvUsers.CurrentRow.Cells[0].Value);
             frm.ShowDialog();
-            _RefreshUsersList();
+            await _RefreshUsersListAsync();
         }
 
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if(MessageBox.Show("Are you sure you want to delete this user?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
             {
-                if(clsUser.Delete((int)dgvUsers.CurrentRow.Cells[0].Value))
+                if(await clsUser.DeleteAsync((int)dgvUsers.CurrentRow.Cells[0].Value))
                 {
                     MessageBox.Show("User deleted successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -225,7 +225,7 @@ namespace DVLD.Users
                     MessageBox.Show("Failed to delete user!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            _RefreshUsersList();
+            _RefreshUsersListAsync();
         }
 
         private void ChangePasswordtoolStripMenuItem_Click(object sender, EventArgs e)

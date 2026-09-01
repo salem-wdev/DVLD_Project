@@ -64,7 +64,7 @@ namespace DVLD.Users
         {
             _ResetDefualtValues();
 
-            _User = clsUser.Find(_UserID);
+            _User = await clsUser.FindAsync(_UserID);
 
             if(_User == null)
             {
@@ -81,7 +81,7 @@ namespace DVLD.Users
             btnSave.Enabled = _IsPasswordReadyToSave();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
             if (!this.ValidateChildren())
             {
@@ -105,7 +105,7 @@ namespace DVLD.Users
 
             
 
-            if (_User.ChangeUserCredentials(_User.UserName, txtNewPassword.Text.Trim()))
+            if (await _User.ChangeUserCredentialsAsync(_User.UserName, txtNewPassword.Text.Trim()))
             {
                 MessageBox.Show("Password changed successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this._ResetDefualtValues();

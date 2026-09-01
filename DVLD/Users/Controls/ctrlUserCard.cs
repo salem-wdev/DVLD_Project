@@ -32,7 +32,7 @@ namespace DVLD.Users.Controls
         public async Task LoadUserInfoAsync(int UserID)
         {
             _UserID = UserID;
-            _User = clsUser.Find(UserID);
+            _User = await clsUser.FindAsync(UserID);
 
             if (_User == null)
             {
