@@ -16,7 +16,7 @@ namespace DVLD_Business.Users
     {
         public enum enMode { AddNew = 0, Update = 1 }
         public enMode Mode { get; private set; }
-        private readonly Dictionary<enMode, Func<bool>> _saveDictionary;
+        private readonly Dictionary<enMode, Func<Task<bool>>> _saveDictionary;
 
         public int UserID { get; private set; }
         public int PersonID { get; private set; }
@@ -47,11 +47,11 @@ namespace DVLD_Business.Users
             this.Password = Password;
             this.IsActive = true;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
-      {
-        {enMode.AddNew, _AddNewUser },
-        {enMode.Update, _UpdateUser},
-      };
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
+            {
+              {enMode.AddNew, _AddNewUserAsync },
+              {enMode.Update, _UpdateUserAsync},
+            };
 
             Mode = enMode.AddNew;
         }
@@ -67,23 +67,23 @@ namespace DVLD_Business.Users
             this.Password = Password;
             this.IsActive = IsActive;
 
-            _saveDictionary = new Dictionary<enMode, Func<bool>>
-      {
-        {enMode.AddNew, _AddNewUser },
-        {enMode.Update, _UpdateUser},
-      };
+            _saveDictionary = new Dictionary<enMode, Func<Task<bool>>>
+            {
+              {enMode.AddNew, _AddNewUserAsync },
+              {enMode.Update, _UpdateUserAsync},
+            };
 
             Mode = enMode.Update;
         }
 
-        private bool _AddNewUser()
+        private async Task<bool> _AddNewUserAsync()
         {
             //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
             //{
             //    return false;
             //}
 
-            this.UserID = clsUserData.AddNewUser(this.PersonID, this.UserName,
+            this.UserID = await clsUserData.AddNewUserAsync(this.PersonID, this.UserName,
         this.Password, this.IsActive);
 
             if (UserID != -1)
@@ -94,14 +94,14 @@ namespace DVLD_Business.Users
             return false;
         }
 
-        private bool _UpdateUser()
+        private async Task<bool> _UpdateUserAsync()
         {
             //if (!_Person.Save()) // Ensure the person is saved and has a valid PersonID
             //{
             //    return false;
             //}
 
-            return clsUserData.UpdateUser(this.UserID, this.UserName,
+            return await clsUserData.UpdateUserAsync(this.UserID, this.UserName,
         this.Password, this.IsActive);
         }
 
@@ -110,27 +110,19 @@ namespace DVLD_Business.Users
             _Person = await clsPerson.FindAsync(PersonID).ConfigureAwait(false);
         }
 
-        public static bool Delete(int UserID)
+        public static async Task<bool> DeleteAsync(int UserID)
         {
-            return clsUserData.DeleteUser(UserID);
+            return await clsUserData.DeleteUserAsync(UserID);
         }
 
-        public static clsUser Find(int UserID)
+        public static async Task<clsUser> FindAsync(int UserID)
         {
-            int PersonID = -1;
-            string UserName = string.Empty;
-            string Password = string.Empty;
-            bool IsActive = false;
+            var result = await clsUserData.GetUserInfoByUserIDAsync(UserID);
 
-
-            bool found = clsUserData.GetUserInfoByUserID(UserID, ref PersonID,
-              ref UserName, ref Password, ref IsActive);
-
-            if (found)
+            if (result.IsFound)
             {
-                return new clsUser(UserID, PersonID, UserName,
-                  Password, IsActive);
-
+                return new clsUser(UserID, result.PersonID, result.UserName,
+                  result.Password, result.IsActive);
             }
             else
             {
@@ -138,19 +130,15 @@ namespace DVLD_Business.Users
             }
         }
 
-        public static clsUser FindByPersonID(int PersonID)
+        public static async Task<clsUser> FindByPersonIDAsync(int PersonID)
         {
-            int UserID = -1;
-            string UserName = string.Empty;
-            string Password = string.Empty;
-            bool IsActive = false;
+           
+           var result = await clsUserData.GetUserInfoByPersonIDAsync(PersonID);
 
-            bool found = clsUserData.GetUserInfoByPersonID(PersonID, ref UserID,
-              ref UserName, ref Password, ref IsActive);
-
-            if (found)
+            if (result.IsFound)
             {
-                return new clsUser(UserID, PersonID, UserName, Password, IsActive);
+                return new clsUser(result.UserID, PersonID, result.UserName,
+                  result.Password, result.IsActive);
             }
             else
             {
@@ -158,20 +146,14 @@ namespace DVLD_Business.Users
             }
         }
 
-        public static clsUser Find(string UserName)
+        public static async Task<clsUser> FindAsync(string UserName)
         {
-            int UserID = -1;
-            int PersonID = -1;
-            string Password = string.Empty;
-            bool IsActive = false;
+            var result = await clsUserData.GetUserInfoByUserNameAsync(UserName);
 
-
-            bool found = clsUserData.GetUserInfoByUserName(UserName,
-              ref UserID, ref PersonID, ref Password, ref IsActive);
-
-            if (found)
+            if (result.IsFound)
             {
-                return new clsUser(UserID, PersonID, UserName, Password, IsActive);
+                return new clsUser(result.UserID, result.PersonID, UserName,
+                  result.Password, result.IsActive);
             }
             else
             {
@@ -179,11 +161,8 @@ namespace DVLD_Business.Users
             }
         }
 
-        protected static clsUser FindByUsernameAndPassword(string UserName, string Password)
+        protected static async Task<clsUser> FindByUsernameAndPasswordAsync(string UserName, string Password)
         {
-            int UserID = -1;
-            int PersonID = -1;
-            bool IsActive = false;
             string HashedPassord = string.Empty;
 
             try
@@ -192,15 +171,15 @@ namespace DVLD_Business.Users
             }
             catch (Exception ex)
             {
-                clsLogger.LogException(ex,$"Error computing hash for password of person ID {PersonID} Username {UserName}");
+                clsLogger.LogException(ex,$"Error computing hash for password of Username {UserName}");
                 return null;
             }
 
-            bool found = clsUserData.GetUserInfoByUsernameAndPassword(UserName,
-              HashedPassord, ref UserID, ref PersonID, ref IsActive);
-            if (found)
+            var result = await clsUserData.GetUserInfoByUsernameAndPasswordAsync(UserName, HashedPassord);
+            if (result.IsFound)
             {
-                return new clsUser(UserID, PersonID, UserName, Password, IsActive);
+                return new clsUser(result.UserID, result.PersonID,
+                    UserName, Password, result.IsActive);
             }
             else
             {
@@ -208,47 +187,48 @@ namespace DVLD_Business.Users
             }
         }
 
-        public static bool IsUserExists(int UserID)
+        public static async Task<bool> IsUserExistsAsync(int UserID)
         {
-            return clsUserData.IsUserExists(UserID);
+            return await clsUserData.IsUserExistsAsync(UserID);
         }
 
-        public static bool IsUserExists(string UserName)
+        public static async Task<bool> IsUserExistsAsync(string UserName)
         {
-            return clsUserData.IsUserExists(UserName);
+            return await clsUserData.IsUserExistsAsync(UserName);
         }
 
-        public static bool IsUserExistsForPersonID(int PersonID)
+        public static async Task<bool> IsUserExistsForPersonIDAsync(int PersonID)
         {
-            return clsUserData.IsUserExistForPersonID(PersonID);
+            return await clsUserData.IsUserExistForPersonIDAsync(PersonID);
         }
 
-        public static DataTable GetAllUsers()
+        public static async Task<DataTable> GetAllUsersAsync()
         {
-            return clsUserData.GetAllUsers();
+            return await clsUserData.GetAllUsersAsync();
         }
         // TODO: Consider moving validation logic for IsActive/Credentials to a centralized 
         // 'ValidateBusinessRules()' method within clsUser before calling Save().
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _saveDictionary[this.Mode]();
+            return await _saveDictionary[this.Mode]();
         }
 
-        public bool ChangeUserCredentials(string NewUserName, string NewPassword)
+        public async Task<bool> ChangeUserCredentialsAsync(string NewUserName, string NewPassword)
         {
-            if (ChangeUserCredentials(this.UserID, NewUserName, ref NewPassword))
+            var result = await ChangeUserCredentialsAsync(this.UserID, NewUserName, NewPassword);
+            if (result.IsSucceed)
             {
                 this.UserName = NewUserName;
-                this.Password = NewPassword;
+                this.Password = result.HashedPassword;
                 return true;
             }
 
             return false;
         }
 
-        public bool ChangeUserActivity(bool IsActive)
+        public async Task<bool> ChangeUserActivityAsync(bool IsActive)
         {
-            if (ChangeUserActivity(this.UserID, IsActive))
+            if (await ChangeUserActivityAsync(this.UserID, IsActive))
             {
                 this.IsActive = IsActive;
                 return true;
@@ -257,7 +237,8 @@ namespace DVLD_Business.Users
             return false;
         }
 
-        public static bool ChangeUserCredentials(int UserID, string NewUserName, ref string NewPassword)
+        public static async Task<(bool IsSucceed, string HashedPassword)>
+            ChangeUserCredentialsAsync(int UserID, string NewUserName, string NewPassword)
         {
             try
             {
@@ -266,13 +247,15 @@ namespace DVLD_Business.Users
             catch (Exception ex)
             {
                 clsLogger.LogException(ex, $"Error computing hash for new password of user ID {UserID} Username {NewUserName}");
-                return false;
+                return (false, string.Empty);
             }
 
-            return clsUserData.ChangeUserCredentials(UserID, NewUserName, NewPassword);
+            bool isSucceed = await clsUserData.ChangeUserCredentialsAsync(UserID, NewUserName, NewPassword);
+
+            return (isSucceed, NewPassword);
         }
 
-        public static bool ChangePassword(int UserID, string NewPassword)
+        public static async Task<bool> ChangePasswordAsync(int UserID, string NewPassword)
         {
             string HashedPassord = string.Empty;
             try
@@ -285,32 +268,32 @@ namespace DVLD_Business.Users
                 return false;
             }
 
-            return clsUserData.ChangePassword(UserID, HashedPassord);
+            return await clsUserData.ChangePasswordAsync(UserID, HashedPassord);
         }
 
-        public static bool DoesPersonHaveUser(int PersonID)
+        public static async Task<bool> DoesPersonHaveUserAsync(int PersonID)
         {
-            return clsUserData.DoesPersonHaveUser44(PersonID);
+            return await clsUserData.DoesPersonHaveUser44Async(PersonID);
         }
 
-        public static bool ChangeUserActivity(int UserID, bool IsActive)
+        public static async Task<bool> ChangeUserActivityAsync(int UserID, bool IsActive)
         {
-            return clsUserData.ChangeUserActivity(UserID, IsActive);
+            return await clsUserData.ChangeUserActivityAsync(UserID, IsActive);
         }
 
         public static async Task<clsUser> CreateNewUserAsync(int PersonID, string UserName, string Password)
         {
-            if (!await clsPerson.IsPersonExistsAsync(PersonID) || clsUser.IsUserExistsForPersonID(PersonID))
+            if (!await clsPerson.IsPersonExistsAsync(PersonID) || await clsUser.IsUserExistsForPersonIDAsync(PersonID))
             {
                 return null;
             }
 
-            if (clsUser.IsUserExists(UserName))
+            if (await clsUser.IsUserExistsAsync(UserName))
             {
                 return null;
             }
 
-            if (IsUserExistsForPersonID(PersonID))
+            if (await IsUserExistsForPersonIDAsync(PersonID))
             {
                 return null;
             }
@@ -330,10 +313,10 @@ namespace DVLD_Business.Users
             return new clsUser(PersonID, UserName, HashedPassord);
         }
 
-        public static clsUser Login(string UserName, string Password)
+        public static async Task<clsUser> LoginAsync(string UserName, string Password)
         {
 
-            clsUser user = clsUser.FindByUsernameAndPassword(UserName, Password);
+            clsUser user = await clsUser.FindByUsernameAndPasswordAsync(UserName, Password);
 
             //incase the user is null or not active.
             if (user == null || !user.IsActive)
@@ -343,25 +326,25 @@ namespace DVLD_Business.Users
             return user;
         }
 
-        public static bool HasUsers()
+        public static async Task<bool> HasUsersAsync()
         {
-            return clsUserData.HasUsers();
+            return await clsUserData.HasUsersAsync();
         }
 
-        public static enUserPermissions GetUserPermissions(int UserID)
+        public static async Task<enUserPermissions> GetUserPermissionsAsync(int UserID)
         {
-            return (enUserPermissions)clsUserData.GetUserPermissionsByUserID(UserID);
+            return (enUserPermissions)await clsUserData.GetUserPermissionsByUserIDAsync(UserID);
         }
 
-        public static bool ValidationUser(int UserID)
+        public static async Task<bool> ValidationUserAsync(int UserID)
         {
-            enUserPermissions userPermissionsValue = GetUserPermissions(UserID);
+            enUserPermissions userPermissionsValue = await GetUserPermissionsAsync(UserID);
             return clsPermissionEvaluator.ValidationUser(userPermissionsValue);
         }
 
-        public bool ValidationUser()
+        public async Task<bool> ValidationUserAsync()
         {
-            enUserPermissions userPermissionsValue = GetUserPermissions(this.UserID);
+            enUserPermissions userPermissionsValue = await GetUserPermissionsAsync(this.UserID);
             return clsPermissionEvaluator.ValidationUser(userPermissionsValue);
         }
     }
