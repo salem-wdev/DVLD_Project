@@ -1,11 +1,12 @@
-﻿using DVLD_DataAccess;
+﻿using DVLD_Business.Users;
+using DVLD_DataAccess;
+using DVLD_Shared.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DVLD_Business.Users;
 
 namespace DVLD_Business
 {
@@ -73,7 +74,7 @@ namespace DVLD_Business
             //call DataAccess Layer 
 
             this.DriverID = await clsDriverData.AddNewDriverAsync(PersonID, CreatedByUserID).ConfigureAwait(false);
-            this.CreatedDate = clsUtilData.GetServerDate();
+            this.CreatedDate = clsDateTime.GetCurrentDateTime();
 
             if (this.DriverID != -1)
             {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DVLD_Business.Users;
+using DVLD_Shared.Utilities;
 
 
 namespace DVLD_Business
@@ -265,7 +266,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            DateTime ReleaseDate = clsBusinessSettings.GetServerDateTime();
+            DateTime ReleaseDate = clsDateTime.GetCurrentDateTime();
             if(ReleaseDate == DateTime.MinValue)
             {
                 return null;
@@ -306,8 +307,8 @@ namespace DVLD_Business
             {
                 return null;
             }
-            DateTime CurrentDate = clsBusinessSettings.GetServerDateTime();
-            if(CurrentDate == DateTime.MinValue)
+            DateTime CurrentDate = clsDateTime.GetCurrentDateTime();
+            if (CurrentDate == DateTime.MinValue)
             {
                 return null;
             }

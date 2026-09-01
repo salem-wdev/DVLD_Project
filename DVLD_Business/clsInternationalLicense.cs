@@ -1,5 +1,6 @@
 ﻿using DVLD_Business;
 using DVLD_DataAccess;
+using DVLD_Shared.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -160,7 +161,7 @@ namespace DVLD_Business
 
             clsLicense license = await clsLicense.FindAsync(IssuedUsingLocalLicenseID);
 
-            if (license == null || license.ExpirationDate < clsUtilData.GetServerDate()
+            if (license == null || license.ExpirationDate < clsDateTime.GetCurrentDateTime()
                 || license.IsActive == false
                 || await clsDetainedLicense.IsLicenseDetainedAsync(IssuedUsingLocalLicenseID))
             {
@@ -191,7 +192,7 @@ namespace DVLD_Business
            var result = await clsInternationalLicenseData.GetInternationalLicenseInfoByIDAsync(InternationalLicenseID);
             if (result.IsFound)
             {
-                if (ExpirationDate < clsUtilData.GetServerDate())
+                if (ExpirationDate < clsDateTime.GetCurrentDateTime())
                 {
                     IsActive = false;
                 }
@@ -306,7 +307,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            DateTime IssueDate = clsBusinessSettings.GetServerDateTime();
+            DateTime IssueDate = clsDateTime.GetCurrentDateTime();
 
             clsApplication application = await GetNewApplicationobjectAsync(CreatedByUser,
                 LocalLicense.DriverInfo.PersonID, enApplicationType.NewInternationalLicense);

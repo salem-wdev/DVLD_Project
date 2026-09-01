@@ -1,4 +1,5 @@
 ﻿using DVLD_DataAccess;
+using DVLD_Shared.Utilities;
 using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace DVLD_Business
             }
             set
             {
-                if (value >= clsUtilData.GetServerDate())
+                if (value >= clsDateTime.GetCurrentDateTime())
                 {
                     if (IsLocked == false)
                         _AppointmentDate = value;
@@ -133,7 +134,7 @@ namespace DVLD_Business
 
         private async Task<bool> _UpdateTestAppointmentAsync()
         {
-            if (this._AppointmentDate < clsUtilData.GetServerDate())
+            if (this._AppointmentDate < clsDateTime.GetCurrentDateTime())
             {
                 this.IsLocked = true;
                 return false;
@@ -157,7 +158,7 @@ namespace DVLD_Business
 
             if (result.isFound)
             {
-                if (result.AppointmentDate < clsUtilData.GetServerDate())
+                if (result.AppointmentDate < clsDateTime.GetCurrentDateTime())
                 {
                     result.IsLocked = true;
                 }
@@ -176,7 +177,7 @@ namespace DVLD_Business
 
             if(result.isFound)
             {
-                if (result.AppointmentDate < clsUtilData.GetServerDate())
+                if (result.AppointmentDate < clsDateTime.GetCurrentDateTime())
                 {
                     result.IsLocked = true;
                 }
@@ -197,7 +198,7 @@ namespace DVLD_Business
 
             if(result.isFound)
             {
-                if (result.AppointmentDate < clsUtilData.GetServerDate())
+                if (result.AppointmentDate < clsDateTime.GetCurrentDateTime())
                 {
                     result.IsLocked = true;
                 }
@@ -407,7 +408,7 @@ namespace DVLD_Business
                 return false;
             }
 
-            if (AppointmentDate < clsUtilData.GetServerDate())
+            if (AppointmentDate < clsDateTime.GetCurrentDateTime())
             {
                 return false;
             }
@@ -449,7 +450,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            if (AppointmentDate < clsUtilData.GetServerDate())
+            if (AppointmentDate < clsDateTime.GetCurrentDateTime())
             {
                 return null;
             }

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using DVLD_DataAccess;
+using DVLD_Infrastructure.Storage;
+using DVLD_Shared.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DVLD_Infrastructure.Storage;
-using DVLD_DataAccess;
 
 namespace DVLD_Business
 {
@@ -350,7 +351,7 @@ namespace DVLD_Business
                 return false;
             }
 
-            if (DateOfBirth > clsBusinessSettings.GetServerDateTime().AddYears(-18))
+            if (DateOfBirth > clsDateTime.GetCurrentDateTime().AddYears(-18))
             {
                 return false;
             }

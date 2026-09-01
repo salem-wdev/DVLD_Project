@@ -1,4 +1,5 @@
 ﻿using DVLD_DataAccess;
+using DVLD_Shared.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -357,7 +358,7 @@ namespace DVLD_Business
 
             if(result.IsFound)
             {
-                if (result.ExpirationDate < clsUtilData.GetServerDate())
+                if (result.ExpirationDate < clsDateTime.GetCurrentDateTime())
                 {
                     result.IsActive = false;
                 }
@@ -380,7 +381,7 @@ namespace DVLD_Business
             
             if(result.IsFound)
             {
-                if (result.ExpirationDate < clsUtilData.GetServerDate())
+                if (result.ExpirationDate < clsDateTime.GetCurrentDateTime())
                 {
                     result.IsActive = false;
                 }
@@ -447,7 +448,7 @@ namespace DVLD_Business
 
         public Boolean IsLicensExpired()
         {
-            return this.ExpirationDate < clsUtilData.GetServerDate();
+            return this.ExpirationDate < clsDateTime.GetCurrentDateTime();
         }
 
         protected virtual void OnLicenseUpdated(LicenseUpdatedEventArgs e)
@@ -483,7 +484,7 @@ namespace DVLD_Business
             clsPerson person = await clsPerson.FindAsync(PersonID).ConfigureAwait(false);
 
             DateTime DateOfBirth = DateTime.Today;
-            DateTime today = clsBusinessSettings.GetServerDateTime();
+            DateTime today = clsDateTime.GetCurrentDateTime();
 
             int years = 0;
 
@@ -563,7 +564,7 @@ namespace DVLD_Business
             // TODO: Get License ID if it's active or not for renewal
             if (OldLicense != null)
             {
-                DateTime ServerDate = clsUtilData.GetServerDate();
+                DateTime ServerDate = clsDateTime.GetCurrentDateTime();
 
                 if (ServerDate < OldLicense.ExpirationDate.AddMonths(-3) || ServerDate > OldLicense.ExpirationDate.AddMonths(3))
                 {
@@ -615,7 +616,7 @@ namespace DVLD_Business
                 return null;
             }
 
-            if (clsUtilData.GetServerDate() > OldLicense.ExpirationDate)
+            if (clsDateTime.GetCurrentDateTime() > OldLicense.ExpirationDate)
             {
                 return null;
             }

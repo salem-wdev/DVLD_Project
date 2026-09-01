@@ -1,11 +1,12 @@
-﻿using DVLD_DataAccess;
+﻿using DVLD_Business.Users;
+using DVLD_DataAccess;
+using DVLD_Shared.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DVLD_Business.Users;
 
 namespace DVLD_Business
 {
@@ -290,7 +291,7 @@ namespace DVLD_Business
             if (!await CanBeEditedAsync())
                 return false;
 
-            if (await clsApplicationData.UpdateStatusAsync(ApplicationID, (byte)enApplicationStatus.Cancelled, clsBusinessSettings.GetServerDateTime()))
+            if (await clsApplicationData.UpdateStatusAsync(ApplicationID, (byte)enApplicationStatus.Cancelled, clsDateTime.GetCurrentDateTime()))
             {
                 this._ApplicationStatus = enApplicationStatus.Cancelled;
                 return true;
@@ -313,7 +314,7 @@ namespace DVLD_Business
             if (!await CanBeEditedAsync(ApplicationID))
                 return false;
 
-            return await clsApplicationData.UpdateStatusAsync(ApplicationID, (byte)enApplicationStatus.Completed, clsBusinessSettings.GetServerDateTime());
+            return await clsApplicationData.UpdateStatusAsync(ApplicationID, (byte)enApplicationStatus.Completed, clsDateTime.GetCurrentDateTime());
         }
 
         public virtual async Task<bool> SaveAsync()
