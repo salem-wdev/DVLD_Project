@@ -183,26 +183,25 @@ namespace DVLD_Business
         {
             if (InternationalLicenseID <= 0) return null; // To prevent unnessasry database connection.
 
-            int ApplicationID = -1;
-            int DriverID = -1; int IssuedUsingLocalLicenseID = -1;
-            DateTime IssueDate = DateTime.Now; DateTime ExpirationDate = DateTime.Now;
-             bool IsActive = true; int CreatedByUserID = 1;
+           
 
            var result = await clsInternationalLicenseData.GetInternationalLicenseInfoByIDAsync(InternationalLicenseID);
             if (result.IsFound)
             {
-                if (ExpirationDate < clsUtilData.GetServerDate())
+                if (result.ExpirationDate < clsUtilData.GetServerDate())
                 {
-                    IsActive = false;
+                    result.IsActive = false;
                 }
 
                 //now we find the base application
-                clsApplication Application = await clsApplication.FindAsync(ApplicationID);
+                clsApplication Application = await clsApplication.FindAsync(result.ApplicationID);
 
+                if (Application == null)
+                    return null;
 
-                return new clsInternationalLicense(InternationalLicenseID, DriverID,
-                    IssuedUsingLocalLicenseID, IssueDate, ExpirationDate,
-                    IsActive, Application);
+                return new clsInternationalLicense(InternationalLicenseID, result.DriverID,
+                    result.IssuedUsingLocalLicenseID, result.IssueDate, result.ExpirationDate,
+                    result.IsActive, Application);
 
             }
              
