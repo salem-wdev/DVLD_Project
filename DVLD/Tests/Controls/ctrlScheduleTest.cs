@@ -231,7 +231,7 @@ namespace DVLD.Tests.Controls
             btnSave.Enabled = true;
             _Mode = enMode.AddNew;
             
-            _DisplayDataAsync();
+            await _DisplayDataAsync();
 
             return true;
         }
@@ -277,7 +277,7 @@ namespace DVLD.Tests.Controls
             _LocalDrivingLicenseApplicationID = _TestAppointment.LocalDrivingLicenseApplicationID;
 
 
-            _DisplayDataAsync();
+            await _DisplayDataAsync();
 
             return true;
         }

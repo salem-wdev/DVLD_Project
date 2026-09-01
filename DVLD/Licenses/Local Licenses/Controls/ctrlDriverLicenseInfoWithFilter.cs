@@ -104,7 +104,7 @@ namespace DVLD.Licenses.Local_Licenses.Controls
             await _FindAsync();
         }
 
-        private void btnFind_Click(object sender, EventArgs e)
+        private async void btnFind_Click(object sender, EventArgs e)
         {
             if(string.IsNullOrWhiteSpace(txtLicenseID.Text))
             {
@@ -112,7 +112,7 @@ namespace DVLD.Licenses.Local_Licenses.Controls
                 return;
             }
 
-            _FindAsync();
+            await _FindAsync();
         }
 
         public void txtLicenseIDFocus()

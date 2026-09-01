@@ -225,7 +225,7 @@ namespace DVLD.Users
                     MessageBox.Show("Failed to delete user!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            _RefreshUsersListAsync();
+            await _RefreshUsersListAsync();
         }
 
         private void ChangePasswordtoolStripMenuItem_Click(object sender, EventArgs e)

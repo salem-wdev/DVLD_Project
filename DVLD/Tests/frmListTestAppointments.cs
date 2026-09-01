@@ -89,7 +89,7 @@ namespace DVLD.Tests
 
             await ctrlDrivingLicenseApplicationInfo1.LoadDataAsync(_LocalDrivingLicenseApplicationID);
 
-            _RefreshDataAsync();
+            await _RefreshDataAsync();
 
         }
 
@@ -124,7 +124,7 @@ namespace DVLD.Tests
 
             frmScheduleTest frm = new frmScheduleTest(_LocalDrivingLicenseApplicationID, _TestTypeID);
             frm.ShowDialog();
-            _RefreshDataAsync();
+            await _RefreshDataAsync();
         }
 
         private void dgvLicenseTestAppointments_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
@@ -132,11 +132,11 @@ namespace DVLD.Tests
             clsUIHelper.ConfigureDataGridViewContextMenu(e, dgvLicenseTestAppointments);
         }
 
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             frmScheduleTest frm = new frmScheduleTest(Convert.ToInt32(dgvLicenseTestAppointments.SelectedRows[0].Cells["TestAppointmentID"].Value));
             frm.ShowDialog();
-            _RefreshDataAsync();
+            await _RefreshDataAsync();
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -144,11 +144,11 @@ namespace DVLD.Tests
             this.Close();
         }
 
-        private void takeTestToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void takeTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             frmTakeTest frm = new frmTakeTest(Convert.ToInt32(dgvLicenseTestAppointments.SelectedRows[0].Cells["TestAppointmentID"].Value), _TestTypeID); 
             frm.ShowDialog();
-            _RefreshDataAsync();
+            await _RefreshDataAsync();
         }
     }
 }
