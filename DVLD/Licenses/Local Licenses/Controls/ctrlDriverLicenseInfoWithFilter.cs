@@ -97,11 +97,11 @@ namespace DVLD.Licenses.Local_Licenses.Controls
 
         }
 
-        public void LoadLicense(int LicenseID)
+        public async void LoadLicense(int LicenseID)
         {
             txtLicenseID.Text = LicenseID.ToString();
             FilterEnabled = false; // Disable the filter controls when loading a specific license.
-            _FindAsync();
+            await _FindAsync();
         }
 
         private void btnFind_Click(object sender, EventArgs e)
