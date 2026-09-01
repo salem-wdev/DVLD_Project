@@ -39,7 +39,7 @@ namespace DVLD
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            while (!clsUser.HasUsers())
+            while (!await clsUser.HasUsersAsync())
             {
                 //this.Hide();
 
