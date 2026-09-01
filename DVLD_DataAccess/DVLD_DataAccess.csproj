@@ -92,7 +92,6 @@
     <Compile Include="clsTestData.cs" />
     <Compile Include="clsTestTypeData.cs" />
     <Compile Include="clsUserData.cs" />
-    <Compile Include="clsUtilData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

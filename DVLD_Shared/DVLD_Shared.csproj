@@ -83,6 +83,7 @@
     <Compile Include="Users\EnforcePermissionAttribute.cs" />
     <Compile Include="Users\enUserPermissions.cs" />
     <Compile Include="Utilities\clsCryptoHelper.cs" />
+    <Compile Include="Utilities\clsDateTime.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
