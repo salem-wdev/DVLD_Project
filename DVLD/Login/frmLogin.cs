@@ -24,10 +24,10 @@ namespace DVLD
             InitializeComponent();
         }
 
-        private void btnLogin_Click(object sender, EventArgs e)
+        private async void btnLogin_Click(object sender, EventArgs e)
         {
             if ((clsGlobal.CurrentUser =
-                clsUser.Login(txtUserName.Text.Trim(), txtPassword.Text.Trim())) != null)
+                await clsUser.LoginAsync(txtUserName.Text.Trim(), txtPassword.Text.Trim())) != null)
             {
                 if (chkRememberMe.Checked)
                 {
