@@ -1,6 +1,7 @@
 ﻿using DVLD.Global_Classes;
 using DVLD_Business;
 using DVLD_Business.Global_Classes;
+using DVLD_Shared.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -60,7 +61,7 @@ namespace DVLD.Tests
         {
             _TestID = await ctrlSecheduledTest1.TestAppointment.TestIDAsync();
 
-            if (ctrlSecheduledTest1.TestAppointment.AppointmentDate <clsBusinessSettings.GetServerDateTime())
+            if (ctrlSecheduledTest1.TestAppointment.AppointmentDate < clsDateTime.GetCurrentDateTime())
             {
                 _LockTestScreen(true, "Appointment has already passed.");
                 return;

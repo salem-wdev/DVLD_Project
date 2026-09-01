@@ -1,6 +1,7 @@
 ﻿using DVLD.Licenses.Local_Licenses;
 using DVLD_Business;
 using DVLD_Business.Global_Classes;
+using DVLD_Shared.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -87,7 +88,7 @@ namespace DVLD.Applications.Renew_Local_License
             if (licensesID > 0)
             {
                 DateTime ExpirationDate = ctrlDriverLicenseInfoWithFilter1.SelectedLicenseInfo.ExpirationDate;
-                DateTime CurrentDate = clsBusinessSettings.GetServerDateTime();
+                DateTime CurrentDate = clsDateTime.GetCurrentDateTime();
                 if (CurrentDate > ExpirationDate.AddMonths(3) || CurrentDate < ExpirationDate.AddMonths(-3))
                 {
                     MessageBox.Show("License is not eligible for renewal." +
