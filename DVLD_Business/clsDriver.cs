@@ -150,7 +150,7 @@ namespace DVLD_Business
 
         private static async Task<clsDriver> _PrepareDriverAsync(int PersonID, int CreatedByUserID)
         {
-            if (!await clsPerson.IsPersonExistsAsync(PersonID) || !clsUser.IsUserExists(CreatedByUserID))
+            if (!await clsPerson.IsPersonExistsAsync(PersonID) || !await clsUser.IsUserExistsAsync(CreatedByUserID))
             {
                 return null;
             }

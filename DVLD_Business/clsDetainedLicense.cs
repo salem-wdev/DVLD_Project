@@ -70,16 +70,14 @@ namespace DVLD_Business
         public int CreatedByUserID { private set; get; }
 
         private clsUser _CreatedByUserInfo = null;
-        public clsUser CreatedByUserInfo
+        public async Task<clsUser> CreatedByUserInfoAsync()
         {
-            get
+            if (_CreatedByUserInfo == null && CreatedByUserID != -1)
             {
-                if (_CreatedByUserInfo == null && CreatedByUserID != -1)
-                {
-                    _CreatedByUserInfo = clsUser.Find(this.CreatedByUserID);
-                }
-                return _CreatedByUserInfo;
+                _CreatedByUserInfo = await clsUser.FindAsync(CreatedByUserID);
             }
+            return _CreatedByUserInfo;
+
         }
 
         public bool IsReleased { private set; get; }
@@ -87,16 +85,13 @@ namespace DVLD_Business
         public int ReleasedByUserID { private set; get; }
 
         private clsUser _ReleasedByUserInfo = null;
-        public clsUser ReleasedByUserInfo
+        public async Task<clsUser> ReleasedByUserInfoAsync()
         {
-            get
+            if (_ReleasedByUserInfo == null && ReleasedByUserID != -1)
             {
-                if (_ReleasedByUserInfo == null && ReleasedByUserID != -1)
-                {
-                    _ReleasedByUserInfo = clsUser.Find(this.ReleasedByUserID);
-                }
-                return _ReleasedByUserInfo;
+                _ReleasedByUserInfo = await clsUser.FindAsync(ReleasedByUserID);
             }
+            return _ReleasedByUserInfo;
         }
 
         public int ReleaseApplicationID { private set; get; }
@@ -249,7 +244,7 @@ namespace DVLD_Business
 
         internal static async Task<clsDetainedLicense> ReleaseDetainedLicenseAsync(int LicenseID, int ReleasedByUserID)
         {
-            if (!clsUser.IsUserExists(ReleasedByUserID)
+            if (!await clsUser.IsUserExistsAsync(ReleasedByUserID)
                 || !await IsLicenseDetainedAsync(LicenseID))
             {
                 return null;
@@ -302,7 +297,7 @@ namespace DVLD_Business
 
         private static async Task<clsDetainedLicense> _CreateNewDetainedLicenseAsync(int LicenseID, float FineFees, int CreatedByUserID)
         {
-            if(!await clsLicense.IsLicenseActiveAsync(LicenseID) || !clsUser.IsUserExists(CreatedByUserID))
+            if(!await clsLicense.IsLicenseActiveAsync(LicenseID) || !await clsUser.IsUserExistsAsync(CreatedByUserID))
             {
                 return null;
             }

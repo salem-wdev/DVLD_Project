@@ -349,7 +349,7 @@ namespace DVLD_Business
             }
 
             // check if the user and person exist
-            if (clsUser.IsUserExists(CreatedByUserID) && await clsPerson.IsPersonExistsAsync(ApplicantPersonID))
+            if (await clsUser.IsUserExistsAsync(CreatedByUserID) && await clsPerson.IsPersonExistsAsync(ApplicantPersonID))
             {
 
                 // TODO: if there is active application for the same person
@@ -399,7 +399,7 @@ namespace DVLD_Business
             clsLicense license = await clsLicense.IssueFirstTimeLocalLicenseAsync(this.LocalDrivingLicenseApplicationID, CreatedByUserID, Notes);
             if (license != null)
             {
-                this.SetCompleteAsync();
+                await this.SetCompleteAsync();
                 return license;
             }
             return null;
