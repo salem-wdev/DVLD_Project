@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DVLD_Shared;
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using DVLD_Shared;
 
 namespace DVLD_Infrastructure.Storage
 {
-    public class clsFileStorage
+    public static class clsFileStorage
     {
         public static bool CreateFolderIfDoesNotExist(string FolderPath)
         {
+            if(string.IsNullOrWhiteSpace(FolderPath)) 
+                return false;
 
             // Check if the folder exists
             if (!Directory.Exists(FolderPath))
@@ -24,6 +23,7 @@ namespace DVLD_Infrastructure.Storage
                 }
                 catch (Exception ex)
                 {
+                    clsLogger.LogException(ex, $"I/O error Creating Folder in path {FolderPath}");
                     return false;
                 }
             }
@@ -34,49 +34,73 @@ namespace DVLD_Infrastructure.Storage
 
         public static string ReplaceFileNameWithGUID(string sourceFile)
         {
+            if (string.IsNullOrWhiteSpace(sourceFile))
+                return null;
             // Full file name. Change your file name   
-            string fileName = sourceFile;
-            FileInfo fi = new FileInfo(fileName);
-            string extn = fi.Extension;
+
+            string extn = Path.GetExtension(sourceFile);
             return clsUtil.GenerateGUID() + extn;
 
         }
 
-        public static bool CopyFileToDestinationFolderWithGUID(ref string sourceFile, string DestinationFolder)
+        public static async Task<string> CopyFileToDestinationFolderWithGUIDAsync(string sourceFile, string destinationFolder)
         {
+            if (string.IsNullOrWhiteSpace(sourceFile) || string.IsNullOrWhiteSpace(destinationFolder))
+                return null;
+
             // this funciton will copy the image to the
             // project images foldr after renaming it
             // with GUID with the same extention, then it will update the sourceFileName with the new name.
 
-            if (!CreateFolderIfDoesNotExist(DestinationFolder))
+            if (!File.Exists(sourceFile))
+                return null;
+
+
+            if (!CreateFolderIfDoesNotExist(destinationFolder))
             {
-                return false;
+                return null;
             }
 
-            string destinationFile = DestinationFolder + ReplaceFileNameWithGUID(sourceFile);
+            string destinationFileNameWithGUID = ReplaceFileNameWithGUID(sourceFile);
+
+            if(destinationFileNameWithGUID == null)
+                return null;
+
+            string destinationFile = Path.Combine(destinationFolder, destinationFileNameWithGUID);
             try
             {
-                File.Copy(sourceFile, destinationFile, true);
-
+                using (var sourceStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
+                using (var destinationStream = new FileStream(destinationFile, FileMode.CreateNew, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
+                {
+                    await sourceStream.CopyToAsync(destinationStream);
+                }
             }
-            catch (IOException iox)
+            catch (Exception ex)
             {
-                return false;
+                clsLogger.LogException(ex, $"I/O error while copying file from '{sourceFile}' to '{destinationFile}' in {nameof(CopyFileToDestinationFolderWithGUIDAsync)}.");
+                DeleteFile(destinationFile);
+                return null;
             }
 
-            sourceFile = destinationFile;
-            return true;
+            return destinationFile;
         }
-       
+
         public static bool DeleteFile(string sourceFile)
         {
+            if(string.IsNullOrWhiteSpace(sourceFile))
+                return false;
+
+            if (!File.Exists(sourceFile))
+                return false;
+
             try
             {
                 File.Delete(sourceFile);
                 return true;
             }
-            catch (Exception iox)
+            catch (Exception ex)
             {
+                clsLogger.LogException(ex, $"I/O error while deleting file '{sourceFile}'.");
                 return false;
             }
         }
